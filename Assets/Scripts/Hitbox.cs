@@ -54,8 +54,6 @@ public class Hitbox : MonoBehaviour
         
     }
 
-
-
     private T GetOrCreateComponent<T>(GameObject obj) where T : Component
     {
         T component = obj.GetComponent<T>();
