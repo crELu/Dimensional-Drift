@@ -9,9 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5594521493148247274}
-  - component: {fileID: 679529968394919227}
   - component: {fileID: 4379686750225789539}
   - component: {fileID: 8556960542435468576}
+  - component: {fileID: 8710917850382657444}
+  - component: {fileID: -4705466459631376881}
   m_Layer: 0
   m_Name: Gun Enemy
   m_TagString: Untagged
@@ -34,23 +35,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &679529968394919227
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7699359067519683171}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 967d6e2f423d46c89da8ef4dd0e3f663, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Prefab: {fileID: 0}
-  SpawnRate: 0
-  Prefab: {fileID: 0}
-  SpawnRate: 0
-  type: 0
 --- !u!23 &4379686750225789539
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -104,3 +88,32 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7699359067519683171}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &8710917850382657444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7699359067519683171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-4705466459631376881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7699359067519683171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 967d6e2f423d46c89da8ef4dd0e3f663, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 10
+  bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
+  fireRate: 0.1
+  fireSpeed: 80
+  spread: {x: 0.1, y: 0.1}
