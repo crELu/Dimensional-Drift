@@ -116,4 +116,4 @@ MonoBehaviour:
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 0.1
   fireSpeed: 80
-  spread: {x: 0.1, y: 0.1}
+  spread: {x: 0, y: 0}

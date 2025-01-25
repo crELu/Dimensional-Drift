@@ -23,7 +23,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: block 1
+  m_Name: Glowing
   m_Shader: {fileID: -6465566751694194690, guid: 398168f992113a44488e74289cac700c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -273,10 +273,10 @@ Material:
     - _y: 0
     m_Colors:
     - _BaseColor: {r: 0.497775, g: 0.8867924, b: 0.5783617, a: 1}
-    - _Color: {r: 1, g: 0.87109554, b: 0.24056602, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
-    - _Emission: {r: 0, g: 0, b: 0, a: 0}
+    - _Emission: {r: 0, g: 5.3403134, b: 0.6710342, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissiveColorLDR: {r: 0, g: 0, b: 0, a: 1}

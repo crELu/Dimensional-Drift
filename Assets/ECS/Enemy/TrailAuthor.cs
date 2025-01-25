@@ -24,7 +24,7 @@ public struct TempTrail : IComponentData
 {
 }
 
-public struct TrailTexture : ISharedComponentData, IEquatable<TrailTexture>
+public struct TrailTexture : ICleanupSharedComponentData, IEquatable<TrailTexture>
 {
     public Texture2D Position;
     public bool Equals(TrailTexture other)
@@ -48,6 +48,11 @@ public struct TrailStateSingleton : IComponentData
 }
 
 public struct TrailData : IComponentData
+{
+    public bool Destroy;
+}
+
+public struct TrailSystemData : ICleanupComponentData
 {
     public int X, Y;
 }
@@ -79,13 +84,23 @@ public partial struct TrailSpawnSystem : ISystem
         foreach (var texture in uniqueSharedComponents)
         {
             if (texture.Position == null) continue;
+            
             foreach (var (trailRef, transformRef) in SystemAPI
-                         .Query<RefRO<TrailData>, RefRO<LocalTransform>>()
+                         .Query<RefRO<TrailSystemData>, RefRO<LocalTransform>>().WithAll<TrailData>()
                          .WithSharedComponentFilterManaged(texture))
             {
                 var trail = trailRef.ValueRO;
                 var transform = transformRef.ValueRO;
                 texture.Position.SetPixel(trail.X, trail.Y, new Color(transform.Position.x, transform.Position.y,transform.Position.z, 1));
+            }
+            
+            foreach (var (trailRef, entity) in SystemAPI.Query<RefRO<TrailSystemData>>().WithAbsent<TrailData>()
+                         .WithSharedComponentFilterManaged(texture).WithEntityAccess())
+            {
+                var trail = trailRef.ValueRO;
+                ecb.RemoveComponent<TrailSystemData>(entity);
+                ecb.RemoveComponent<TrailTexture>(entity);
+                texture.Position.SetPixel(trail.X, trail.Y, Color.clear);
             }
             texture.Position.Apply();
         }
@@ -98,6 +113,7 @@ public partial struct TrailSpawnSystem : ISystem
     {
         var data = TrailManager.main.RegisterTrail();
         ecb.AddSharedComponentManaged(e, new TrailTexture{Position = TrailManager.tex});
-        ecb.AddComponent(e, new TrailData { X = data.Item1, Y = data.Item2});
+        ecb.AddComponent(e, new TrailData {});
+        ecb.AddComponent(e, new TrailSystemData { X = data.Item1, Y = data.Item2});
     }
 }

@@ -19,6 +19,7 @@ public class PlayerAuthor : BaseAuthor
 
 public struct Player : IComponentData
 {
+    public int Health;
 }
 
 public readonly partial struct PlayerAspect : IAspect
