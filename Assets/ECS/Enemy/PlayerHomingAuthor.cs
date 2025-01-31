@@ -25,14 +25,14 @@ public struct PlayerHoming : IComponentData
     public float HomingSpeed;
 }
 
-[BurstCompile]
+// [BurstCompile]
 public partial struct PlayerHomingSystem : ISystem
 {
     public void OnCreate(ref SystemState state) { }
 
     public void OnDestroy(ref SystemState state) { }
     
-    [BurstCompile]
+    // [BurstCompile]
     private partial struct ProcessPlayerHomingJob : IJobEntity
     {
         public float3 Target;
@@ -70,7 +70,7 @@ public partial struct PlayerHomingSystem : ISystem
         }
     }
 
-    [BurstCompile]
+    // [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         new ProcessPlayerHomingJob

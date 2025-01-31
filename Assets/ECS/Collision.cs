@@ -12,7 +12,7 @@ using UnityEngine;
 [UpdateBefore(typeof(PhysicsSimulationGroup))]
 public partial struct CollisionSystem : ISystem
 {
-    [BurstCompile]
+    // [BurstCompile]
     private struct CollisionEventJob : ICollisionEventsJob
     {
         [ReadOnly] public ComponentLookup<PhysicsCollider> ColliderLookup;
@@ -127,7 +127,7 @@ public partial struct CollisionSystem : ISystem
 [UpdateBefore(typeof(PhysicsSimulationGroup))] // We are updating before `PhysicsSimulationGroup` - this means that we will get the events of the previous frame
 public partial struct GetNumCollisionEventsSystem : ISystem
 {
-    [BurstCompile]
+    // [BurstCompile]
     public partial struct CountNumCollisionEvents : ICollisionEventsJob
     {
         public NativeReference<int> NumCollisionEvents;
@@ -137,7 +137,7 @@ public partial struct GetNumCollisionEventsSystem : ISystem
         }
     }
 
-    [BurstCompile]
+    // [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         NativeReference<int> numCollisionEvents = new NativeReference<int>(0, Allocator.TempJob);
