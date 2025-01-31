@@ -88,13 +88,13 @@ public partial struct PlayerPhysicsSystem : ISystem
             var playerData = PlayerManager.main;
             var transform = player.Transform;
             var playerPhysics = player.PhysicsVelocity;
-            var f = playerData.GetMovement(player.PhysicsVelocity.Linear) * dt + playerData.GetDash();
-        
-            playerPhysics.ApplyImpulse(player.PhysicsMass, transform.Position, transform.Rotation, f, transform.Position);
+            var impulse = playerData.GetMovement(player.PhysicsVelocity.Linear) * dt + playerData.GetDash();
+            
+
+            playerPhysics.ApplyImpulse(player.PhysicsMass, transform.Position, transform.Rotation, impulse, transform.Position);
             //playerPhysics.ApplyAngularImpulse(player.PhysicsMass, playerData.GetRotation(transform.Rotation) * dt);
-        
+            playerPhysics.Angular = float3.zero;
             playerData.position = player.Transform.Position;
-            transform.Rotation = math.slerp(transform.Rotation, playerData.transform.rotation, .5f);
             player.Transform = transform;
             player.PhysicsVelocity = playerPhysics;
         }

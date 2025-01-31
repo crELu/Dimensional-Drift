@@ -821,7 +821,7 @@ namespace Unity.Physics.Authoring
                 points.Length * UnsafeUtility.SizeOf<float3>());
         }
 
-        [BurstCompile]
+        // [BurstCompile]
         struct BakePointsJob : IJobParallelFor
         {
             [Collections.ReadOnly]

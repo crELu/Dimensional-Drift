@@ -10,7 +10,7 @@ using Unity.Jobs;
 using Unity.Rendering;
 using UnityEngine;
 
-[BurstCompile]
+// [BurstCompile]
 public partial struct SquishSystem : ISystem
 {
     private static readonly int T = Shader.PropertyToID("_SquishData");
@@ -19,7 +19,7 @@ public partial struct SquishSystem : ISystem
 
     public void OnDestroy(ref SystemState state) { }
 
-    [BurstCompile]
+    // [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var renderMeshArrayList = new List<RenderMeshArray>();
@@ -51,7 +51,7 @@ public partial struct SquishSystem : ISystem
     }
 }
 
-// [BurstCompile]
+// // [BurstCompile]
 // public partial struct ProcessSquishJob : IJobEntity
 // {
 //     public float T1, H, T2;

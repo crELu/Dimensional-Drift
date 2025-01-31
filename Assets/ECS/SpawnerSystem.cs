@@ -6,7 +6,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 using UnityEngine;
 
-// [BurstCompile]
+// // [BurstCompile]
 // public partial struct OptimizedSpawnerSystem : ISystem
 // {
 //     public void OnCreate(ref SystemState state)
@@ -16,7 +16,7 @@ using UnityEngine;
 //
 //     public void OnDestroy(ref SystemState state) { }
 //
-//     [BurstCompile]
+//     // [BurstCompile]
 //     public void OnUpdate(ref SystemState state)
 //     {
 //         EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
@@ -37,7 +37,7 @@ using UnityEngine;
 //     }
 // }
 //
-// [BurstCompile]
+// // [BurstCompile]
 // public partial struct ProcessSpawnerJob : IJobEntity
 // {
 //     public EntityCommandBuffer.ParallelWriter Ecb;

@@ -28,7 +28,7 @@ public struct EnemyHealth : IComponentData
     public Random RandomSeed;
 }
 
-[BurstCompile]
+// [BurstCompile]
 public partial struct BaseEnemyAI : ISystem
 {
     public void OnCreate(ref SystemState state)
@@ -38,7 +38,7 @@ public partial struct BaseEnemyAI : ISystem
 
     public void OnDestroy(ref SystemState state) { }
     
-    [BurstCompile]
+    // [BurstCompile]
     public partial struct BaseEnemyAIJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter Ecb;
@@ -52,7 +52,6 @@ public partial struct BaseEnemyAI : ISystem
         }
     }
 
-    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);

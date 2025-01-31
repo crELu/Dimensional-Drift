@@ -57,7 +57,7 @@ public struct TrailSystemData : ICleanupComponentData
     public int X, Y;
 }
 
-[BurstCompile]
+// [BurstCompile]
 public partial struct TrailSpawnSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
@@ -66,7 +66,7 @@ public partial struct TrailSpawnSystem : ISystem
 
     public void OnDestroy(ref SystemState state) { }
 
-    [BurstCompile]
+    // [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var ecb = new EntityCommandBuffer(Allocator.Temp);
