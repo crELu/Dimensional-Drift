@@ -29,14 +29,14 @@ public struct LinearVelocity : IComponentData
     public float Speed;
 }
 
-[BurstCompile]
+// [BurstCompile]
 public partial struct LinearVelocitySystem : ISystem
 {
     public void OnCreate(ref SystemState state) { }
 
     public void OnDestroy(ref SystemState state) { }
     
-    [BurstCompile]
+    // [BurstCompile]
     private partial struct ProcessLinearVelocityJob : IJobEntity
     {
         private void Execute([ChunkIndexInQuery] int chunkIndex, LinearVelocity l, ref PhysicsVelocity p)
@@ -45,7 +45,7 @@ public partial struct LinearVelocitySystem : ISystem
         }
     }
 
-    [BurstCompile]
+    // [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         new ProcessLinearVelocityJob().ScheduleParallel();

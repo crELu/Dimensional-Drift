@@ -1,28 +1,32 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using Collider = UnityEngine.Collider;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager main;
     [Header("Movement Settings")]
     public float baseAccel;
-    public float moveSpeed, rotateSpeed, rollSpeed;
+    public float moveSpeed, rotateSpeed;
     public AnimationCurve accelSpeedScaling;
     public AnimationCurve accelDotScaling;
     public float baseDrag = 5f;
     public AnimationCurve dragSpeedScaling;
-    
     [Header("Camera Settings")]
     public Transform cameraFixture;
     public Quaternion normalCameraRot, orthoCameraRot;
@@ -30,9 +34,9 @@ public class PlayerManager : MonoBehaviour
     
     private InputAction _moveAction;
     private InputAction _lookAction;
-    private InputAction _rollLAction;
-    private InputAction _rollRAction;
     private InputAction _dashAction;
+    private InputAction _flyUpAction;
+    private InputAction _flyDownAction;
     private InputAction _fireAction;
 
     [Header("Dash Settings")]
@@ -57,13 +61,17 @@ public class PlayerManager : MonoBehaviour
     private Camera _camera;
     public Vector3 Right => Dim3 ? transform.right : _camera.transform.right;
     public Vector3 MoveForward => Dim3 ? transform.forward : _camera.transform.up;
+    
+    public Vector3 MoveUp => Dim3 ? transform.up : Vector3.zero;
     private Vector2 MoveInput => _moveAction.ReadValue<Vector2>();
+    
+    private float FlyInput => _flyUpAction.ReadValue<float>() - _flyDownAction.ReadValue<float>();
     private Vector3 LookInput
     {
         get
         {
             var v = _lookAction.ReadValue<Vector2>();
-            return new Vector3(v.x, v.y, rollSpeed * (_rollLAction.ReadValue<float>() - _rollRAction.ReadValue<float>()));
+            return v;
         }
     }
 
@@ -71,15 +79,17 @@ public class PlayerManager : MonoBehaviour
     {
         _moveAction = InputSystem.actions.FindAction("Move");
         _lookAction = InputSystem.actions.FindAction("Look");
-        _rollLAction = InputSystem.actions.FindAction("Roll Left");
-        _rollRAction = InputSystem.actions.FindAction("Roll Right");
         _dashAction = InputSystem.actions.FindAction("Dash");
+        _flyUpAction = InputSystem.actions.FindAction("Fly Up");
+        _flyDownAction = InputSystem.actions.FindAction("Fly Down");
         _fireAction = InputSystem.actions.FindAction("Fire 1");
         _anim = GetComponent<Animator>();
         _camera = Camera.main;
         main = this;
         DimensionManager.dimSwitch.AddListener(SwitchDims);
         SwitchDims();
+        transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+        _camera.transform.localPosition = normalCameraPos;
     }
 
     void Update()
@@ -116,19 +126,27 @@ public class PlayerManager : MonoBehaviour
         else // D = 3
         {
             _camera.transform.localPosition = normalCameraPos;
+            cameraFixture.localRotation = normalCameraRot;
             Camera.main.orthographic = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
     }
 
     private void DoRotation()
-    {
+    {   
         if (Dim3)
         {
-            cameraFixture.localRotation = normalCameraRot;
-            var v = LookInput * rotateSpeed * Time.deltaTime;
-            var rot = Quaternion.Euler(-v.y, v.x, -v.z);
-            transform.rotation *= rot;
+            var inputRotation = LookInput * (rotateSpeed * Time.deltaTime);
+            var characterRotation = Quaternion.Euler(0, inputRotation.x, 0);
+            transform.rotation *= characterRotation;
+            
+            // Calculate camera pitch (up/down) using LookInput.y
+            float cameraPitch = cameraFixture.localRotation.eulerAngles.x;
+            if (cameraPitch > 180f)
+                cameraPitch -= 360f;            
+            cameraPitch -= LookInput.y * rotateSpeed * Time.deltaTime;
+            cameraPitch = math.clamp(cameraPitch, -90f, 90f);
+            cameraFixture.localRotation = Quaternion.Euler(cameraPitch, 0, 0);
         }
         else
         {
@@ -154,17 +172,16 @@ public class PlayerManager : MonoBehaviour
     
     public Vector3 GetMovement(Vector3 velocity)
     {
-        Vector3 d = MoveInput.y * MoveForward + MoveInput.x * Right;
-        
-        if (d != Vector3.zero)
+        Vector3 inputVector = MoveInput.y * MoveForward + MoveInput.x * Right + FlyInput * MoveUp;
+        Vector3 impulse = Vector3.zero;
+        if (inputVector != Vector3.zero)
         {
-            float speedMultipliers = accelDotScaling.Evaluate(Vector3.Dot(d, velocity)) *
+            float speedMultipliers = accelDotScaling.Evaluate(Vector3.Dot(inputVector, velocity)) *
                                      accelSpeedScaling.Evaluate(velocity.magnitude/moveSpeed);
-            d = baseAccel * speedMultipliers * d;
+            impulse = baseAccel * speedMultipliers * inputVector;
         }
-        
-        d += -velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude)); 
-        return d;
+        impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude)); 
+        return impulse;
     }
     
     public Vector3 GetDash()

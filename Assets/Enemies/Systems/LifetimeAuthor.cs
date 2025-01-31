@@ -34,7 +34,7 @@ public partial struct LifetimeSystem : ISystem
 
     public void OnDestroy(ref SystemState state) { }
     
-    [BurstCompile]
+    // [BurstCompile]
     public partial struct LifetimeJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter Ecb;
@@ -50,7 +50,7 @@ public partial struct LifetimeSystem : ISystem
         }
     }
 
-    [BurstCompile]
+    // [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);

@@ -12,7 +12,7 @@ using UnityEngine;
 [UpdateBefore(typeof(PhysicsSimulationGroup))]
 public partial struct CollisionSystem : ISystem
 {
-    [BurstCompile]
+    // [BurstCompile]
     private struct CollisionEventJob : ICollisionEventsJob
     {
         [ReadOnly] public ComponentLookup<PhysicsCollider> ColliderLookup;

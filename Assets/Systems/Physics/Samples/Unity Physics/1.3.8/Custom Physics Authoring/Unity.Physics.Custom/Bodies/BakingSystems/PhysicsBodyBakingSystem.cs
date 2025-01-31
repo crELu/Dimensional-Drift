@@ -130,7 +130,7 @@ namespace Unity.Physics.Authoring
     [WorldSystemFilter(WorldSystemFilterFlags.BakingSystem)]
     public partial struct PhysicsBodyBakingSystem : ISystem
     {
-        [BurstCompile]
+        // [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var entityManager = state.EntityManager;

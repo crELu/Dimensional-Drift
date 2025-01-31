@@ -36,7 +36,7 @@ public struct GunEnemy : IComponentData
     public Entity Bullet;
 }
 
-[BurstCompile]
+// [BurstCompile]
 public partial struct GunEnemyAI : ISystem
 {
     private ComponentLookup<LocalTransform> _localTransformLookup;
@@ -49,7 +49,7 @@ public partial struct GunEnemyAI : ISystem
 
     public void OnDestroy(ref SystemState state) { }
     
-    [BurstCompile]
+    // [BurstCompile]
     private partial struct GunEnemyAIJob : IJobEntity
     {
         public EntityCommandBuffer.ParallelWriter Ecb;
@@ -83,7 +83,7 @@ public partial struct GunEnemyAI : ISystem
         }
     }
 
-    [BurstCompile]
+    // [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         _localTransformLookup.Update(ref state);

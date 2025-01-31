@@ -889,29 +889,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseAccel: 550
-  moveSpeed: 65
-  rotateSpeed: 15
-  rollSpeed: 4
+  moveSpeed: 20
+  rotateSpeed: 20
   accelSpeedScaling:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      time: -0.000015527825
+      value: 2.020063
+      inSlope: -2.0222902
+      outSlope: -2.0222902
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      time: 0.999549
+      value: -0.0013464689
+      inSlope: -2.0222902
+      outSlope: -2.0222902
       tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -920,8 +919,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: -1
-      value: 2
+      time: -1.0105817
+      value: 1.9939907
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -929,8 +928,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 1
     - serializedVersion: 3
-      time: 0
-      value: 1
+      time: 0.48930973
+      value: 1.9989078
       inSlope: -0.011558861
       outSlope: 0.0032680575
       tangentMode: 1
@@ -940,8 +939,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: -1.9559953
+      outSlope: -1.9559953
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -954,22 +953,22 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 1
+      time: -0.0001552105
+      value: 2.0003777
       inSlope: 0
       outSlope: 0
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
-      time: 1
-      value: 1
+      time: 0.9998448
+      value: 2.0003777
       inSlope: 0
       outSlope: 0
       tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -1130,8 +1129,8 @@ Camera:
   near clip plane: 0.1
   far clip plane: 1000
   field of view: 80
-  orthographic: 0
-  orthographic size: 15
+  orthographic: 1
+  orthographic size: 3
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
