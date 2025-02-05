@@ -8,34 +8,41 @@ namespace ECS.Enemy
     {
         public static TrailManager main;
         public VisualEffect effect;
-        public static Texture2D tex;
+        public static Texture2D tex1, tex2;
         private int _currentPointer;
         private int _maxCapacity;
         private int _capacity;
         
         private void Awake()
         {
-            tex = new Texture2D(512, 512, TextureFormat.RGBAFloat, false);
-            for (int y = 0; y < tex.height; y++)
+            tex1 = CreateTex(512);
+            tex2 = CreateTex(512);
+            main = this;
+            effect.SetTexture("Positions", tex1);
+            effect.SetTexture("ColorLife", tex2);
+        }
+
+        private Texture2D CreateTex(int dim)
+        {
+            var tex = new Texture2D(dim, dim, TextureFormat.RGBAFloat, false);
+            for (int i = 0; i < dim; i++)
             {
-                for (int x = 0; x < tex.width; x++)
+                for (int j = 0; j < dim; j++)
                 {
-                    Color color = Color.clear;
-                    tex.SetPixel(x, y, color);
+                    tex.SetPixel(i, j, Color.clear);
                 }
             }
             tex.Apply();
-            main = this;
-            effect.SetTexture("Positions", tex);
+            return tex;
         }
 
-        public (int, int, Texture2D) RegisterTrail()
+        public (int, int, Texture2D, Texture2D) RegisterTrail()
         {
-            var x = _currentPointer / tex.width;
-            var y = _currentPointer % tex.width;
+            var x = _currentPointer / tex1.width;
+            var y = _currentPointer % tex1.width;
             _capacity++;
             _currentPointer++;
-            return (x, y, tex);
+            return (x, y, tex1, tex2);
         }
     }
 }

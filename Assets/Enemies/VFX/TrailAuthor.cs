@@ -12,21 +12,28 @@ using Unity.Transforms;
 
 public class TrailAuthor : BaseAuthor
 {
+    public Color color = Color.magenta;
+    public float lifetime = 1;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
+        Color c = color;
+        c.a = lifetime;
         baker.AddComponent(entity, new TempTrail
         {
+            ColorLife = c
         });
     }
 }
 
 public struct TempTrail : IComponentData
 {
+    public Color ColorLife;
 }
 
 public struct TrailTexture : ICleanupSharedComponentData, IEquatable<TrailTexture>
 {
     public Texture2D Position;
+    public Texture2D ColorLife;
     public bool Equals(TrailTexture other)
     {
         return Equals(Position, other.Position);
@@ -55,6 +62,7 @@ public struct TrailData : IComponentData
 public struct TrailSystemData : ICleanupComponentData
 {
     public int X, Y;
+    public Color ColorLife;
 }
 
 // [BurstCompile]
@@ -73,11 +81,14 @@ public partial struct TrailSpawnSystem : ISystem
 
         foreach (var (tempTrail, entity) in SystemAPI.Query<RefRW<TempTrail>>().WithEntityAccess())
         {
-            if (!TrailManager.tex) break;
+            if (!TrailManager.tex1) break;
             ecb.RemoveComponent<TempTrail>(entity);
-            AddTrail(entity, ref ecb, ref state);
+            AddTrail(entity, ref ecb, ref state, tempTrail.ValueRO);
         }
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
         
+        ecb = new EntityCommandBuffer(Allocator.Temp);
         var uniqueSharedComponents = new List<TrailTexture>();
         state.EntityManager.GetAllUniqueSharedComponentsManaged(uniqueSharedComponents);
 
@@ -92,6 +103,7 @@ public partial struct TrailSpawnSystem : ISystem
                 var trail = trailRef.ValueRO;
                 var transform = transformRef.ValueRO;
                 texture.Position.SetPixel(trail.X, trail.Y, new Color(transform.Position.x, transform.Position.y,transform.Position.z, 1));
+                texture.ColorLife.SetPixel(trail.X, trail.Y, trail.ColorLife);
             }
             
             foreach (var (trailRef, entity) in SystemAPI.Query<RefRO<TrailSystemData>>().WithAbsent<TrailData>()
@@ -103,17 +115,18 @@ public partial struct TrailSpawnSystem : ISystem
                 texture.Position.SetPixel(trail.X, trail.Y, Color.clear);
             }
             texture.Position.Apply();
+            texture.ColorLife.Apply();
         }
         
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
     }
 
-    private void AddTrail(Entity e, ref EntityCommandBuffer ecb, ref SystemState state)
+    private void AddTrail(Entity e, ref EntityCommandBuffer ecb, ref SystemState state, TempTrail t)
     {
         var data = TrailManager.main.RegisterTrail();
-        ecb.AddSharedComponentManaged(e, new TrailTexture{Position = TrailManager.tex});
+        ecb.AddSharedComponentManaged(e, new TrailTexture{Position = data.Item3, ColorLife = data.Item4});
         ecb.AddComponent(e, new TrailData {});
-        ecb.AddComponent(e, new TrailSystemData { X = data.Item1, Y = data.Item2});
+        ecb.AddComponent(e, new TrailSystemData { X = data.Item1, Y = data.Item2, ColorLife = t.ColorLife});
     }
 }

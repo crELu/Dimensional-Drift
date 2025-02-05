@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -11,24 +12,37 @@ using UnityEngine;
 public class PlayerAuthor : BaseAuthor
 {
     public GameObject projectile;
+    public List<GameObject> projectiles;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
-        baker.AddComponent(entity, new Player
+        baker.AddComponent(entity, new PlayerData
         {
             Health = 100,
             Shield = 100,
             AttackIndex = int.MaxValue,
-            Projectile = baker.ToEntity(projectile)
         });
+        var buffer = baker.AddBuffer<PlayerProjectilePrefab>(entity);
+        for (int i = 0; i < projectiles.Count; i++)
+        {
+            buffer.Add(new PlayerProjectilePrefab
+            {
+                Projectile = baker.ToEntity(projectiles[i])
+            });
+        }
         base.Bake(baker, entity);
     }
 }
 
-public struct Player : IComponentData
+[InternalBufferCapacity(10)]
+public struct PlayerProjectilePrefab: IBufferElementData
+{
+    public Entity Projectile;
+}
+
+public struct PlayerData : IComponentData
 {
     public int Health;
     public int Shield;
-    public Entity Projectile;
     public float AttackTime;
     public int AttackIndex;
 }
@@ -37,12 +51,12 @@ public readonly partial struct PlayerAspect : IAspect
 {
     public readonly Entity Self;
     
-    private readonly RefRW<Player> _player;
+    private readonly RefRW<PlayerData> _player;
     private readonly RefRW<LocalTransform> _localTransform;
     private readonly RefRW<PhysicsVelocity> _physicsVelocity;
     private readonly RefRO<PhysicsMass> _physicsMass;
 
-    public Player Player {
+    public PlayerData Player {
         get => _player.ValueRW;
         set => _player.ValueRW = value;
     }
@@ -77,40 +91,51 @@ public partial struct PlayerSystem : ISystem
         var deltaTime = SystemAPI.Time.DeltaTime;
         var bullets = PlayerManager.Bullets;
         EntityCommandBuffer ecb = GetEntityCommandBuffer(ref state);
-        
-        foreach (var p in SystemAPI.Query<PlayerAspect>())
-        {
-            Player pData = p.Player;
 
-            if (PlayerManager.fire)
+        Entity player = SystemAPI.GetSingletonEntity<PlayerAspect>();
+        PlayerAspect p = SystemAPI.GetAspect<PlayerAspect>(player);
+        var projectiles = SystemAPI.GetBuffer<PlayerProjectilePrefab>(player);
+        
+        PlayerData pData = p.Player;
+
+        if (PlayerManager.fire)
+        {
+            pData.AttackTime = 0;
+            pData.AttackIndex = 0;
+            PlayerManager.Fire();
+        }
+        pData.AttackTime += deltaTime;
+        foreach (var attack in bullets)
+        {
+            var bulletQueue = attack.Bullets;
+            
+            var prefab = projectiles.ElementAt((int)attack.projectile).Projectile;
+            
+            while (bulletQueue.Count > 0 && pData.AttackTime > bulletQueue.Peek().time)
             {
-                pData.AttackTime = 0;
-                pData.AttackIndex = 0;
-            }
-            pData.AttackTime += deltaTime;
-            while (pData.AttackIndex < bullets.Length && pData.AttackTime > bullets[pData.AttackIndex].time)
-            {
-                var bulletData = bullets[pData.AttackIndex];
-                
-                Entity newEntity = ecb.Instantiate(pData.Projectile);
-                var originalTransform = _localTransformLookup[pData.Projectile];
-                
+                var bulletData = bulletQueue.Dequeue();
+            
+                Entity newEntity = ecb.Instantiate(prefab);
+                var originalTransform = _localTransformLookup[prefab];
+            
                 var position = p.Transform.TransformPoint(bulletData.position);
-                var rotation = math.mul(p.Transform.Rotation, bulletData.rotation);
-                
+                var rotation = math.mul(PlayerManager.main.LookRotation, bulletData.rotation);
+            
                 ecb.SetComponent(newEntity, LocalTransform.FromPositionRotationScale(
                     position,
                     rotation,
                     originalTransform.Scale
                 ));
-                ecb.SetComponent(newEntity, new Lifetime(){Time = bulletData.lifetime});
-                var v = new PhysicsVelocity { Linear = math.mul(rotation, math.forward()) * bulletData.speed };
+                ecb.SetComponent(newEntity, new Lifetime(){Time = attack.lifetime});
+                var v = new PhysicsVelocity { Linear = math.mul(rotation, math.forward()) * attack.speed };
                 ecb.AddComponent(newEntity, v);
 
                 pData.AttackIndex++;
             }
-            p.Player = pData;
         }
+        
+        p.Player = pData;
+        
     }
     
     private EntityCommandBuffer GetEntityCommandBuffer(ref SystemState state)
@@ -150,6 +175,8 @@ public partial struct PlayerPhysicsSystem : ISystem
             //playerPhysics.ApplyAngularImpulse(player.PhysicsMass, playerData.GetRotation(transform.Rotation) * dt);
             playerPhysics.Angular = float3.zero;
             playerData.position = player.Transform.Position;
+            transform.Rotation = playerData.transform.rotation;
+            
             player.Transform = transform;
             player.PhysicsVelocity = playerPhysics;
         }
