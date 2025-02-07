@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da7b00a664894f3ab55b6796f8d40eea, type: 3}
+  m_Name: Sniper
+  m_EditorClassIdentifier: 
+  <MaxStacks>k__BackingField: 3
+  <Stacks>k__BackingField: 2
+  <Requirements>k__BackingField: []
+  coreType: 0
+  tier1:
+    damage: 5
+    size: 0
+    speed: 100
+    attackSpeed: 0
+    attackDelay: -50
+    duration: 0
+    accuracy: 100
+    count: -1
+    precision: 0
+  tier2:
+    damage: 20
+    size: 0
+    speed: 200
+    attackSpeed: 0
+    attackDelay: -50
+    duration: 0
+    accuracy: 300
+    count: -3
+    precision: 0
+  tier3:
+    damage: 0
+    size: 0
+    speed: 0
+    attackSpeed: 0
+    attackDelay: 0
+    duration: 0
+    accuracy: 0
+    count: 0
+    precision: 0

@@ -67,7 +67,7 @@ public partial struct GunEnemyAI : ISystem
                 var t = LocalTransformLookup[e];
                 float3 position = t.Position;
                 float3 d = math.normalize(PlayerPosition - position);
-                float3 direction = math.mul(Maths.GetRandomRotationWithinCone(ref enemy.RandomSeed, g.Spread.x, g.Spread.y), d);
+                float3 direction = math.mul(MathsBurst.GetRandomRotationWithinCone(ref enemy.RandomSeed, g.Spread.x, g.Spread.y), d);
                 
                 Entity newEntity = Ecb.Instantiate(chunkIndex, g.Bullet);
                 var originalTransform = LocalTransformLookup[g.Bullet];

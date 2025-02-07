@@ -51,10 +51,9 @@ public class PlayerManager : MonoBehaviour
     
     [Header("Weapon Settings")] 
     public PlayerWeapon currentWeapon;
-    private float _attackCd;
     public static bool fire;
-    public static NativeArray<Bullet> Bullets => main.currentWeapon.Bullets;
-    
+    public static List<Attack> Bullets => main.currentWeapon.Bullets;
+
     private Animator _anim;
     [HideInInspector] public float3 position;
     private bool Dim3 => DimensionManager.currentDim == 0;
@@ -64,8 +63,8 @@ public class PlayerManager : MonoBehaviour
     
     public Vector3 MoveUp => Dim3 ? transform.up : Vector3.zero;
     private Vector2 MoveInput => _moveAction.ReadValue<Vector2>();
-    
     private float FlyInput => _flyUpAction.ReadValue<float>() - _flyDownAction.ReadValue<float>();
+    public Quaternion LookRotation => Dim3 ? Camera.main.transform.rotation : transform.rotation;
     private Vector3 LookInput
     {
         get
@@ -75,6 +74,10 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    public static void Fire()
+    {
+        main.currentWeapon.RecalcBullets();
+    }
     void Start()
     {
         _moveAction = InputSystem.actions.FindAction("Move");
@@ -101,16 +104,8 @@ public class PlayerManager : MonoBehaviour
 
     private void DoAttack()
     {
-        _attackCd -= Time.deltaTime;
-        if (_attackCd <= 0 && _fireAction.IsPressed())
-        {
-            fire = true;
-            _attackCd = currentWeapon.Cd;
-        }
-        else
-        {
-            fire = false;
-        }
+        
+        fire = currentWeapon.Fire(_fireAction.IsPressed());
     }
 
     private void SwitchDims()
