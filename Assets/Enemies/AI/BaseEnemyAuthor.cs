@@ -1,67 +1,89 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Burst;
-using UnityEngine;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
-using Unity.Transforms;
 using Random = Unity.Mathematics.Random;
 
-class BaseEnemyAuthor : BaseAuthor
+namespace Enemies.AI
 {
-    public int health = 10;
-    public override void Bake(UniversalBaker baker, Entity entity)
+    class BaseEnemyAuthor : BaseAuthor
     {
-        baker.AddComponent(entity, new EnemyHealth
+        public int health = 10;
+        public override void Bake(UniversalBaker baker, Entity entity)
         {
-            Health = health,
-            MaxHealth = health,
-            RandomSeed = new Random((uint)UnityEngine.Random.Range(0, 50000))
-        });
-    }
-}
-
-public struct EnemyHealth : IComponentData
-{
-    public int Health, MaxHealth;
-    public Random RandomSeed;
-}
-
-// [BurstCompile]
-public partial struct BaseEnemyAI : ISystem
-{
-    public void OnCreate(ref SystemState state)
-    {
-        state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
-    }
-
-    public void OnDestroy(ref SystemState state) { }
-    
-    // [BurstCompile]
-    public partial struct BaseEnemyAIJob : IJobEntity
-    {
-        public EntityCommandBuffer.ParallelWriter Ecb;
-        
-        private void Execute([ChunkIndexInQuery] int chunkIndex, Entity e, LocalTransform t, EnemyHealth b)
-        {
-            if (b.Health <= 0)
+            baker.AddComponent(entity, new EnemyHealth
             {
-                Ecb.DestroyEntity(chunkIndex, e);
-            }
+                Health = health,
+                MaxHealth = health,
+                RandomSeed = new Random((uint)UnityEngine.Random.Range(0, 50000))
+            });
+            baker.AddComponent(entity, new EnemyMovePattern
+            {
+                CurrentMovePatternType = MovePatternType.Wander
+            });
+            baker.AddComponent(entity, new PhysicsVelocity
+            {
+                Linear = float3.zero,
+                Angular = float3.zero
+            });
+            baker.AddComponent(entity, new PhysicsMass
+            {
+
+                Transform = RigidTransform.identity,
+                InverseInertia = float3.zero,
+                InverseMass = 0f,
+                AngularExpansionFactor = 0f,
+                CenterOfMass = default,
+                InertiaOrientation = default
+            });
         }
     }
 
-    public void OnUpdate(ref SystemState state)
+    public struct EnemyHealth : IComponentData
     {
-        EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
-        new BaseEnemyAIJob {Ecb = ecb}.ScheduleParallel();
+        public int Health, MaxHealth;
+        public Random RandomSeed;
     }
 
-    private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
+    public struct EnemyMovePattern : IComponentData
     {
-        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-        return ecb.AsParallelWriter();
+        public MovePatternType CurrentMovePatternType;
+    }
+
+// [BurstCompile]
+    public partial struct BaseEnemyAI : ISystem
+    {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
+        }
+
+        public void OnDestroy(ref SystemState state) { }
+    
+        // [BurstCompile]
+        public partial struct BaseEnemyAIJob : IJobEntity
+        {
+            public EntityCommandBuffer.ParallelWriter Ecb;
+        
+            private void Execute([ChunkIndexInQuery] int chunkIndex, Entity enemy, EnemyMovePattern enemyMovePattern, EnemyHealth enemyHealth)
+            {
+                if (enemyHealth.Health <= 0)
+                {
+                    Ecb.DestroyEntity(chunkIndex, enemy);
+                }
+            }
+        }
+
+        public void OnUpdate(ref SystemState state)
+        {
+            EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
+            new BaseEnemyAIJob {Ecb = ecb}.ScheduleParallel();
+        }
+
+        private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
+        {
+            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            return ecb.AsParallelWriter();
+        }
     }
 }

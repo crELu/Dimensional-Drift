@@ -1,107 +1,142 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Burst;
-using Unity.Collections;
-using UnityEngine;
+﻿using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
-using UnityEngine.Serialization;
-using Random = Unity.Mathematics.Random;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
-class GunEnemyAuthor : BaseEnemyAuthor
+namespace Enemies.AI
 {
-    public GameObject bullet;
-    public float fireRate, fireSpeed;
-    public Vector2 spread;
-    public override void Bake(UniversalBaker baker, Entity entity)
+    class GunEnemyAuthor : BaseEnemyAuthor
     {
-        baker.AddComponent(entity, new GunEnemy
+        public GameObject bullet;
+        public float fireRate, fireSpeed;
+        public Vector2 spread;
+        public override void Bake(UniversalBaker baker, Entity entity)
         {
-            AttackCd = fireRate,
-            Speed = fireSpeed,
-            Bullet = baker.ToEntity(bullet),
-            Spread = spread
-        });
-        base.Bake(baker, entity);
-    }
-}
-
-public struct GunEnemy : IComponentData
-{
-    public float AttackCd, A, Speed;
-    public float2 Spread;
-    public Entity Bullet;
-}
-
-// [BurstCompile]
-public partial struct GunEnemyAI : ISystem
-{
-    private ComponentLookup<LocalTransform> _localTransformLookup;
-    
-    public void OnCreate(ref SystemState state)
-    {
-        state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
-    }
-
-    public void OnDestroy(ref SystemState state) { }
-    
-    // [BurstCompile]
-    private partial struct GunEnemyAIJob : IJobEntity
-    {
-        public EntityCommandBuffer.ParallelWriter Ecb;
-        public float DeltaTime;
-        public float3 PlayerPosition;
-        [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
-    
-        private void Execute([ChunkIndexInQuery] int chunkIndex, Entity e, ref EnemyHealth enemy, ref GunEnemy g)
-        {
-            g.A += DeltaTime;
-            
-            if (g.A > g.AttackCd)
+            baker.AddComponent(entity, new GunEnemyWeaponStats
             {
-                g.A -= g.AttackCd;
-                var t = LocalTransformLookup[e];
-                float3 position = t.Position;
-                float3 d = math.normalize(PlayerPosition - position);
-                float3 direction = math.mul(MathsBurst.GetRandomRotationWithinCone(ref enemy.RandomSeed, g.Spread.x, g.Spread.y), d);
-                
-                Entity newEntity = Ecb.Instantiate(chunkIndex, g.Bullet);
-                var originalTransform = LocalTransformLookup[g.Bullet];
-
-                Ecb.SetComponent(chunkIndex, newEntity, LocalTransform.FromPositionRotationScale(
-                    position,
-                    originalTransform.Rotation,
-                    originalTransform.Scale
-                ));
-                var v = new PhysicsVelocity { Linear = direction * g.Speed };
-                Ecb.AddComponent(chunkIndex, newEntity, v);
-            }
+                AttackCd = fireRate,
+                Speed = fireSpeed,
+                Bullet = baker.ToEntity(bullet),
+                Spread = spread
+            });
+            base.Bake(baker, entity);
         }
     }
 
-    // [BurstCompile]
-    public void OnUpdate(ref SystemState state)
+    public struct GunEnemyWeaponStats : IComponentData
     {
-        _localTransformLookup.Update(ref state);
-        EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
-        new GunEnemyAIJob
-        {
-            DeltaTime = SystemAPI.Time.DeltaTime,
-            Ecb = ecb,
-            LocalTransformLookup = _localTransformLookup,
-            PlayerPosition = PlayerManager.main.position
-        }.ScheduleParallel(); 
+        public float AttackCd, AttackDowntime, Speed;
+        public float2 Spread;
+        public Entity Bullet;
     }
 
-    private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
+// [BurstCompile]
+    public partial struct GunEnemyAI : ISystem
     {
-        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-        return ecb.AsParallelWriter();
+        private ComponentLookup<LocalTransform> _localTransformLookup;
+
+        [SerializeField]
+        private EnemyPhysicsConsts _consts;
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
+            _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
+            _consts = new EnemyPhysicsConsts
+            {
+                Acceleration = 0,
+                Drag = 0,
+                MaxSpeed = 1
+            };
+        }
+
+        public void OnDestroy(ref SystemState state) { }
+    
+        // [BurstCompile]
+        private partial struct GunEnemyAIJob : IJobEntity
+        {
+            public EntityCommandBuffer.ParallelWriter Ecb;
+            public float DeltaTime;
+            public Vector3 PlayerPosition;
+            public EnemyPhysicsConsts MoveConsts;
+            [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
+    
+            private void Execute([ChunkIndexInQuery] int chunkIndex, 
+                Entity enemy, ref EnemyMovePattern enemyMovePattern, 
+                ref EnemyHealth enemyHealth, ref GunEnemyWeaponStats enemyWeaponStats,
+                ref PhysicsVelocity physicsVelocity, ref PhysicsMass physicsMass)
+            {
+                LocalTransform transform = LocalTransformLookup[enemy];
+                DoAttackUpdate(chunkIndex, ref enemyHealth, 
+                    ref enemyWeaponStats, transform);
+                DoMovementUpdate(ref enemyMovePattern, 
+                    ref physicsVelocity, ref physicsMass, transform);
+            }
+
+            private void DoAttackUpdate(int chunkIndex, 
+                ref EnemyHealth enemyHealth, 
+                ref GunEnemyWeaponStats enemyWeaponStatsStats, 
+                LocalTransform transform)
+            {
+                enemyWeaponStatsStats.AttackDowntime += DeltaTime;
+            
+                if (enemyWeaponStatsStats.AttackDowntime > enemyWeaponStatsStats.AttackCd)
+                {
+                    enemyWeaponStatsStats.AttackDowntime -= enemyWeaponStatsStats.AttackCd;
+                    Vector3 position = transform.Position;
+                    Vector3 d = math.normalize(PlayerPosition - position);
+                    Vector3 direction = math.mul(
+                        MathsBurst.GetRandomRotationWithinCone(
+                            ref enemyHealth.RandomSeed, enemyWeaponStatsStats.Spread.x, 
+                            enemyWeaponStatsStats.Spread.y), d);
+                
+                    Entity newEntity = Ecb.Instantiate(chunkIndex, enemyWeaponStatsStats.Bullet);
+                    var originalTransform = LocalTransformLookup[enemyWeaponStatsStats.Bullet];
+
+                    Ecb.SetComponent(chunkIndex, newEntity, LocalTransform.FromPositionRotationScale(
+                        position,
+                        originalTransform.Rotation,
+                        originalTransform.Scale
+                    ));
+                    var velocity = new PhysicsVelocity { Linear = direction * enemyWeaponStatsStats.Speed };
+                    Ecb.AddComponent(chunkIndex, newEntity, velocity);
+                }                
+            }
+
+            private void DoMovementUpdate(ref EnemyMovePattern enemyMovePattern,
+                ref PhysicsVelocity physicsVelocity, ref PhysicsMass physicsMass,
+                LocalTransform transform)
+            {
+                Vector3 targetPosition = PatternManager.GetTargetPosition(
+                    enemyMovePattern.CurrentMovePatternType, transform);
+                EnemyPhysicsManager.PerformEnemyMove(transform, targetPosition,
+                    ref physicsVelocity, ref physicsMass, MoveConsts, DeltaTime);
+            }
+        }
+
+        // [BurstCompile]
+        public void OnUpdate(ref SystemState state)
+        {
+            _localTransformLookup.Update(ref state);
+            EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
+            new GunEnemyAIJob
+            {
+                DeltaTime = SystemAPI.Time.DeltaTime,
+                Ecb = ecb,
+                LocalTransformLookup = _localTransformLookup,
+                PlayerPosition = PlayerManager.main.position,
+                MoveConsts = _consts
+            }.ScheduleParallel(); 
+        }
+
+        private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
+        {
+            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            return ecb.AsParallelWriter();
+        }
     }
 }
-
