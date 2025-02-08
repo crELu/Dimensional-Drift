@@ -35,7 +35,7 @@ namespace Enemies.AI
     }
 
 // [BurstCompile]
-    public partial struct GunEnemyAI : ISystem
+    public partial struct GunEnemyShootAI : ISystem
     {
         private ComponentLookup<LocalTransform> _localTransformLookup;
 
@@ -56,24 +56,20 @@ namespace Enemies.AI
         public void OnDestroy(ref SystemState state) { }
     
         // [BurstCompile]
-        private partial struct GunEnemyAIJob : IJobEntity
+        private partial struct GunEnemyShootAIJob : IJobEntity
         {
             public EntityCommandBuffer.ParallelWriter Ecb;
             public float DeltaTime;
             public Vector3 PlayerPosition;
-            public EnemyPhysicsConsts MoveConsts;
             [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
     
             private void Execute([ChunkIndexInQuery] int chunkIndex, 
                 Entity enemy, ref EnemyMovePattern enemyMovePattern, 
-                ref EnemyHealth enemyHealth, ref GunEnemyWeaponStats enemyWeaponStats,
-                ref PhysicsVelocity physicsVelocity, ref PhysicsMass physicsMass)
+                ref EnemyHealth enemyHealth, ref GunEnemyWeaponStats enemyWeaponStats)
             {
                 LocalTransform transform = LocalTransformLookup[enemy];
                 DoAttackUpdate(chunkIndex, ref enemyHealth, 
                     ref enemyWeaponStats, transform);
-                DoMovementUpdate(ref enemyMovePattern, 
-                    ref physicsVelocity, ref physicsMass, transform);
             }
 
             private void DoAttackUpdate(int chunkIndex, 
@@ -104,6 +100,67 @@ namespace Enemies.AI
                     var velocity = new PhysicsVelocity { Linear = direction * enemyWeaponStatsStats.Speed };
                     Ecb.AddComponent(chunkIndex, newEntity, velocity);
                 }                
+            }
+        }
+
+        // [BurstCompile]
+        public void OnUpdate(ref SystemState state)
+        {
+            _localTransformLookup.Update(ref state);
+            EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
+            new GunEnemyShootAIJob
+            {
+                DeltaTime = SystemAPI.Time.DeltaTime,
+                Ecb = ecb,
+                LocalTransformLookup = _localTransformLookup,
+                PlayerPosition = PlayerManager.main.position,
+            }.ScheduleParallel(); 
+        }
+
+        private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
+        {
+            var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            return ecb.AsParallelWriter();
+        }
+    }
+
+    public partial struct GunEnemyMoveAI : ISystem
+    {
+        private ComponentLookup<LocalTransform> _localTransformLookup;
+
+        [SerializeField]
+        private EnemyPhysicsConsts _consts;
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
+            _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
+            _consts = new EnemyPhysicsConsts
+            {
+                Acceleration = 0,
+                Drag = 0,
+                MaxSpeed = 1
+            };
+        }
+
+        public void OnDestroy(ref SystemState state) { }
+    
+        // [BurstCompile]
+        private partial struct GunEnemyMoveAIJob : IJobEntity
+        {
+            public EntityCommandBuffer.ParallelWriter Ecb;
+            public float DeltaTime;
+            public Vector3 PlayerPosition;
+            public EnemyPhysicsConsts MoveConsts;
+            [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
+    
+            private void Execute([ChunkIndexInQuery] int chunkIndex, 
+                Entity enemy, ref EnemyMovePattern enemyMovePattern, 
+                ref EnemyHealth enemyHealth, ref PhysicsVelocity physicsVelocity, ref PhysicsMass physicsMass)
+            {
+                LocalTransform transform = LocalTransformLookup[enemy];
+                DoMovementUpdate(ref enemyMovePattern, 
+                    ref physicsVelocity, ref physicsMass, transform);
             }
 
             private void DoMovementUpdate(ref EnemyMovePattern enemyMovePattern,

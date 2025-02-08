@@ -38,16 +38,18 @@ namespace Enemies.AI
         }
     }
 
-    public struct EnemyHealth : IComponentData
+    public struct EnemyHealth : IComponentData // rename to enemy base stats
     {
         public int Health, MaxHealth;
         public Random RandomSeed;
+        Vector3 targetPosition;  
     }
 
     public struct EnemyMovePattern : IComponentData
     {
-        public MovePatternType CurrentMovePatternType;
+        public MovePatternType CurrentMovePatternType; // move to enemy base stats
     }
+
 
 // [BurstCompile]
     public partial struct BaseEnemyAI : ISystem
