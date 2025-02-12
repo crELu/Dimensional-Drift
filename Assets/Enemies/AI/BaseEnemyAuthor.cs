@@ -42,7 +42,7 @@ namespace Enemies.AI
     {
         public int Health, MaxHealth;
         public Random RandomSeed;
-        Vector3 targetPosition;  
+        // Store target position here?
     }
 
     public struct EnemyMovePattern : IComponentData

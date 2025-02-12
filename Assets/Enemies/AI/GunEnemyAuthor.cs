@@ -22,7 +22,7 @@ namespace Enemies.AI
                 Speed = fireSpeed,
                 Bullet = baker.ToEntity(bullet),
                 Spread = spread
-            });
+            }); 
             base.Bake(baker, entity);
         }
     }
@@ -38,19 +38,11 @@ namespace Enemies.AI
     public partial struct GunEnemyShootAI : ISystem
     {
         private ComponentLookup<LocalTransform> _localTransformLookup;
-
-        [SerializeField]
-        private EnemyPhysicsConsts _consts;
+        
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
             _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
-            _consts = new EnemyPhysicsConsts
-            {
-                Acceleration = 0,
-                Drag = 0,
-                MaxSpeed = 1
-            };
         }
 
         public void OnDestroy(ref SystemState state) { }
@@ -130,17 +122,17 @@ namespace Enemies.AI
         private ComponentLookup<LocalTransform> _localTransformLookup;
 
         [SerializeField]
-        private EnemyPhysicsConsts _consts;
+        // private EnemyPhysicsConsts _consts;
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
             _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
-            _consts = new EnemyPhysicsConsts
-            {
-                Acceleration = 0,
-                Drag = 0,
-                MaxSpeed = 1
-            };
+            // _consts = new EnemyPhysicsConsts
+            // {
+            //     Acceleration = 0,
+            //     Drag = 0,
+            //     MaxSpeed = 1
+            // };
         }
 
         public void OnDestroy(ref SystemState state) { }
@@ -179,13 +171,13 @@ namespace Enemies.AI
         {
             _localTransformLookup.Update(ref state);
             EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
-            new GunEnemyAIJob
+            new GunEnemyMoveAIJob
             {
                 DeltaTime = SystemAPI.Time.DeltaTime,
                 Ecb = ecb,
                 LocalTransformLookup = _localTransformLookup,
                 PlayerPosition = PlayerManager.main.position,
-                MoveConsts = _consts
+                // MoveConsts = _consts
             }.ScheduleParallel(); 
         }
 
