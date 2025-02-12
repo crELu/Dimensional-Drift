@@ -1,6 +1,12 @@
-﻿using Unity.Entities;
+﻿using Latios.Transforms;
+using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Transforms;
+using UnityEngine;
+using UnityEngine.SocialPlatforms;
+using UnityEngine.UIElements;
+using LocalTransform = Unity.Transforms.LocalTransform;
 using Random = Unity.Mathematics.Random;
 
 namespace Enemies.AI
@@ -35,6 +41,12 @@ namespace Enemies.AI
                 CenterOfMass = default,
                 InertiaOrientation = default
             });
+            baker.AddComponent(entity, new LocalTransform
+            {
+                Position = gameObject.transform.position,
+                Rotation = gameObject.transform.rotation,
+                Scale = gameObject.transform.localScale.x
+            });
         }
     }
 
@@ -66,7 +78,8 @@ namespace Enemies.AI
         {
             public EntityCommandBuffer.ParallelWriter Ecb;
         
-            private void Execute([ChunkIndexInQuery] int chunkIndex, Entity enemy, EnemyMovePattern enemyMovePattern, EnemyHealth enemyHealth)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, 
+                Entity enemy, EnemyHealth enemyHealth)
             {
                 if (enemyHealth.Health <= 0)
                 {
