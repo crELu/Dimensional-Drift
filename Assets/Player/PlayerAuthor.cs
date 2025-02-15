@@ -78,6 +78,7 @@ public partial struct PlayerSystem : ISystem
     private NativeArray<Entity> _projectiles;
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerData>();
         _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
     }
 
