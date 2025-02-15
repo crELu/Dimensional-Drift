@@ -271,6 +271,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1092805689}
+    - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1092805692}
   m_SourcePrefab: {fileID: 100100000, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
 --- !u!1001 &56461756
 PrefabInstance:
@@ -430,8 +433,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 67977920}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -112.5, y: 14.5, z: 79.4}
+  m_LocalRotation: {x: 0.0016984402, y: 0, z: 0, w: 0.9999986}
+  m_LocalPosition: {x: -112.5, y: 14.563329, z: 79.40083}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -505,8 +508,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
-  fireRate: 10
+  fireRate: 2
   fireSpeed: 80
   spread: {x: 0, y: 0}
 --- !u!114 &131763804
@@ -521,6 +528,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &131763806
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131763801}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &149705714
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -652,6 +686,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1713750709}
+    - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1713750712}
   m_SourcePrefab: {fileID: 100100000, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
 --- !u!1001 &198525242
 PrefabInstance:
@@ -749,6 +786,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -765,6 +806,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &201000747
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 201000742}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &212524881
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -831,6 +899,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
       insertIndex: -1
       addedObject: {fileID: 300702237}
+    - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 300702240}
   m_SourcePrefab: {fileID: 100100000, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
 --- !u!1 &230222791
 GameObject:
@@ -843,6 +914,7 @@ GameObject:
   - component: {fileID: 230222792}
   - component: {fileID: 230222794}
   - component: {fileID: 230222793}
+  - component: {fileID: 230222795}
   m_Layer: 0
   m_Name: ray 1 (2)
   m_TagString: Untagged
@@ -880,6 +952,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -896,6 +972,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &230222795
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 230222791}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &297791822
 GameObject:
   m_ObjectHideFlags: 0
@@ -1000,6 +1103,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -1016,6 +1123,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &300702240
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 300702235}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &307543818
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1082,6 +1216,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
       insertIndex: -1
       addedObject: {fileID: 799258123}
+    - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 799258126}
   m_SourcePrefab: {fileID: 100100000, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
 --- !u!1001 &328408165
 PrefabInstance:
@@ -1149,6 +1286,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1713782539}
+    - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1713782542}
   m_SourcePrefab: {fileID: 100100000, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
 --- !u!1 &333601926 stripped
 GameObject:
@@ -1168,6 +1308,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -1184,6 +1328,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &333601931
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 333601926}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &465585112
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1573,6 +1744,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ee64b661dbd8d324dbf5b69841a0c20d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 131763803}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ee64b661dbd8d324dbf5b69841a0c20d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 131763806}
   m_SourcePrefab: {fileID: 100100000, guid: ee64b661dbd8d324dbf5b69841a0c20d, type: 3}
 --- !u!1 &630180771
 GameObject:
@@ -1585,6 +1759,7 @@ GameObject:
   - component: {fileID: 630180772}
   - component: {fileID: 630180774}
   - component: {fileID: 630180773}
+  - component: {fileID: 630180775}
   m_Layer: 0
   m_Name: ray 1 (16)
   m_TagString: Untagged
@@ -1622,6 +1797,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -1638,6 +1817,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &630180775
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630180771}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &799258121 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
@@ -1656,6 +1862,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -1672,6 +1882,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &799258126
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 799258121}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &848390035
 GameObject:
   m_ObjectHideFlags: 0
@@ -1683,6 +1920,7 @@ GameObject:
   - component: {fileID: 848390036}
   - component: {fileID: 848390038}
   - component: {fileID: 848390037}
+  - component: {fileID: 848390039}
   m_Layer: 0
   m_Name: ray 1 (18)
   m_TagString: Untagged
@@ -1720,6 +1958,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -1736,6 +1978,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &848390039
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848390035}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &879757747
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2032,6 +2301,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -2048,6 +2321,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &906143039
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906143034}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &913913660
 GameObject:
   m_ObjectHideFlags: 0
@@ -2230,6 +2530,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -2246,6 +2550,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &962917366
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962917361}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &980414367
 GameObject:
   m_ObjectHideFlags: 0
@@ -2408,6 +2739,7 @@ GameObject:
   - component: {fileID: 1033519406}
   - component: {fileID: 1033519408}
   - component: {fileID: 1033519407}
+  - component: {fileID: 1033519409}
   m_Layer: 0
   m_Name: ray 1 (6)
   m_TagString: Untagged
@@ -2445,6 +2777,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -2461,6 +2797,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1033519409
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1033519405}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1050325225
 GameObject:
   m_ObjectHideFlags: 0
@@ -2651,6 +3014,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -2667,6 +3034,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1092805692
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1092805687}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1139326951
 GameObject:
   m_ObjectHideFlags: 0
@@ -2849,6 +3243,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -2865,6 +3263,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1210718090
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1210718085}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &1227553103
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2931,6 +3356,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1626893059022652093, guid: 4de205da74c70e541be3b2547a3961e3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 201000744}
+    - targetCorrespondingSourceObject: {fileID: 1626893059022652093, guid: 4de205da74c70e541be3b2547a3961e3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 201000747}
   m_SourcePrefab: {fileID: 100100000, guid: 4de205da74c70e541be3b2547a3961e3, type: 3}
 --- !u!1001 &1234766097
 PrefabInstance:
@@ -2998,6 +3426,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
       insertIndex: -1
       addedObject: {fileID: 962917363}
+    - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 962917366}
   m_SourcePrefab: {fileID: 100100000, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
 --- !u!1001 &1235203017
 PrefabInstance:
@@ -3246,6 +3677,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -3262,6 +3697,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1305405625
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305405620}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &1316121021
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3328,6 +3790,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1626893059022652093, guid: 4de205da74c70e541be3b2547a3961e3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 906143036}
+    - targetCorrespondingSourceObject: {fileID: 1626893059022652093, guid: 4de205da74c70e541be3b2547a3961e3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 906143039}
   m_SourcePrefab: {fileID: 100100000, guid: 4de205da74c70e541be3b2547a3961e3, type: 3}
 --- !u!1001 &1337328508
 PrefabInstance:
@@ -3395,6 +3860,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1305405622}
+    - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1305405625}
   m_SourcePrefab: {fileID: 100100000, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
 --- !u!1 &1363482201
 GameObject:
@@ -3657,6 +4125,7 @@ GameObject:
   - component: {fileID: 1528001941}
   - component: {fileID: 1528001943}
   - component: {fileID: 1528001942}
+  - component: {fileID: 1528001944}
   m_Layer: 0
   m_Name: ray 1 (4)
   m_TagString: Untagged
@@ -3694,6 +4163,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -3710,6 +4183,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1528001944
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1528001940}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &1532042032
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3965,6 +4465,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -3981,6 +4485,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1713750712
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713750707}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1713782537 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
@@ -3999,6 +4530,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -4015,6 +4550,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1713782542
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713782537}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &1874998960
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4169,6 +4731,7 @@ GameObject:
   - component: {fileID: 1881503294}
   - component: {fileID: 1881503296}
   - component: {fileID: 1881503295}
+  - component: {fileID: 1881503297}
   m_Layer: 0
   m_Name: ray 1 (5)
   m_TagString: Untagged
@@ -4206,6 +4769,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -4222,6 +4789,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1881503297
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881503293}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &1938161552
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4288,6 +4882,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1626893059022652093, guid: 4de205da74c70e541be3b2547a3961e3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1210718087}
+    - targetCorrespondingSourceObject: {fileID: 1626893059022652093, guid: 4de205da74c70e541be3b2547a3961e3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1210718090}
   m_SourcePrefab: {fileID: 100100000, guid: 4de205da74c70e541be3b2547a3961e3, type: 3}
 --- !u!1 &1953205593
 GameObject:
@@ -4300,6 +4897,7 @@ GameObject:
   - component: {fileID: 1953205594}
   - component: {fileID: 1953205596}
   - component: {fileID: 1953205595}
+  - component: {fileID: 1953205597}
   m_Layer: 0
   m_Name: ray 1 (1)
   m_TagString: Untagged
@@ -4337,6 +4935,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -4353,6 +4955,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1953205597
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1953205593}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1001 &2062480496
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4652,6 +5281,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
       insertIndex: -1
       addedObject: {fileID: 333601928}
+    - targetCorrespondingSourceObject: {fileID: 731480746143329297, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 333601931}
   m_SourcePrefab: {fileID: 100100000, guid: 8bbef3b8bc3f26d43a7b2203f8fb6576, type: 3}
 --- !u!4 &25199967810227760
 Transform:
@@ -4745,6 +5377,7 @@ GameObject:
   - component: {fileID: 543450652040620610}
   - component: {fileID: 919132147500298491}
   - component: {fileID: 919132147500298490}
+  - component: {fileID: 919132147500298492}
   m_Layer: 0
   m_Name: ray 1
   m_TagString: Untagged
@@ -4765,6 +5398,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 100
+  baseRotationSpeed: 100
+  baseAcceleration: 30
+  baseDrag: 1
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 2
   fireSpeed: 80
@@ -4781,6 +5418,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &919132147500298492
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132147500298488}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!4 &1027782425955291305
 Transform:
   m_ObjectHideFlags: 0
