@@ -9,7 +9,7 @@ public class GunWeapon: PlayerWeapon
 
     protected override Attack BaseWeaponAttack(WeaponStats stats)
     {
-        Attack attack = new Attack{Bullets = new(), speed = stats.speed, lifetime = stats.duration, damage = stats.damage, projectile = Attack.ProjectileType.GunBasic};
+        Attack attack = new Attack{Bullets = new(), bulletStats = stats.bulletStats, projectile = Attack.ProjectileType.GunBasic};
         
         float weaponCd = 1 / stats.attackSpeed;
         float delayAmount = Maths.Sigmoid(stats.attackDelay);

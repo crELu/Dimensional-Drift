@@ -279,10 +279,10 @@ Material:
     - _latiosCurrentDeformBase: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 0.3726415, b: 0.3726415, a: 1}
-    - _Color: {r: 0.39048588, g: 0.5446778, b: 0.6132076, a: 0.5019608}
+    - _Color: {r: 0.39048588, g: 0.5446778, b: 0.6132076, a: 0.2901961}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
-    - _Emission: {r: 0, g: 11.50526, b: 11.984315, a: 0}
+    - _Emission: {r: 0, g: 16.270895, b: 16.94838, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissiveColor: {r: 0, g: 15.982057, b: 20, a: 20}
     - _EmissiveColorLDR: {r: 0, g: 0.90588236, b: 1, a: 1}

@@ -4,16 +4,19 @@ using Latios;
 using Latios.Authoring;
 using Unity.Entities;
 
+#if !LATIOS_TRANSFORMS_UNITY
+#error The currently active Latios Framework Bootstrap requires LATIOS_TRANSFORMS_UNITY to be defined for correct operation.
+#endif
+
 [UnityEngine.Scripting.Preserve]
 public class LatiosBakingBootstrap : ICustomBakingBootstrap
 {
     public void InitializeBakingForAllWorlds(ref CustomBakingBootstrapContext context)
     {
         //Latios.Authoring.CoreBakingBootstrap.ForceRemoveLinkedEntityGroupsOfLength1(ref context);
-        Latios.Transforms.Authoring.TransformsBakingBootstrap.InstallLatiosTransformsBakers(ref context);
-        Latios.Psyshock.Authoring.PsyshockBakingBootstrap.InstallUnityColliderBakers(ref context);
+        //Latios.Psyshock.Authoring.PsyshockBakingBootstrap.InstallUnityColliderBakers(ref context);
         Latios.Kinemation.Authoring.KinemationBakingBootstrap.InstallKinemation(ref context);
-        //Latios.Mimic.Authoring.MimicBakingBootstrap.InstallMecanimAddon(ref context);
+        Latios.Mimic.Authoring.MimicBakingBootstrap.InstallMecanimAddon(ref context);
     }
 }
 
@@ -27,7 +30,6 @@ public class LatiosEditorBootstrap : ICustomEditorBootstrap
         var systems = DefaultWorldInitialization.GetAllSystemTypeIndices(WorldSystemFilterFlags.Default, true);
         BootstrapTools.InjectUnitySystems(systems, world, world.simulationSystemGroup);
 
-        Latios.Transforms.TransformsBootstrap.InstallTransforms(world, world.simulationSystemGroup);
         Latios.Kinemation.KinemationBootstrap.InstallKinemation(world);
         Latios.Calligraphics.CalligraphicsBootstrap.InstallCalligraphics(world);
 
@@ -48,10 +50,10 @@ public class LatiosBootstrap : ICustomBootstrap
         var systems = DefaultWorldInitialization.GetAllSystemTypeIndices(WorldSystemFilterFlags.Default);
         BootstrapTools.InjectUnitySystems(systems, world, world.simulationSystemGroup);
 
-        Latios.Transforms.TransformsBootstrap.InstallTransforms(world, world.simulationSystemGroup);
+        //Latios.Transforms.TransformsBootstrap.InstallGameObjectEntitySynchronization(world);
         Latios.Myri.MyriBootstrap.InstallMyri(world);
         Latios.Kinemation.KinemationBootstrap.InstallKinemation(world);
-        //Latios.Mimic.MimicBootstrap.InstallMecanimAddon(world);
+        Latios.Mimic.MimicBootstrap.InstallMecanimAddon(world);
         Latios.Calligraphics.CalligraphicsBootstrap.InstallCalligraphics(world);
         Latios.Calligraphics.CalligraphicsBootstrap.InstallCalligraphicsAnimations(world);
 

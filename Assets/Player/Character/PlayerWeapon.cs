@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Entities;
 using UnityEngine;
 
 
@@ -43,11 +44,15 @@ public class PlayerWeapon : MonoBehaviour
         _cooldown -= Time.deltaTime;
     }
 
-    public virtual bool Fire(bool pressed)
+    public virtual bool Fire(PlayerManager player, bool pressed)
     {
-        if (pressed && _cooldown < 0)
+        Compile();
+        
+        if (pressed && _cooldown < 0 && Stats.ammoUse >= player.Ammo)
         {
             _cooldown = Cd;
+            player.UseAmmo(Stats.ammoUse);
+            RecalcBullets();
             return true;
         }
         return false;
@@ -55,7 +60,7 @@ public class PlayerWeapon : MonoBehaviour
 
     public void RecalcBullets()
     {
-        Compile();
+        Compile(); // TODO remove this at some point when we can guarantee this runs after anything is changed
         Bullets.Clear();
         Bullets.Add(BaseWeaponAttack(BaseStats));
         foreach (var core in CoreAugments)
@@ -99,9 +104,8 @@ public class PlayerWeapon : MonoBehaviour
 public struct Attack
 {
     public Queue<Bullet> Bullets;
-    public float damage, speed, lifetime;
+    public BulletStats bulletStats;
     public ProjectileType projectile;
-    
     public enum ProjectileType
     {
         GunBasic,
@@ -124,7 +128,6 @@ public struct Attack
         LaserPlaceholder2,
     }
 }
-
 
 [Serializable]
 public struct Bullet

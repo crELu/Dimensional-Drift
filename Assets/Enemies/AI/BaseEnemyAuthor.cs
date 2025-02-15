@@ -35,10 +35,10 @@ namespace Enemies.AI
             });
         }
     }
-
+    
     public struct EnemyStats : IComponentData 
     {
-        public int Health, MaxHealth;
+        public float Health, MaxHealth;
         public Random RandomSeed;
         public float3 TargetPosition;
         public float BaseMovementSpeed;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Extensions;
@@ -18,8 +19,7 @@ public class PlayerAuthor : BaseAuthor
         baker.AddComponent(entity, new PlayerData
         {
             Health = 100,
-            Shield = 100,
-            AttackIndex = int.MaxValue,
+            Shield = 100
         });
         var buffer = baker.AddBuffer<PlayerProjectilePrefab>(entity);
         for (int i = 0; i < projectiles.Count; i++)
@@ -44,7 +44,6 @@ public struct PlayerData : IComponentData
     public int Health;
     public int Shield;
     public float AttackTime;
-    public int AttackIndex;
 }
 
 public readonly partial struct PlayerAspect : IAspect
@@ -76,7 +75,7 @@ public readonly partial struct PlayerAspect : IAspect
 public partial struct PlayerSystem : ISystem
 {
     private ComponentLookup<LocalTransform> _localTransformLookup;
-    
+    private NativeArray<Entity> _projectiles;
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerData>();
@@ -85,65 +84,148 @@ public partial struct PlayerSystem : ISystem
 
     public void OnDestroy(ref SystemState state) { }
     
+    [BurstCompile]
+    public partial struct BulletFiringJob : IJobParallelFor
+    {
+        public EntityCommandBuffer.ParallelWriter ECB;
+        public NativeArray<BulletEntity> BulletsToFire;
+        public NativeArray<LocalTransform> PlayerTransform;
+        public quaternion PlayerLookRotation;
+        public float3 PlayerPosition;
+    
+        [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
+
+        public void Execute(int index)
+        {
+            var be = BulletsToFire[index];
+            var bullet = be.Bullet;
+            var prefab = be.Prefab;
+
+            var originalTransform = TransformLookup[prefab];
+        
+            var position = PlayerPosition + math.mul(PlayerTransform[0].Rotation, bullet.position);
+            var rotation = math.mul(PlayerLookRotation, bullet.rotation);
+
+            Entity newEntity = ECB.Instantiate(index, prefab);
+        
+            ECB.SetComponent(index, newEntity, LocalTransform.FromPositionRotationScale(
+                position,
+                rotation,
+                originalTransform.Scale
+            ));
+        
+            ECB.AddComponent(index, newEntity, new Lifetime { Time = be.Stats.duration });
+            ECB.AddComponent(index, newEntity, new PhysicsVelocity
+            {
+                Linear = math.mul(rotation, math.forward()) * be.Stats.speed
+            });
+            ECB.AddComponent(index, newEntity, new PlayerProjectile()
+            {
+                Damage = be.Stats.damage
+            });
+        }
+    }
+
+    public struct BulletEntity
+    {
+        public Bullet Bullet;
+        public BulletStats Stats;
+        public Entity Prefab;
+    }
+
+    
     public void OnUpdate(ref SystemState state)
     {
         _localTransformLookup.Update(ref state);
         
         var deltaTime = SystemAPI.Time.DeltaTime;
         var bullets = PlayerManager.Bullets;
-        EntityCommandBuffer ecb = GetEntityCommandBuffer(ref state);
+        EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
 
         Entity player = SystemAPI.GetSingletonEntity<PlayerAspect>();
         PlayerAspect p = SystemAPI.GetAspect<PlayerAspect>(player);
-        var projectiles = SystemAPI.GetBuffer<PlayerProjectilePrefab>(player);
+        var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
+        var projectilePrefabs = SystemAPI.GetBuffer<PlayerProjectilePrefab>(player);
         
         PlayerData pData = p.Player;
 
         if (PlayerManager.fire)
         {
             pData.AttackTime = 0;
-            pData.AttackIndex = 0;
-            PlayerManager.Fire();
         }
         pData.AttackTime += deltaTime;
+        var bulletsToFire = new List<BulletEntity>();
+
+        if (!_projectiles.IsCreated)
+        {
+            _projectiles = new NativeArray<Entity>(projectilePrefabs.Length, Allocator.Persistent);
+            for (int i = 0; i < projectilePrefabs.Length; i++)
+            {
+                _projectiles[i] = projectilePrefabs[i].Projectile;
+            }
+        }
+        
         foreach (var attack in bullets)
         {
             var bulletQueue = attack.Bullets;
             
-            var prefab = projectiles.ElementAt((int)attack.projectile).Projectile;
-            
+            //var prefab = projectiles.ElementAt((int)attack.projectile).Projectile;
+
             while (bulletQueue.Count > 0 && pData.AttackTime > bulletQueue.Peek().time)
             {
                 var bulletData = bulletQueue.Dequeue();
-            
-                Entity newEntity = ecb.Instantiate(prefab);
-                var originalTransform = _localTransformLookup[prefab];
-            
-                var position = p.Transform.TransformPoint(bulletData.position);
-                var rotation = math.mul(PlayerManager.main.LookRotation, bulletData.rotation);
-            
-                ecb.SetComponent(newEntity, LocalTransform.FromPositionRotationScale(
-                    position,
-                    rotation,
-                    originalTransform.Scale
-                ));
-                ecb.SetComponent(newEntity, new Lifetime(){Time = attack.lifetime});
-                var v = new PhysicsVelocity { Linear = math.mul(rotation, math.forward()) * attack.speed };
-                ecb.AddComponent(newEntity, v);
-
-                pData.AttackIndex++;
+                var prefab = _projectiles[(int)attack.projectile];
+                bulletsToFire.Add(new() {
+                    Bullet = bulletData,
+                    Stats = attack.bulletStats,
+                    Prefab = prefab
+                });
+                
+                //Entity newEntity = ecb.Instantiate(prefab);
+                
+                // var originalTransform = _localTransformLookup[prefab];
+                //
+                // var position = p.Transform.TransformPoint(bulletData.position);
+                // var rotation = math.mul(PlayerManager.main.LookRotation, bulletData.rotation);
+                //
+                // ecb.SetComponent(newEntity, LocalTransform.FromPositionRotationScale(
+                //     position,
+                //     rotation,
+                //     originalTransform.Scale
+                // ));
+                // ecb.SetComponent(newEntity, new Lifetime(){Time = attack.lifetime});
+                // var v = new PhysicsVelocity { Linear = math.mul(rotation, math.forward()) * attack.speed };
+                // ecb.AddComponent(newEntity, v);
             }
         }
         
+        var job = new BulletFiringJob
+        {
+            ECB = ecb,
+            BulletsToFire = new NativeArray<BulletEntity>(bulletsToFire.ToArray(), Allocator.TempJob),
+            PlayerTransform = new NativeArray<LocalTransform>(new[] { playerTransform }, Allocator.TempJob),
+            PlayerLookRotation = PlayerManager.main.LookRotation,
+            PlayerPosition = playerTransform.Position,
+            TransformLookup = _localTransformLookup,
+        };
+
+        // Schedule with initial dependency chain
+        JobHandle handle = job.Schedule(bulletsToFire.Count, 64, state.Dependency);
+
+        // Combine disposals with main handle
+        handle = job.PlayerTransform.Dispose(handle);
+
+        state.Dependency = handle;
+    
         p.Player = pData;
         
     }
     
-    private EntityCommandBuffer GetEntityCommandBuffer(ref SystemState state)
+    private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
     {
         var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-        return ecb;
+        return ecb.AsParallelWriter();
     }
 }
 
@@ -162,7 +244,6 @@ public partial struct PlayerPhysicsSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-
         foreach (var player in SystemAPI.Query<PlayerAspect>())
         {
             var dt = SystemAPI.Time.fixedDeltaTime;
@@ -181,6 +262,5 @@ public partial struct PlayerPhysicsSystem : ISystem
             player.Transform = transform;
             player.PhysicsVelocity = playerPhysics;
         }
-        
     }
 }

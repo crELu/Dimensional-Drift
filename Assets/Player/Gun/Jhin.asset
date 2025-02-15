@@ -17,13 +17,13 @@ MonoBehaviour:
   <Requirements>k__BackingField: []
   coreType: 0
   tier1:
-    damage: 15
+    damage: 0
     size: 0
     speed: 0
     attackSpeed: 0
-    attackDelay: -50
+    attackDelay: 0
     duration: 0
-    accuracy: 10
+    accuracy: 0
     count: 0
     precision: 0
   tier2:
