@@ -24,7 +24,7 @@ class BaseEnemyAuthor : BaseAuthor
 
 public struct EnemyHealth : IComponentData
 {
-    public int Health, MaxHealth;
+    public float Health, MaxHealth;
     public Random RandomSeed;
 }
 

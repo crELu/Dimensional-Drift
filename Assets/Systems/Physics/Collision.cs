@@ -45,16 +45,20 @@ public partial struct CollisionSystem : ISystem
             
             uint aLayers = colliderA.GetCollisionFilter().BelongsTo;
             uint bLayers = ColliderLookup.GetRefRO(entityB).ValueRO.Value.Value.GetCollisionFilter().BelongsTo;
-
-            if (PlayerLookup.HasComponent(entityA) && EnemyWeaponLookup.HasComponent(entityB))
+            //Debug.Log($"OK! {EnemyLookup.HasComponent(entityA)} {PlayerWeaponLookup.HasComponent(entityB)}");
+            if (PlayerLookup.HasComponent(entityA) && EnemyWeaponLookup.HasComponent(entityB)) // Enemy Hit Player
             {
                 if (EnemyWeaponLookup.GetRefRO(entityB).ValueRO.DieOnHit)
                 {
                     Ecb.DestroyEntity(0, entityB);
                 }
             }
-            if (EnemyLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB))
+            if (EnemyLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
             {
+                PlayerProjectile playerProj = PlayerWeaponLookup.GetRefRO(entityB).ValueRO;
+                EnemyHealth enemy = EnemyLookup.GetRefRW(entityA).ValueRW;
+                enemy.Health -= playerProj.Damage;
+                EnemyLookup.GetRefRW(entityA).ValueRW = enemy;
                 Ecb.DestroyEntity(0, entityB);
             }
             if (TerrainLookup.HasComponent(entityA) && EnemyWeaponLookup.HasComponent(entityB))

@@ -23,8 +23,8 @@ MonoBehaviour:
     attackSpeed: 20
     attackDelay: 500
     duration: 0
-    accuracy: -20
-    count: 4
+    accuracy: 0
+    count: 1
     precision: 0
   tier2:
     damage: -50

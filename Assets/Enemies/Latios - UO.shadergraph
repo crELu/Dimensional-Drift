@@ -621,7 +621,7 @@
     "m_TessellationMaxDisplacement": 0.009999999776482582,
     "m_DebugSymbols": false,
     "m_Version": 2,
-    "inspectorFoldoutMask": 0
+    "inspectorFoldoutMask": 1
 }
 
 {

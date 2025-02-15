@@ -51,6 +51,7 @@ public class PlayerManager : MonoBehaviour
     
     [Header("Weapon Settings")] 
     public PlayerWeapon currentWeapon;
+    [field:SerializeField] public float Ammo { get; private set; }
     public static bool fire;
     public static List<Attack> Bullets => main.currentWeapon.Bullets;
 
@@ -73,11 +74,7 @@ public class PlayerManager : MonoBehaviour
             return v;
         }
     }
-
-    public static void Fire()
-    {
-        main.currentWeapon.RecalcBullets();
-    }
+    
     void Start()
     {
         _moveAction = InputSystem.actions.FindAction("Move");
@@ -104,8 +101,22 @@ public class PlayerManager : MonoBehaviour
 
     private void DoAttack()
     {
-        
-        fire = currentWeapon.Fire(_fireAction.IsPressed());
+        fire = currentWeapon.Fire(this, _fireAction.IsPressed());
+    }
+
+    public void UseAmmo(float a)
+    {
+        if (a<0) {Debug.Log("don t do that (use negative ammo)");}
+        if (a>Ammo) {Debug.Log("dont do that (use more ammo than exists)");}
+        Ammo -= a;
+        Ammo = Mathf.Max(0, Ammo);
+    }
+    
+    public void AddAmmo(float a)
+    {
+        if (a<0) Debug.Log("don t do that (add negative ammo)");
+        Ammo += a;
+        Ammo = Mathf.Min(100, Ammo);
     }
 
     private void SwitchDims()

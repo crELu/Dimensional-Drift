@@ -12,7 +12,7 @@ using Unity.Transforms;
 
 public class TrailAuthor : BaseAuthor
 {
-    public Color color = Color.magenta;
+    [ColorUsage(false, true)] public Color color = Color.magenta;
     public float lifetime = 1;
     public override void Bake(UniversalBaker baker, Entity entity)
     {

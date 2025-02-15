@@ -129,7 +129,7 @@ MonoBehaviour:
     attackSpeed: 5
     attackDelay: 0.2
     duration: 7
-    accuracy: 1
+    accuracy: 0.75
     count: 1
     precision: 0
   BasicAugments: []

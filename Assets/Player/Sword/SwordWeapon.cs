@@ -10,7 +10,7 @@ public class SwordWeapon: PlayerWeapon
     
     protected override Attack BaseWeaponAttack(WeaponStats stats)
     {
-        Attack attack = new Attack{Bullets = new(), speed = stats.speed, lifetime = stats.duration, damage = stats.damage};
+        Attack attack = new Attack{Bullets = new(), bulletStats = stats.bulletStats};
         
         attack.Bullets.Enqueue(new Bullet {position = position, rotation = Quaternion.identity, time = 0});
 
