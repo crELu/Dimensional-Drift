@@ -123,15 +123,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Bullets: []
   baseStats:
-    damage: 10
-    size: 1
-    speed: 300
     attackSpeed: 5
     attackDelay: 0.2
-    duration: 7
     accuracy: 0.75
+    ammoUse: 0
     count: 1
-    precision: 0
+    bulletStats:
+      damage: 50
+      size: 1
+      speed: 0
+      duration: 0.5
+      extraction: 0
+      power: 0
+      pierce: 0
   BasicAugments: []
   SpecializedAugments: []
   CoreAugments: []

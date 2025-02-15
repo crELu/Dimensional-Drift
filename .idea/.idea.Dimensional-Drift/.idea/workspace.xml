@@ -4,71 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e55ef862-8198-434e-a97f-d1a3e83e6ecd" name="Changes" comment="really important package added (and probably other stuff)">
-      <change afterPath="$PROJECT_DIR$/Assets/ECS/linker.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/ECS/linker.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyGunTag.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyGunTag.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyProjectile.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyProjectile.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyShootingAuthor.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyShootingAuthor.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Player/Character/Core/BulletAddons.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Player/Character/Core/BulletAddons.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS2.unity.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/BaseEnemyAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/BaseEnemyAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/LinearVelocityAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/LinearVelocityAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/LinearVelocityAuthor.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/LinearVelocityAuthor.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/L - Ray body 1.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/L - Ray body 1.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/L - Ray body 2.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/L - Ray body 2.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/L Ray Body.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/L Ray Body.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Latios - UO.shadergraph" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Latios - UO.shadergraph" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Projectile 1.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Projectile 1.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Ray body.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Ray body.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Ray body.mat.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Ray body.mat.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Snak.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Snak.anim" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Snak.controller" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Snak.controller" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/VFX/TrailAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/VFX/TrailAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/spike.fbx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/spike.fbx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/LatiosBootstrap.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/LatiosBootstrap.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Cannon/BombWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Cannon/BombWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Cannon/Cannon.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Cannon/Cannon.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Character/PlayerProjectileAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Character/PlayerProjectileAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Character/PlayerWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Character/PlayerWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Character/Stats.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Character/Stats.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Glowing.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Glowing.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun Basic.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun Basic.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun Crit.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun Crit.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/Core/EveryNShot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/Core/EveryNShot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/Gun.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/Gun.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/GunWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/GunWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/Jhin.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/Jhin.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/Minigun.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/Minigun.asset" afterDir="false" />
+    <list default="true" id="e55ef862-8198-434e-a97f-d1a3e83e6ecd" name="Changes" comment="Lots of stuff done, can't write it all here.">
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Laser/L - Basic.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Laser/L - Basic.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Player/Laser/Laser.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Laser/Laser.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Laser/LaserWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Laser/LaserWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/PlayerAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/PlayerAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Sword/SwordWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Sword/SwordWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Ezreal Q.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Ezreal Q.vfx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Q.shadergraph" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Q.shadergraph.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/lux.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/lux.vfx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS2.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS.unity.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/General VFX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/General VFX.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/General VFX/Every Trail.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/General VFX/Every Trail.vfx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/General VFX/New VFX.vfx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/General VFX/New VFX.vfx.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/General VFX/Sun.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/General VFX/Sun.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/Physics/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Physics/Collision.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/csc.rsp" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/csc.rsp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,6 +35,7 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock://D:/Unity Projects/Dimensional-Drift/Assets/Enemies/AI/BaseEnemyAuthor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Player/Cannon/Core/Homing.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Player/Player.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock://D:/Unity Projects/Dimensional-Drift/Assets/Player/char.fbx.meta" root0="SKIP_HIGHLIGHTING" />
@@ -198,7 +138,7 @@
       <workItem from="1738213785255" duration="2064000" />
       <workItem from="1738351602017" duration="6162000" />
       <workItem from="1738463608642" duration="33151000" />
-      <workItem from="1738905888489" duration="49457000" />
+      <workItem from="1738905888489" duration="50123000" />
     </task>
     <task id="LOCAL-00001" summary="did some stuff probably">
       <option name="closed" value="true" />
@@ -232,7 +172,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738911168326</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Lots of stuff done, can't write it all here.">
+      <option name="closed" value="true" />
+      <created>1739606860285</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1739606860285</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -263,6 +211,7 @@
     <MESSAGE value="other stuff as well" />
     <MESSAGE value="macaron" />
     <MESSAGE value="really important package added (and probably other stuff)" />
-    <option name="LAST_COMMIT_MESSAGE" value="really important package added (and probably other stuff)" />
+    <MESSAGE value="Lots of stuff done, can't write it all here." />
+    <option name="LAST_COMMIT_MESSAGE" value="Lots of stuff done, can't write it all here." />
   </component>
 </project>
