@@ -99,7 +99,7 @@ namespace Enemies.AI
 
             private void MoveEnemy(ref LocalTransform transform, 
                 EnemyStats enemyStats, ref PhysicsVelocity physicsVelocity)
-            {
+            {   
                 float distance = Vector3.Distance(
                     transform.Position, enemyStats.TargetPosition);
                 if (distance > Mathf.Epsilon)
