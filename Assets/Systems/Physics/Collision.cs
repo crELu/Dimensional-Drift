@@ -19,7 +19,7 @@ public partial struct CollisionSystem : ISystem
         [ReadOnly] public ComponentLookup<PhysicsCollider> ColliderLookup;
         [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
         public ComponentLookup<PlayerData> PlayerLookup;
-        public ComponentLookup<EnemyHealth> EnemyLookup;
+        public ComponentLookup<EnemyStats> EnemyLookup;
         [ReadOnly] public ComponentLookup<DamagePlayer> EnemyWeaponLookup;
         [ReadOnly] public ComponentLookup<PlayerProjectile> PlayerWeaponLookup;
         [ReadOnly] public ComponentLookup<Obstacle> TerrainLookup;
@@ -91,7 +91,7 @@ public partial struct CollisionSystem : ISystem
             TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
             PlayerLookup = SystemAPI.GetComponentLookup<PlayerData>(),
             EnemyWeaponLookup = SystemAPI.GetComponentLookup<DamagePlayer>(true),
-            EnemyLookup = SystemAPI.GetComponentLookup<EnemyHealth>(),
+            EnemyLookup = SystemAPI.GetComponentLookup<EnemyStats>(),
             PlayerWeaponLookup = SystemAPI.GetComponentLookup<PlayerProjectile>(true),
             TerrainLookup = SystemAPI.GetComponentLookup<Obstacle>(true),
             AllBodies = physicsWorld.CollisionWorld.Bodies,
