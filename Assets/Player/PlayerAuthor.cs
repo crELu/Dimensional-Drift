@@ -79,6 +79,7 @@ public partial struct PlayerSystem : ISystem
     
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerData>();
         _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
     }
 

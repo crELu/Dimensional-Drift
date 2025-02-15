@@ -192,6 +192,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93dba67b558f492f99d0443b8d32afec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  color: {r: 0, g: 1, b: 0.607996, a: 1}
+  lifetime: 1
 --- !u!114 &6074844828712467920
 MonoBehaviour:
   m_ObjectHideFlags: 0

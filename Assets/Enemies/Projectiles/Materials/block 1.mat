@@ -273,7 +273,7 @@ Material:
     - _y: 0
     m_Colors:
     - _BaseColor: {r: 0.497775, g: 0.8867924, b: 0.5783617, a: 1}
-    - _Color: {r: 1, g: 0.87109554, b: 0.24056602, a: 1}
+    - _Color: {r: 1, g: 0.9141993, b: 0.23921567, a: 1}
     - _DiffusionProfileAsset: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _Emission: {r: 0, g: 0, b: 0, a: 0}
