@@ -122,17 +122,20 @@ public class PlayerManager : MonoBehaviour
     private void SwitchDims()
     {
         Debug.Log(DimensionManager.currentDim);
-        _camera.transform.localRotation = Quaternion.identity;
         if (DimensionManager.currentDim > 0) // D < 3
         {
             _camera.transform.localPosition = orthoCameraPos;
+            float angle = Mathf.Atan2(transform.forward.z, transform.forward.x) * Mathf.Rad2Deg;
+            _camera.transform.localRotation = Quaternion.Euler(0, 0, angle - 90f);
             Camera.main.orthographic = true;
+            
             Cursor.lockState = CursorLockMode.Confined;
         }
         else // D = 3
         {
             _camera.transform.localPosition = normalCameraPos;
-            cameraFixture.localRotation = normalCameraRot;
+            
+            _camera.transform.localRotation = normalCameraRot;
             Camera.main.orthographic = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
@@ -151,26 +154,21 @@ public class PlayerManager : MonoBehaviour
             if (cameraPitch > 180f)
                 cameraPitch -= 360f;            
             cameraPitch -= LookInput.y * rotateSpeed * Time.deltaTime;
-            cameraPitch = math.clamp(cameraPitch, -90f, 90f);
+            cameraPitch = math.clamp(cameraPitch, -75f, 70f);
             cameraFixture.localRotation = Quaternion.Euler(cameraPitch, 0, 0);
         }
         else
         {
-            float r = LookInput.z * rotateSpeed * Time.deltaTime;;
-            _camera.transform.rotation *= Quaternion.Euler(0, 0, -r);
-            
             transform.rotation = Quaternion.Euler(0, transform.rotation.y, 0);
-            
-            
             Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
             Vector3 mouseScreenPosition = Input.mousePosition; 
             Vector3 mouseDirection = mouseScreenPosition - screenCenter;
             
             float angle = Mathf.Atan2(mouseDirection.y, mouseDirection.x);
-            float angleDegrees = -angle * Mathf.Rad2Deg + 90f;
+            float angleDegrees = -angle * Mathf.Rad2Deg + 90f - _camera.transform.localEulerAngles.z;
             Quaternion targetRotation = Quaternion.Euler(0f, angleDegrees, 0f);
 
-            transform.rotation = targetRotation;//Quaternion.RotateTowards(transform.rotation, targetRotation, 180 * Time.deltaTime);
+            transform.rotation = targetRotation;
             
             cameraFixture.rotation = orthoCameraRot;
         }
