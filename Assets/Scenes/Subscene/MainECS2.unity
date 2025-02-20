@@ -1285,6 +1285,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 80
+  baseMovementSpeed: 0
+  baseRotationSpeed: 0
+  baseAcceleration: 0
+  baseDrag: 0
 --- !u!114 &249302384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1818,6 +1822,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 80
+  baseMovementSpeed: 0
+  baseRotationSpeed: 0
+  baseAcceleration: 0
+  baseDrag: 0
 --- !u!114 &455197226
 MonoBehaviour:
   m_ObjectHideFlags: 0
