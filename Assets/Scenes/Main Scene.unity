@@ -6095,6 +6095,7 @@ MonoBehaviour:
   baseAccel: 1000
   moveSpeed: 1000
   rotateSpeed: 20
+  controllerRotateSpeed: 10
   accelSpeedScaling:
     serializedVersion: 2
     m_Curve:
@@ -6191,6 +6192,9 @@ MonoBehaviour:
   orthoCameraRot: {x: 0.70710677, y: 0, z: 0, w: 0.70710677}
   normalCameraPos: {x: 3, y: 7, z: -12}
   orthoCameraPos: {x: 0, y: 0, z: -80}
+  fov: 80
+  orthographicSize: 30
+  dimSwitchDuration: 1
   dashDur: 0.05
   dashCooldown: 0.2
   dashSpeed: 1000

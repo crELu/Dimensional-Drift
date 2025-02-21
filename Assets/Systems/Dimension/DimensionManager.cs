@@ -34,7 +34,7 @@ public class DimensionManager : MonoBehaviour
         dimSwitch.Invoke();
     }
 }
-
+// Three = 0, Two = 1, etc. Done for convenience of the default being 0.
 public enum Dimension
 {
     Three,

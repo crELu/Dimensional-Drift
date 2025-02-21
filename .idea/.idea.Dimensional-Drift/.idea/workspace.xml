@@ -4,26 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e55ef862-8198-434e-a97f-d1a3e83e6ecd" name="Changes" comment="Lots of stuff done, can't write it all here.">
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/ChasePattern.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/ChasePattern.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/WanderPattern.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/WanderPattern.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/PatternManager.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/PatternManager.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/BaseEnemyAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/BaseEnemyAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/GunEnemyAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/GunEnemyAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/PlayerHomingAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/PlayerHomingAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/L Ray Body.mat.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/L Ray Body.mat.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Materials/block 1.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Materials/block 1.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Systems/LinearVelocityAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/LinearVelocityAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/PlayerAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/PlayerAuthor.cs" afterDir="false" />
+    <list default="true" id="e55ef862-8198-434e-a97f-d1a3e83e6ecd" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/Player/PerspectiveBlender.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/PerspectiveBlender.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/projectSettingsUpdater.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Snak.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Snak.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Subscene.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Subscene.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/Physics/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Physics/Collision.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS2.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS2.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/HDRP Balanced.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/HDRP Balanced.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/HDRP High Fidelity.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/HDRP High Fidelity.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/HDRP Performant.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/HDRP Performant.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/HDRPDefaultResources/HDRenderPipelineGlobalSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/HDRPDefaultResources/HDRenderPipelineGlobalSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Systems/Dimension/DimensionManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Dimension/DimensionManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Systems/Input/InputSystem_Actions.inputactions" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Input/InputSystem_Actions.inputactions" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EntitiesClientSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EntitiesClientSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/GraphicsSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/GraphicsSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.testtools.codecoverage/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/Packages/com.unity.testtools.codecoverage/Settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/QualitySettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/QualitySettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ShaderGraphSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ShaderGraphSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,24 +48,15 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/crELu/Dimensional-Drift.git&quot;,
-    &quot;accountId&quot;: &quot;bbabd9c2-3466-416b-a916-87c161c658a5&quot;
+    &quot;accountId&quot;: &quot;cfaaf8ca-50bc-4896-a8ad-ad840848e66d&quot;
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/84f0d810adef4e6c8deab33e4ae93f7c1dec00/ca/e490eaf0/Component.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/84f0d810adef4e6c8deab33e4ae93f7c1dec00/db/2e2dd896/AnimationCurve.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Enemies/AI/BaseEnemyAuthor.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Enemies/AI/BaseEnemyAuthor.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Enemies/Projectiles/Homing.prefab" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Enemies/Projectiles/Homing.prefab" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Player/Cannon/Core/Homing.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Player/Gun/VFX.meta" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Player/Gun/VFX.meta" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Player/Player.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Scenes/Main Scene.unity" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Scenes/Main Scene.unity" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Scenes/Subscene/MainECS.unity" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Scenes/Subscene/MainECS.unity" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Systems/Dimension/DimensionManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/csc.rsp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.latios.latiosframework/Kinemation/Authoring/LatiosMeshRendererBakingUtility.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.latios.latiosframework/Mimic/Mecanim/Authoring/MecanimBaker.cs" root0="FORCE_HIGHLIGHTING" />
@@ -106,31 +98,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "app.teamhub.selectedTeam": "https://github.com/crELu/Dimensional-Drift",
-    "git-widget-placeholder": "Merging really-cool-branch",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
-  },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "C:\\Users\\xurun\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache",
-      "C:\\Users\\xurun\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache",
-      "C:\\Users\\xurun\\AppData\\Local\\Symbols\\src"
-    ]
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;app.teamhub.selectedTeam&quot;: &quot;https://github.com/crELu/Dimensional-Drift&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dimension-switching&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="D:\Unity Editors\6000.0.33f1\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="E:\Program Files\Unity\Hub\Editor\6000.0.33f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-projectPath E:\Media\Documents\Classes\2024\CSC404\Dimensional-Drift -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="E:\Media\Documents\Classes\2024\CSC404\Dimensional-Drift" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -138,7 +123,7 @@
       <method v="2" />
     </configuration>
     <configuration name="Unit Tests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="D:\Unity Editors\6000.0.33f1\Editor\Unity.exe" />
+      <option name="EXE_PATH" value="E:\Program Files\Unity\Hub\Editor\6000.0.33f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath E:\Media\Documents\Classes\2024\CSC404\Dimensional-Drift -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="E:\Media\Documents\Classes\2024\CSC404\Dimensional-Drift" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -186,6 +171,14 @@
       <workItem from="1738351602017" duration="6162000" />
       <workItem from="1738463608642" duration="33151000" />
       <workItem from="1738905888489" duration="50123000" />
+      <workItem from="1739752307218" duration="737000" />
+      <workItem from="1739924494667" duration="4850000" />
+      <workItem from="1739936433018" duration="51000" />
+      <workItem from="1740005902855" duration="9272000" />
+      <workItem from="1740025082987" duration="11230000" />
+      <workItem from="1740093331891" duration="6753000" />
+      <workItem from="1740104841886" duration="30610000" />
+      <workItem from="1740158554782" duration="5967000" />
     </task>
     <task id="LOCAL-00001" summary="did some stuff probably">
       <option name="closed" value="true" />
@@ -227,7 +220,31 @@
       <option name="project" value="LOCAL" />
       <updated>1739606860285</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="tweaked dash settings:&#10;- 0.05 duration&#10;- faster, to 1000 speed&#10;tweaked movement settings:&#10;- accel and ms to 1000&#10;- changed drag to be 5x drag at the end of the curve to prevent going over top speed">
+      <option name="closed" value="true" />
+      <created>1739930119689</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1739930119689</updated>
+    </task>
+    <task id="LOCAL-00007" summary="including dash modifications with previous commit">
+      <option name="closed" value="true" />
+      <created>1739930146192</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1739930146192</updated>
+    </task>
+    <task id="LOCAL-00008" summary="changed 2d camera to rotate to face direction player is facing in 3d to reduce disorientation of player">
+      <option name="closed" value="true" />
+      <created>1740015264964</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1740015264964</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -259,6 +276,9 @@
     <MESSAGE value="macaron" />
     <MESSAGE value="really important package added (and probably other stuff)" />
     <MESSAGE value="Lots of stuff done, can't write it all here." />
-    <option name="LAST_COMMIT_MESSAGE" value="Lots of stuff done, can't write it all here." />
+    <MESSAGE value="tweaked dash settings:&#10;- 0.05 duration&#10;- faster, to 1000 speed&#10;tweaked movement settings:&#10;- accel and ms to 1000&#10;- changed drag to be 5x drag at the end of the curve to prevent going over top speed" />
+    <MESSAGE value="including dash modifications with previous commit" />
+    <MESSAGE value="changed 2d camera to rotate to face direction player is facing in 3d to reduce disorientation of player" />
+    <option name="LAST_COMMIT_MESSAGE" value="changed 2d camera to rotate to face direction player is facing in 3d to reduce disorientation of player" />
   </component>
 </project>
