@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Physics.Systems;
 using Unity.Transforms;
 
 namespace Enemies.AI
@@ -25,6 +26,8 @@ namespace Enemies.AI
     }
 
     [BurstCompile]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+    [UpdateAfter(typeof(PhysicsSystemGroup))]
     public partial struct PlayerHomingSystem : ISystem
     {
         public void OnCreate(ref SystemState state) { }
@@ -57,13 +60,10 @@ namespace Enemies.AI
                 quaternion currentRotation = quaternion.LookRotationSafe(currentDirection, math.up());
                 quaternion targetRotation = quaternion.LookRotationSafe(directionToTarget, math.up());
 
-                // Perform spherical interpolation to smoothly rotate towards the target
-                quaternion smoothedRotation = math.slerp(currentRotation, targetRotation, h.HomingSpeed * DeltaTime);
+                quaternion smoothedRotation = MathsBurst.RotateTowards(currentRotation, targetRotation, h.HomingSpeed * DeltaTime);
 
-                // Extract the new forward direction from the smoothed rotation
                 float3 newDirection = math.forward(smoothedRotation);
 
-                // Preserve the original speed
                 float speed = math.length(p.Linear);
                 p.Linear = newDirection * speed;
             }
@@ -74,8 +74,8 @@ namespace Enemies.AI
         {
             new ProcessPlayerHomingJob
             {
-                Target = PlayerManager.main.position,
-                DeltaTime = SystemAPI.Time.DeltaTime
+                Target = PlayerManager.Position,
+                DeltaTime = SystemAPI.Time.fixedDeltaTime
             }.ScheduleParallel();
         }
     }

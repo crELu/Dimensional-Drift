@@ -1,0 +1,130 @@
+Index: Assets/Player/Mechanics/Cannon.meta
+===================================================================
+diff --git a/Assets/Player/Mechanics/Cannon.meta b/Assets/Player/Mechanics/Cannon.meta
+deleted file mode 100644
+--- a/Assets/Player/Mechanics/Cannon.meta	(revision 7a193b8b4121aefe6369b609a00d24f8f61a068f)
++++ /dev/null	(revision 7a193b8b4121aefe6369b609a00d24f8f61a068f)
+@@ -1,3 +0,0 @@
+-fileFormatVersion: 2
+-guid: 67044090a0ba4d089711753ef93d1529
+-timeCreated: 1737922475
+\ No newline at end of file
+Index: Assets/Player/Mechanics/Sword.meta
+===================================================================
+diff --git a/Assets/Player/Mechanics/Sword.meta b/Assets/Player/Mechanics/Sword.meta
+deleted file mode 100644
+--- a/Assets/Player/Mechanics/Sword.meta	(revision 7a193b8b4121aefe6369b609a00d24f8f61a068f)
++++ /dev/null	(revision 7a193b8b4121aefe6369b609a00d24f8f61a068f)
+@@ -1,3 +0,0 @@
+-fileFormatVersion: 2
+-guid: e8f51f8bc2f2467da1faae8f9f20b5e7
+-timeCreated: 1737922479
+\ No newline at end of file
+Index: Assets/Player/Mechanics/Laser.meta
+===================================================================
+diff --git a/Assets/Player/Mechanics/Laser.meta b/Assets/Player/Mechanics/Laser.meta
+deleted file mode 100644
+--- a/Assets/Player/Mechanics/Laser.meta	(revision 7a193b8b4121aefe6369b609a00d24f8f61a068f)
++++ /dev/null	(revision 7a193b8b4121aefe6369b609a00d24f8f61a068f)
+@@ -1,3 +0,0 @@
+-fileFormatVersion: 2
+-guid: 2f887b02a07e449d9742ee98e74b43df
+-timeCreated: 1737922485
+\ No newline at end of file
+Index: .idea/.idea.Dimensional-Drift/.idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"e55ef862-8198-434e-a97f-d1a3e83e6ecd\" name=\"Changes\" comment=\"\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/.idea.Dimensional-Drift.dir/.idea/indexLayout.xml\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/.idea.Dimensional-Drift.dir/.idea/projectSettingsUpdater.xml\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/.idea.Dimensional-Drift.dir/.idea/vcs.xml\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/.idea.Dimensional-Drift.dir/.idea/workspace.xml\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/.gitignore\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/Collision.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/Collision.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/Enemy/BaseEnemyAuthor.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/Enemy/BaseEnemyAuthor.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/Enemy/GunEnemyAuthor.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/Enemy/GunEnemyAuthor.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/Enemy/LifetimeAuthor.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/Enemy/LifetimeAuthor.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/Enemy/LinearVelocityAuthor.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/Enemy/LinearVelocityAuthor.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/Enemy/PlayerHomingAuthor.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/Enemy/PlayerHomingAuthor.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/Enemy/TrailAuthor.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/Enemy/TrailAuthor.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/Player/Player.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/Player/Player.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/Player/PlayerAuthor.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/Player/PlayerAuthor.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/SpawnerSystem.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/SpawnerSystem.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/ECS/SquishSystem.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/ECS/SquishSystem.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/InputSystem_Actions.inputactions\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/InputSystem_Actions.inputactions\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/OutdoorsScene.unity\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/OutdoorsScene.unity\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/OutdoorsScene/MainECS.unity\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/OutdoorsScene/MainECS.unity\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom.Editor/Editors/PhysicsShapeAuthoringEditor.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom.Editor/Editors/PhysicsShapeAuthoringEditor.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Bodies/BakingSystems/PhysicsBodyBakingSystem.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Bodies/BakingSystems/PhysicsBodyBakingSystem.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Bodies/PhysicsShapeAuthoring.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Bodies/PhysicsShapeAuthoring.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Utilities/BakeGeometryJobs.cs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Utilities/BakeGeometryJobs.cs\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/SceneDependencyCache/04554dd91a5e9f8229fe30837cc9eb9d.sceneWithBuildSettings\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/SceneDependencyCache/04554dd91a5e9f8229fe30837cc9eb9d.sceneWithBuildSettings\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Assets/Settings/HDRPDefaultResources/HDRenderPipelineGlobalSettings.asset\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Assets/Settings/HDRPDefaultResources/HDRenderPipelineGlobalSettings.asset\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Packages/manifest.json\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Packages/manifest.json\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/Packages/packages-lock.json\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/Packages/packages-lock.json\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"HighlightingSettingsPerFile\">\r\n    <setting file=\"file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics/Unity.Mathematics/math.cs\" root0=\"SKIP_HIGHLIGHTING\" />\r\n    <setting file=\"file://$PROJECT_DIR$/Library/PackageCache/com.unity.physics/Unity.Physics/Extensions/PhysicsComponentExtensions.cs\" root0=\"SKIP_HIGHLIGHTING\" />\r\n  </component>\r\n  <component name=\"MetaFilesCheckinStateConfiguration\" checkMetaFiles=\"true\" />\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;customColor&quot;: &quot;&quot;,\r\n  &quot;associatedIndex&quot;: 5\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2sK4upXyzC9mxTOyQWyfAUpwug5\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"app.teamhub.selectedTeam\": \"https://github.com/crELu/Dimensional-Drift\",\r\n    \"git-widget-placeholder\": \"movement-tweaks\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"settings.editor.selected.configurable\": \"preferences.sourceCode.C#\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\" selected=\"Attach to Unity Editor.Attach to Unity Editor\">\r\n    <configuration name=\"Start Unity\" type=\"RunUnityExe\" factoryName=\"Unity Executable\">\r\n      <option name=\"EXE_PATH\" value=\"E:\\Program Files\\Unity\\Hub\\Editor\\6000.0.33f1\\Editor\\Unity.exe\" />\r\n      <option name=\"PROGRAM_PARAMETERS\" value=\"-projectPath E:\\Media\\Documents\\Classes\\2024\\CSC404\\Dimensional-Drift -debugCodeOptimization\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"E:\\Media\\Documents\\Classes\\2024\\CSC404\\Dimensional-Drift\" />\r\n      <option name=\"PASS_PARENT_ENVS\" value=\"1\" />\r\n      <option name=\"USE_EXTERNAL_CONSOLE\" value=\"0\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"Unit Tests (batch mode)\" type=\"RunUnityExe\" factoryName=\"Unity Executable\">\r\n      <option name=\"EXE_PATH\" value=\"E:\\Program Files\\Unity\\Hub\\Editor\\6000.0.33f1\\Editor\\Unity.exe\" />\r\n      <option name=\"PROGRAM_PARAMETERS\" value=\"-runTests -batchmode -projectPath E:\\Media\\Documents\\Classes\\2024\\CSC404\\Dimensional-Drift -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"E:\\Media\\Documents\\Classes\\2024\\CSC404\\Dimensional-Drift\" />\r\n      <option name=\"PASS_PARENT_ENVS\" value=\"1\" />\r\n      <option name=\"USE_EXTERNAL_CONSOLE\" value=\"0\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"Attach to Unity Editor &amp; Play\" type=\"UNITY_DEBUG_RUN_CONFIGURATION\" factoryName=\"UNITY_ATTACH_AND_PLAY\" show_console_on_std_err=\"false\" show_console_on_std_out=\"false\" port=\"50000\" address=\"localhost\">\r\n      <option name=\"allowRunningInParallel\" value=\"false\" />\r\n      <option name=\"listenPortForConnections\" value=\"false\" />\r\n      <option name=\"pid\" />\r\n      <option name=\"projectPathOnTarget\" />\r\n      <option name=\"runtimes\">\r\n        <list />\r\n      </option>\r\n      <option name=\"selectedOptions\">\r\n        <list />\r\n      </option>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"Attach to Unity Editor\" type=\"UNITY_DEBUG_RUN_CONFIGURATION\" factoryName=\"Unity Debug\" show_console_on_std_err=\"false\" show_console_on_std_out=\"false\" port=\"50000\" address=\"localhost\">\r\n      <option name=\"allowRunningInParallel\" value=\"false\" />\r\n      <option name=\"listenPortForConnections\" value=\"false\" />\r\n      <option name=\"pid\" />\r\n      <option name=\"projectPathOnTarget\" />\r\n      <option name=\"runtimes\">\r\n        <list />\r\n      </option>\r\n      <option name=\"selectedOptions\">\r\n        <list />\r\n      </option>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"e55ef862-8198-434e-a97f-d1a3e83e6ecd\" name=\"Changes\" comment=\"\" />\r\n      <created>1738191157379</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1738191157379</updated>\r\n      <workItem from=\"1738191158494\" duration=\"26000\" />\r\n      <workItem from=\"1738191221388\" duration=\"17845000\" />\r\n      <workItem from=\"1738213785255\" duration=\"2064000\" />\r\n      <workItem from=\"1738351602017\" duration=\"6162000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"UnityCheckinConfiguration\" checkUnsavedScenes=\"true\" />\r\n  <component name=\"UnityProjectConfiguration\" hasMinimizedUI=\"true\" />\r\n  <component name=\"UnityProjectDiscoverer\">\r\n    <option name=\"hasUnityReference\" value=\"true\" />\r\n    <option name=\"unityProject\" value=\"true\" />\r\n    <option name=\"unityProjectFolder\" value=\"true\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"CLEAR_INITIAL_COMMIT_MESSAGE\" value=\"true\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.idea.Dimensional-Drift/.idea/workspace.xml b/.idea/.idea.Dimensional-Drift/.idea/workspace.xml
+--- a/.idea/.idea.Dimensional-Drift/.idea/workspace.xml	(revision 7a193b8b4121aefe6369b609a00d24f8f61a068f)
++++ b/.idea/.idea.Dimensional-Drift/.idea/workspace.xml	(date 1739646606251)
+@@ -5,34 +5,10 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="e55ef862-8198-434e-a97f-d1a3e83e6ecd" name="Changes" comment="">
+-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift.dir/.idea/indexLayout.xml" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift.dir/.idea/projectSettingsUpdater.xml" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift.dir/.idea/vcs.xml" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift.dir/.idea/workspace.xml" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/.gitignore" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/Collision.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/Enemy/BaseEnemyAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/Enemy/BaseEnemyAuthor.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/Enemy/GunEnemyAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/Enemy/GunEnemyAuthor.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/Enemy/LifetimeAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/Enemy/LifetimeAuthor.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/Enemy/LinearVelocityAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/Enemy/LinearVelocityAuthor.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/Enemy/PlayerHomingAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/Enemy/PlayerHomingAuthor.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/Enemy/TrailAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/Enemy/TrailAuthor.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/Player/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/Player/Player.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/Player/PlayerAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/Player/PlayerAuthor.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/SpawnerSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/SpawnerSystem.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/ECS/SquishSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ECS/SquishSystem.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/InputSystem_Actions.inputactions" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/InputSystem_Actions.inputactions" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/OutdoorsScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/OutdoorsScene.unity" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/OutdoorsScene/MainECS.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/OutdoorsScene/MainECS.unity" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom.Editor/Editors/PhysicsShapeAuthoringEditor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom.Editor/Editors/PhysicsShapeAuthoringEditor.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Bodies/BakingSystems/PhysicsBodyBakingSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Bodies/BakingSystems/PhysicsBodyBakingSystem.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Bodies/PhysicsShapeAuthoring.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Bodies/PhysicsShapeAuthoring.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Utilities/BakeGeometryJobs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Samples/Unity Physics/1.3.8/Custom Physics Authoring/Unity.Physics.Custom/Utilities/BakeGeometryJobs.cs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/SceneDependencyCache/04554dd91a5e9f8229fe30837cc9eb9d.sceneWithBuildSettings" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/SceneDependencyCache/04554dd91a5e9f8229fe30837cc9eb9d.sceneWithBuildSettings" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Assets/Settings/HDRPDefaultResources/HDRenderPipelineGlobalSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/HDRPDefaultResources/HDRenderPipelineGlobalSettings.asset" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/Assets/Player/Mechanics/Cannon.meta" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/Assets/Player/Mechanics/Laser.meta" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/Assets/Player/Mechanics/Sword.meta" beforeDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -55,6 +31,10 @@
+   &quot;associatedIndex&quot;: 5
+ }</component>
+   <component name="ProjectId" id="2sK4upXyzC9mxTOyQWyfAUpwug5" />
++  <component name="ProjectLevelVcsManager">
++    <OptionsSetting value="false" id="Update" />
++    <ConfirmationsSetting value="2" id="Add" />
++  </component>
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+@@ -64,7 +44,7 @@
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "RunOnceActivity.git.unshallow": "true",
+     "app.teamhub.selectedTeam": "https://github.com/crELu/Dimensional-Drift",
+-    "git-widget-placeholder": "movement-tweaks",
++    "git-widget-placeholder": "main",
+     "node.js.detected.package.eslint": "true",
+     "node.js.detected.package.tslint": "true",
+     "node.js.selected.package.eslint": "(autodetect)",
+@@ -96,9 +76,6 @@
+       <option name="listenPortForConnections" value="false" />
+       <option name="pid" />
+       <option name="projectPathOnTarget" />
+-      <option name="runtimes">
+-        <list />
+-      </option>
+       <option name="selectedOptions">
+         <list />
+       </option>
+@@ -109,9 +86,6 @@
+       <option name="listenPortForConnections" value="false" />
+       <option name="pid" />
+       <option name="projectPathOnTarget" />
+-      <option name="runtimes">
+-        <list />
+-      </option>
+       <option name="selectedOptions">
+         <list />
+       </option>
+@@ -143,6 +117,7 @@
+     <option name="unityProject" value="true" />
+     <option name="unityProjectFolder" value="true" />
+   </component>
++  <component name="UnityUnitTestConfiguration" currentTestLauncher="Both" />
+   <component name="VcsManagerConfiguration">
+     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+   </component>

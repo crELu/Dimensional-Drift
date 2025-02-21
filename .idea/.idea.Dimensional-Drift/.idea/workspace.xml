@@ -4,26 +4,45 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e55ef862-8198-434e-a97f-d1a3e83e6ecd" name="Changes" comment="Lots of stuff done, can't write it all here.">
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/ChasePattern.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/ChasePattern.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/WanderPattern.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/WanderPattern.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/PatternManager.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/PatternManager.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS.unity" afterDir="false" />
+    <list default="true" id="e55ef862-8198-434e-a97f-d1a3e83e6ecd" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/Movement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/Movement.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/ThrusterAuthoring.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/ThrusterAuthoring.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/ThrusterPairAuthoring.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/ThrusterPairAuthoring.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/VFX/VFXType.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/VFX/VFXType.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/WaveManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/WaveManager.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/PlayerMovement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Player/PlayerMovement.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/shelf/Uncommitted_changes_before_Update_at_1_31_2025_5_25_PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/shelf/Uncommitted_changes_before_Update_at_1_31_2025_5_25_PM__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/BaseEnemyAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/BaseEnemyAuthor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/GunEnemyAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/GunEnemyAuthor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/PatternManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/PatternManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/PlayerHomingAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/PlayerHomingAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/L Ray Body.mat.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/L Ray Body.mat.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Materials/block 1.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Materials/block 1.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Systems/LinearVelocityAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/LinearVelocityAuthor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/L Ray Body.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/L Ray Body.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Homing.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Homing.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Normal.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Normal.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Projectile.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Projectile.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Snak.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Snak.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyGunTag.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyGunTag.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyShootingAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyShootingAuthor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/VFX/TrailAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/VFX/VFXAuthor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/VFX/TrailAuthor.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/VFX/VFXAuthor.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/VFX/TrailManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/VFX/VFXManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/VFX/TrailManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/VFX/VFXManager.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/ray 1.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/ray 1.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/ray 2 .prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/ray 2 .prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/VFX/Bullet.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/VFX/Bullet.vfx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/VFX/bullet.fbx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/VFX/bullet.fbx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Player/PlayerAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/PlayerAuthor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Subscene.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Subscene.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/Physics/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Physics/Collision.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS2.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS2.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Systems/Util/MathsBurst.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Util/MathsBurst.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +52,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="enemy-movement" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -51,28 +70,18 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/84f0d810adef4e6c8deab33e4ae93f7c1dec00/ca/e490eaf0/Component.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/84f0d810adef4e6c8deab33e4ae93f7c1dec00/db/2e2dd896/AnimationCurve.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Enemies/AI/BaseEnemyAuthor.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Enemies/AI/BaseEnemyAuthor.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Enemies/Projectiles/Homing.prefab" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Enemies/Projectiles/Homing.prefab" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Player/Cannon/Core/Homing.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Player/Gun/VFX.meta" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Player/Gun/VFX.meta" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Player/Player.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Scenes/Main Scene.unity" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Scenes/Main Scene.unity" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Scenes/Subscene/MainECS.unity" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://E:/Media/Documents/Classes/2024/CSC404/Dimensional-Drift/Assets/Scenes/Subscene/MainECS.unity" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/csc.rsp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.latios.latiosframework/Kinemation/Authoring/LatiosMeshRendererBakingUtility.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.latios.latiosframework/Mimic/Mecanim/Authoring/MecanimBaker.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.latios.latiosframework/Transforms/CachedQvvs/TransformComponents.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities/Unity.Entities.Editor/Inspector/Elements/ComponentElement.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities/Unity.Entities.Hybrid/Baking/BakingOnlyEntityAuthoring.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities/Unity.Entities/Diff/EntityPatcher.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities/Unity.Entities/EntityCommandBuffer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities/Unity.Entities/EntityComponentStoreDebug.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities/Unity.Entities/Iterators/BufferLookup.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities/Unity.Entities/Iterators/ComponentLookup.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities/Unity.Entities/Iterators/EntityQuery.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.entities/Unity.Entities/Serialization/UnityObjectRef.cs" root0="SKIP_HIGHLIGHTING" />
@@ -106,28 +115,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "app.teamhub.selectedTeam": "https://github.com/crELu/Dimensional-Drift",
-    "git-widget-placeholder": "Merging really-cool-branch",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;app.teamhub.selectedTeam&quot;: &quot;https://github.com/crELu/Dimensional-Drift&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "C:\\Users\\xurun\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache",
-      "C:\\Users\\xurun\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache",
-      "C:\\Users\\xurun\\AppData\\Local\\Symbols\\src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\xurun\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\xurun\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\xurun\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="D:\Unity Editors\6000.0.33f1\Editor\Unity.exe" />
@@ -150,9 +159,6 @@
       <option name="listenPortForConnections" value="false" />
       <option name="pid" />
       <option name="projectPathOnTarget" />
-      <option name="runtimes">
-        <list />
-      </option>
       <option name="selectedOptions">
         <list />
       </option>
@@ -163,9 +169,6 @@
       <option name="listenPortForConnections" value="false" />
       <option name="pid" />
       <option name="projectPathOnTarget" />
-      <option name="runtimes">
-        <list />
-      </option>
       <option name="selectedOptions">
         <list />
       </option>
@@ -186,6 +189,9 @@
       <workItem from="1738351602017" duration="6162000" />
       <workItem from="1738463608642" duration="33151000" />
       <workItem from="1738905888489" duration="50123000" />
+      <workItem from="1740016662517" duration="13284000" />
+      <workItem from="1740104204546" duration="1882000" />
+      <workItem from="1740106152910" duration="11185000" />
     </task>
     <task id="LOCAL-00001" summary="did some stuff probably">
       <option name="closed" value="true" />

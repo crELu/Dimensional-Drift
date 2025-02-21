@@ -8,7 +8,7 @@ namespace Enemies.AI
 {
     public static partial class PatternManager
     {
-        public static Vector3 GetTargetPosition(MovePatternType movePatternType, LocalTransform enemyTransform)
+        public static float3 GetTargetPosition(MovePatternType movePatternType, LocalTransform enemyTransform)
         {
             switch (movePatternType)
             {

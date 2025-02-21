@@ -103,7 +103,7 @@ namespace Enemies.AI
                 DeltaTime = SystemAPI.Time.DeltaTime,
                 Ecb = ecb,
                 LocalTransformLookup = _localTransformLookup,
-                PlayerPosition = PlayerManager.main.position,
+                PlayerPosition = PlayerManager.Position,
             }.ScheduleParallel(); 
         }
 

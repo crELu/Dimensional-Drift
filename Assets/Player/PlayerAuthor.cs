@@ -12,7 +12,6 @@ using UnityEngine;
 
 public class PlayerAuthor : BaseAuthor
 {
-    public GameObject projectile;
     public List<GameObject> projectiles;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
@@ -204,7 +203,7 @@ public partial struct PlayerSystem : ISystem
             ECB = ecb,
             BulletsToFire = new NativeArray<BulletEntity>(bulletsToFire.ToArray(), Allocator.TempJob),
             PlayerTransform = new NativeArray<LocalTransform>(new[] { playerTransform }, Allocator.TempJob),
-            PlayerLookRotation = PlayerManager.main.LookRotation,
+            PlayerLookRotation = PlayerManager.main.movement.LookRotation,
             PlayerPosition = playerTransform.Position,
             TransformLookup = _localTransformLookup,
         };
@@ -250,13 +249,13 @@ public partial struct PlayerPhysicsSystem : ISystem
             var playerData = PlayerManager.main;
             var transform = player.Transform;
             var playerPhysics = player.PhysicsVelocity;
-            var impulse = playerData.GetMovement(player.PhysicsVelocity.Linear) * dt + playerData.GetDash();
+            var impulse = playerData.movement.GetMovement(player.PhysicsVelocity.Linear) * dt + playerData.movement.GetDash();
             
 
             playerPhysics.ApplyImpulse(player.PhysicsMass, transform.Position, transform.Rotation, impulse, transform.Position);
             //playerPhysics.ApplyAngularImpulse(player.PhysicsMass, playerData.GetRotation(transform.Rotation) * dt);
             playerPhysics.Angular = float3.zero;
-            playerData.position = player.Transform.Position;
+            playerData.movement.Position = player.Transform.Position;
             transform.Rotation = playerData.transform.rotation;
             
             player.Transform = transform;
