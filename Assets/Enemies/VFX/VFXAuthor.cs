@@ -21,13 +21,15 @@ public class VFXAuthor : BaseAuthor
         c.a = lifetime;
         baker.AddComponent(entity, new TempTrail
         {
-            ColorLife = c
+            ColorLife = c,
+            Name = vfxType,
         });
     }
 }
 
 public struct TempTrail : IComponentData
 {
+    public FixedString64Bytes Name;
     public Color ColorLife;
 }
 
@@ -35,6 +37,10 @@ public struct TrailTexture : ICleanupSharedComponentData, IEquatable<TrailTextur
 {
     public Texture2D Position;
     public Texture2D ColorLife;
+    public Texture2D Size;
+    public int Id;
+    public FixedString64Bytes Name;
+    
     public bool Equals(TrailTexture other)
     {
         return Equals(Position, other.Position);
@@ -69,65 +75,127 @@ public struct TrailSystemData : ICleanupComponentData
 // [BurstCompile]
 public partial struct TrailSpawnSystem : ISystem
 {
+    private ComponentLookup<TrailData> _trailLookup;
+    private ComponentLookup<LocalTransform> _localTransformLookup;
+    private ComponentLookup<Parent> _parentLookup;
+    private ComponentLookup<PostTransformMatrix> _postTransformLookup;
+    
     public void OnCreate(ref SystemState state)
     {
+        _trailLookup = state.GetComponentLookup<TrailData>(isReadOnly: true);
+        _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
+        _parentLookup = state.GetComponentLookup<Parent>(isReadOnly: true);
+        _postTransformLookup = state.GetComponentLookup<PostTransformMatrix>(isReadOnly: true);
     }
 
     public void OnDestroy(ref SystemState state) { }
+    
+    private partial struct VFXUpdateJob : IJobEntity
+        {
+            public EntityCommandBuffer.ParallelWriter Ecb;
+            [NativeDisableParallelForRestriction] public NativeArray<Color> Position, ColorLife, Size;
+            [ReadOnly] public ComponentLookup<TrailData> TrailAlive;
+            public int Width;
+            [NativeDisableParallelForRestriction] public NativeReference<int> NumDeletions;
+            [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
+            [ReadOnly] public ComponentLookup<Parent> ParentLookup;
+            [ReadOnly] public ComponentLookup<PostTransformMatrix> PostTransformLookup;
+    
+            private void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, TrailSystemData trail)
+            {
+                var i = trail.Y * Width + trail.X;
+                if (TrailAlive.HasComponent(entity))
+                {
+                    TransformHelpers.ComputeWorldTransformMatrix(entity, out float4x4 worldMatrix, ref LocalTransformLookup, ref ParentLookup, ref PostTransformLookup);
+                    float3 pos = worldMatrix.c3.xyz;
+                    Position[i] = new Color(pos.x, pos.y, pos.z, 1);
+                    ColorLife[i] = trail.ColorLife;
+                    Size[i] = trail.ColorLife;
+                }
+                else
+                {
+                    Ecb.RemoveComponent<TrailSystemData>(chunkIndex, entity);
+                    Ecb.RemoveComponent<TrailTexture>(chunkIndex, entity);
+                    NumDeletions.Value++;
+                    //VFXManager.main.UnregisterParticles(Texture.Name, Texture.Id, 1);
+                    Position[i] = Color.clear;
+                }
+            }
+        }
 
     // [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        _trailLookup.Update(ref state);
+        _localTransformLookup.Update(ref state);
+        _parentLookup.Update(ref state);
+        _postTransformLookup.Update(ref state);
+        
         var ecb = new EntityCommandBuffer(Allocator.Temp);
 
         foreach (var (tempTrail, entity) in SystemAPI.Query<RefRW<TempTrail>>().WithEntityAccess())
         {
-            if (!VFXManager.tex1) break;
             ecb.RemoveComponent<TempTrail>(entity);
             AddTrail(entity, ref ecb, ref state, tempTrail.ValueRO);
         }
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
         
-        ecb = new EntityCommandBuffer(Allocator.Temp);
+        
         var uniqueSharedComponents = new List<TrailTexture>();
         state.EntityManager.GetAllUniqueSharedComponentsManaged(uniqueSharedComponents);
 
         foreach (var texture in uniqueSharedComponents)
         {
+            ecb = new EntityCommandBuffer(Allocator.TempJob);
             if (texture.Position == null) continue;
             
-            foreach (var (trailRef, transformRef) in SystemAPI
-                         .Query<RefRO<TrailSystemData>, RefRO<LocalToWorld>>().WithAll<TrailData>()
-                         .WithSharedComponentFilterManaged(texture))
-            {
-                var trail = trailRef.ValueRO;
-                var transform = transformRef.ValueRO;
-                texture.Position.SetPixel(trail.X, trail.Y, new Color(transform.Position.x, transform.Position.y,transform.Position.z, 1));
-                texture.ColorLife.SetPixel(trail.X, trail.Y, trail.ColorLife);
-            }
+            var query = SystemAPI.QueryBuilder()
+                .WithAll<TrailSystemData>()
+                .WithAll<TrailTexture>()
+                .Build();
+
+            query.SetSharedComponentFilterManaged(texture);
             
-            foreach (var (trailRef, entity) in SystemAPI.Query<RefRO<TrailSystemData>>().WithAbsent<TrailData>()
-                         .WithSharedComponentFilterManaged(texture).WithEntityAccess())
+            _trailLookup.Update(ref state);
+            _localTransformLookup.Update(ref state);
+            _parentLookup.Update(ref state);
+            _postTransformLookup.Update(ref state);
+            
+            var position = texture.Position.GetRawTextureData<Color>();
+            var color = texture.ColorLife.GetRawTextureData<Color>();
+            var size = texture.Size.GetRawTextureData<Color>();
+            var free = new NativeReference<int>(Allocator.TempJob);
+            var job = new VFXUpdateJob
             {
-                var trail = trailRef.ValueRO;
-                ecb.RemoveComponent<TrailSystemData>(entity);
-                ecb.RemoveComponent<TrailTexture>(entity);
-                texture.Position.SetPixel(trail.X, trail.Y, Color.clear);
-            }
+                Ecb = ecb.AsParallelWriter(), Position = position, ColorLife = color, Size = size,
+                TrailAlive = _trailLookup, Width = texture.Position.width,
+                LocalTransformLookup = _localTransformLookup,
+                ParentLookup = _parentLookup,
+                PostTransformLookup = _postTransformLookup,
+                NumDeletions = free
+            };
+            job.ScheduleParallel(query, state.Dependency).Complete();
+            
+            VFXManager.main.UnregisterParticles(texture.Name, texture.Id, free.Value);
+
             texture.Position.Apply();
             texture.ColorLife.Apply();
+            texture.Size.Apply();
+            
+            ecb.Playback(state.EntityManager);
+            ecb.Dispose();
         }
-        
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
     }
 
     private void AddTrail(Entity e, ref EntityCommandBuffer ecb, ref SystemState state, TempTrail t)
     {
-        var data = VFXManager.main.RegisterTrail();
-        ecb.AddSharedComponentManaged(e, new TrailTexture{Position = data.Item3, ColorLife = data.Item4});
+        var dataTuple = VFXManager.main.RegisterParticle(t.Name);
+        if (!dataTuple.HasValue) return;
+        var (data, id) = dataTuple.Value;
+        
+        ecb.AddSharedComponentManaged(e, new TrailTexture{Position = data.Positions, ColorLife = data.ColorLife, Size = data.Size, Id = id, Name = t.Name});
         ecb.AddComponent(e, new TrailData {});
-        ecb.AddComponent(e, new TrailSystemData { X = data.Item1, Y = data.Item2, ColorLife = t.ColorLife});
+        ecb.AddComponent(e, new TrailSystemData { X = data.X, Y = data.Y, ColorLife = t.ColorLife});
     }
 }

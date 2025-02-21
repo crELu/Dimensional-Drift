@@ -177,6 +177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 0, g: 5.9921575, b: 2.394129, a: 1}
   lifetime: 0.5
+  vfxType: EnemyEngine1
 --- !u!1 &2096099866143080345
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,7 +388,6 @@ MonoBehaviour:
     y: 2
     z: 2
   baseSpinSpeed: 180
-  baseRotationDamping: 5
   angularPid:
     Kp:
       x: 4
@@ -490,6 +490,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 0, g: 5.9921575, b: 2.394129, a: 1}
   lifetime: 0.5
+  vfxType: EnemyEngine1
 --- !u!1 &6487255054852230737
 GameObject:
   m_ObjectHideFlags: 0

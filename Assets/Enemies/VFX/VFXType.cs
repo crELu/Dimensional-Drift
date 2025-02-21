@@ -13,40 +13,49 @@ namespace ECS.Enemy
         public VisualEffect effectPrefab;
         
         private TrailGraph[] _graphs;
-        private int _workingGraph;
-        private void Start()
+        private TrailGraph[] Graphs
         {
-            _graphs = new TrailGraph[capacity];
+            get
+            {
+                if (_graphs == null) _graphs = new TrailGraph[capacity];
+                return _graphs;
+            }
         }
+
+        private int _workingGraph;
         
         public (VFXData, int)? RegisterParticle()
         {
-            if (_graphs[_workingGraph].Filled)
+            if (Graphs[_workingGraph] == null || Graphs[_workingGraph].Filled)
             {
-                _workingGraph = Array.IndexOf(_graphs, null);
+                _workingGraph = Array.IndexOf(Graphs, null);
                 if (_workingGraph == -1)
                 {
                     Debug.Log($"Ran out of space on the current VFX: {name}.");
                     return null;
                 }
 
-                _graphs[_workingGraph] = new TrailGraph(texSize, effectPrefab);
+                Graphs[_workingGraph] = new TrailGraph(texSize, effectPrefab);
             }
 
-            var data = _graphs[_workingGraph].RegisterTrail();
+            var data = Graphs[_workingGraph].RegisterTrail();
             return (data, _workingGraph);
         }
 
-        public void UnregisterParticle(int graphId)
+        public void UnregisterParticle(int graphId, int count)
         {
-            var graph = _graphs[graphId];
+            var graph = Graphs[graphId];
             if (graph == null)
             {
                 Debug.Log($"Tried to remove from null VFX: {name}.");
                 return;
             }
-            graph.Free();
-            if (graph.Complete) _graphs[graphId] = null;
+            graph.Free(count);
+            if (graph.Complete)
+            {
+                graph.CleanUp();
+                Graphs[graphId] = null;
+            }
         }
     }
     
@@ -65,16 +74,24 @@ namespace ECS.Enemy
             ColorLife = CreateTex(s);
             Size = CreateTex(s);
             _capacity = s * s;
+            _w = s;
             Effect.SetTexture("Positions", Positions);
             Effect.SetTexture("ColorLife", ColorLife);
             Effect.SetTexture("Size", Size);
         }
         
         public bool Filled => _currentPointer >= _capacity;
-        public bool Complete => Filled && _active == 0;
-        public void Free()
+        public bool Complete => Filled && _active <= 0;
+        public void Free(int count)
         {
-            _active--;
+            _active -= count;
+        }
+        public void CleanUp()
+        {
+            Object.Destroy(Effect.gameObject);
+            Object.Destroy(Positions);
+            Object.Destroy(ColorLife);
+            Object.Destroy(Size);
         }
         public VFXData RegisterTrail()
         {

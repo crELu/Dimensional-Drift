@@ -435,6 +435,54 @@ Transform:
   - {fileID: 833599741}
   m_Father: {fileID: 2147006703}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -15.63}
+--- !u!1 &54817587
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 54817588}
+  - component: {fileID: 54817589}
+  m_Layer: 0
+  m_Name: PlayerGun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &54817588
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 54817587}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 109062890}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &54817589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 54817587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7563635921614e849401ca285b6e6a2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  name: PlayerGun
+  capacity: 3
+  texSize: 64
+  effectPrefab: {fileID: 4380606848192304876, guid: 3cd04916944d7374682a71e1ca6690ee, type: 3}
 --- !u!1 &67741165
 GameObject:
   m_ObjectHideFlags: 0
@@ -544,7 +592,7 @@ GameObject:
   - component: {fileID: 109062888}
   - component: {fileID: 109062891}
   m_Layer: 0
-  m_Name: Every Trail
+  m_Name: VFX Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -655,7 +703,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 54817588}
+  - {fileID: 134246668}
+  - {fileID: 961812291}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &109062891
@@ -670,7 +721,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecdb7b310f0b4c5c93eb3dbda4082b89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effect: {fileID: 109062889}
 --- !u!4 &116606373 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7350275955188979915, guid: 2b9f7ebba15c219449182e5539db54e7, type: 3}
@@ -708,6 +758,54 @@ Transform:
   - {fileID: 1973122443}
   m_Father: {fileID: 284057772}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -15}
+--- !u!1 &134246667
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 134246668}
+  - component: {fileID: 134246669}
+  m_Layer: 0
+  m_Name: Enemy Engine 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &134246668
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 134246667}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 109062890}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &134246669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 134246667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7563635921614e849401ca285b6e6a2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  name: EnemyEngine1
+  capacity: 3
+  texSize: 64
+  effectPrefab: {fileID: 72309740819474193, guid: 525ae27e9e1da0e4f9e9e2059035fd05, type: 3}
 --- !u!1 &149119503
 GameObject:
   m_ObjectHideFlags: 0
@@ -844,7 +942,6 @@ MonoBehaviour:
     y: 0
     z: 0
   baseSpinSpeed: 0
-  baseRotationDamping: 0
   angularPid:
     Kp:
       x: 0
@@ -4469,6 +4566,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 67741166}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &961812290
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 961812291}
+  - component: {fileID: 961812292}
+  m_Layer: 0
+  m_Name: Enemy Bullet 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &961812291
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961812290}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 109062890}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &961812292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961812290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7563635921614e849401ca285b6e6a2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  name: EnemyBullet1
+  capacity: 3
+  texSize: 64
+  effectPrefab: {fileID: 72309740819474193, guid: 525ae27e9e1da0e4f9e9e2059035fd05, type: 3}
 --- !u!1 &972268949
 GameObject:
   m_ObjectHideFlags: 0
@@ -8749,6 +8894,10 @@ PrefabInstance:
     - target: {fileID: 4908072128196280180, guid: fbe5ee0243cb5d54693e830d019c7a81, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5195455754049410414, guid: fbe5ee0243cb5d54693e830d019c7a81, type: 3}
+      propertyPath: baseStats.count
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 5195455754049410414, guid: fbe5ee0243cb5d54693e830d019c7a81, type: 3}
       propertyPath: CoreAugments.Array.size

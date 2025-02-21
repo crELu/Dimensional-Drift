@@ -194,6 +194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 16, g: 0, b: 16, a: 1}
   lifetime: 1
+  vfxType: EnemyBullet1
 --- !u!114 &6074844828712467920
 MonoBehaviour:
   m_ObjectHideFlags: 0

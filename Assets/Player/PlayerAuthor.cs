@@ -88,7 +88,7 @@ public partial struct PlayerSystem : ISystem
     {
         public EntityCommandBuffer.ParallelWriter ECB;
         public NativeArray<BulletEntity> BulletsToFire;
-        public NativeArray<LocalTransform> PlayerTransform;
+        public LocalTransform PlayerTransform;
         public quaternion PlayerLookRotation;
         public float3 PlayerPosition;
     
@@ -102,7 +102,7 @@ public partial struct PlayerSystem : ISystem
 
             var originalTransform = TransformLookup[prefab];
         
-            var position = PlayerPosition + math.mul(PlayerTransform[0].Rotation, bullet.position);
+            var position = PlayerPosition + math.mul(PlayerTransform.Rotation, bullet.position);
             var rotation = math.mul(PlayerLookRotation, bullet.rotation);
 
             Entity newEntity = ECB.Instantiate(index, prefab);
@@ -202,7 +202,7 @@ public partial struct PlayerSystem : ISystem
         {
             ECB = ecb,
             BulletsToFire = new NativeArray<BulletEntity>(bulletsToFire.ToArray(), Allocator.TempJob),
-            PlayerTransform = new NativeArray<LocalTransform>(new[] { playerTransform }, Allocator.TempJob),
+            PlayerTransform = playerTransform,
             PlayerLookRotation = PlayerManager.main.movement.LookRotation,
             PlayerPosition = playerTransform.Position,
             TransformLookup = _localTransformLookup,
@@ -212,7 +212,7 @@ public partial struct PlayerSystem : ISystem
         JobHandle handle = job.Schedule(bulletsToFire.Count, 64, state.Dependency);
 
         // Combine disposals with main handle
-        handle = job.PlayerTransform.Dispose(handle);
+        //handle = job.PlayerTransform.Dispose(handle);
 
         state.Dependency = handle;
     

@@ -86,6 +86,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 16, g: 15.823498, b: 0, a: 1}
   lifetime: 2
+  vfxType: PlayerGun
 --- !u!114 &7918589941069970403
 MonoBehaviour:
   m_ObjectHideFlags: 0
