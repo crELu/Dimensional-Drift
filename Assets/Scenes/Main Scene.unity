@@ -6050,15 +6050,15 @@ MonoBehaviour:
   fov: 80
   orthographicSize: 30
   dimSwitchDuration: 0.2
-  dashDur: 0.05
-  dashCooldown: 0.2
-  dashSpeed: 1000
+  dashDur: 0.02
+  dashCooldown: 0.5
+  dashSpeed: 3000
   dashCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 2.0111918
       inSlope: -2.0299342
       outSlope: -2.0299342
       tangentMode: 0
@@ -6083,6 +6083,10 @@ MonoBehaviour:
     x: 14.625869
     y: 442.61896
     z: 15.967603
+  velocity:
+    x: 0
+    y: 0
+    z: 0
 --- !u!4 &1406390150
 Transform:
   m_ObjectHideFlags: 0

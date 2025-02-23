@@ -63,7 +63,9 @@ public class PlayerManager : MonoBehaviour
     public static List<Attack> Bullets => main.currentWeapon.Bullets;
 
     private Animator _anim;
-    [HideInInspector] public float3 position;
+    [HideInInspector] 
+    public float3 position;
+    public float3 velocity;
     private bool Dim3 => DimensionManager.CurrentDim == Dimension.Three;
     private Camera _camera;
     public Vector3 Right => Dim3 ? transform.right : _camera.transform.right;
@@ -306,6 +308,10 @@ public class PlayerManager : MonoBehaviour
     public Vector3 GetMovement(Vector3 velocity)
     {
         Vector3 inputVector = MoveInput.y * MoveForward + MoveInput.x * Right + FlyInput * MoveUp;
+        if (Dim3)
+        {
+            inputVector += FlyInput * MoveUp;
+        }
         Vector3 impulse = Vector3.zero;
         if (inputVector != Vector3.zero)
         {
@@ -322,28 +328,25 @@ public class PlayerManager : MonoBehaviour
         if (_isDashing) return _dashDir * _dashSpeed;
         
         _dashCd -= Time.deltaTime;
-        if (!(_dashAction.ReadValue<float>() > 0) || _dashCd > 0) return Vector3.zero;
+        if (_dashAction.ReadValue<float>() <= 0 || _dashCd > 0) return Vector3.zero;
         
         var input = MoveInput;
-
+        _dashDir = MoveForward * input.y + Right * input.x;
         if (Dim3)
         {
-            if (Vector2.Dot(input, Vector2.up) > 0.5f)
-            {
-                _dashDir = MoveForward;
-                StartCoroutine(Dash());
-            }
-            else if (Vector2.Dot(input, Vector2.up) > -0.5f)
-            {
-                _dashDir = input.x > 0 ? Right : -Right;
-                StartCoroutine(Dash());
-            }
+            _dashDir += FlyInput * MoveUp;
+        }
+
+        if (_dashDir.Equals(float3.zero))
+        {
+            _dashDir = transform.forward;
         }
         else
         {
-            _dashDir = new Vector3(input.x, 0, input.y).normalized;
-            StartCoroutine(Dash());
+            _dashDir.Normalize();
         }
+        StartCoroutine(Dash());
+
         
         
         return _dashDir * _dashSpeed;
@@ -354,11 +357,11 @@ public class PlayerManager : MonoBehaviour
     {
         _isDashing = true;
         _dashCd = dashCooldown;
-        float a = 0;
-        while (a < dashDur)
+        float timer = 0;
+        while (timer < dashDur)
         {
-            a += Time.deltaTime;
-            _dashSpeed = dashSpeed * dashCurve.Evaluate(a / dashDur);
+            timer += Time.deltaTime;
+            _dashSpeed = dashSpeed * dashCurve.Evaluate(timer / dashDur);
             yield return null;
         }
         _isDashing = false;
