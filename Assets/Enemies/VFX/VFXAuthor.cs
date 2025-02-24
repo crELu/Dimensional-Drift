@@ -14,6 +14,7 @@ public class VFXAuthor : BaseAuthor
 {
     [ColorUsage(false, true)] public Color color = Color.magenta;
     public float lifetime = 1;
+    public Vector4 scale = Vector3.one;
     public string vfxType;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
@@ -23,6 +24,7 @@ public class VFXAuthor : BaseAuthor
         {
             ColorLife = c,
             Name = vfxType,
+            Scale = new Color(scale.x, scale.y, scale.z, scale.w),
         });
     }
 }
@@ -30,6 +32,7 @@ public class VFXAuthor : BaseAuthor
 public struct TempTrail : IComponentData
 {
     public FixedString64Bytes Name;
+    public Color Scale;
     public Color ColorLife;
 }
 
@@ -70,10 +73,11 @@ public struct TrailSystemData : ICleanupComponentData
 {
     public int X, Y;
     public Color ColorLife;
+    public Color Scale;
 }
 
-// [BurstCompile]
-public partial struct TrailSpawnSystem : ISystem
+[BurstCompile]
+public partial struct TrailUpdateSystem : ISystem
 {
     private ComponentLookup<TrailData> _trailLookup;
     private ComponentLookup<LocalTransform> _localTransformLookup;
@@ -90,6 +94,7 @@ public partial struct TrailSpawnSystem : ISystem
 
     public void OnDestroy(ref SystemState state) { }
     
+    [BurstCompile]
     private partial struct VFXUpdateJob : IJobEntity
         {
             public EntityCommandBuffer.ParallelWriter Ecb;
@@ -110,7 +115,7 @@ public partial struct TrailSpawnSystem : ISystem
                     float3 pos = worldMatrix.c3.xyz;
                     Position[i] = new Color(pos.x, pos.y, pos.z, 1);
                     ColorLife[i] = trail.ColorLife;
-                    Size[i] = trail.ColorLife;
+                    Size[i] = trail.Scale;
                 }
                 else
                 {
@@ -122,39 +127,22 @@ public partial struct TrailSpawnSystem : ISystem
                 }
             }
         }
-
-    // [BurstCompile]
+    
     public void OnUpdate(ref SystemState state)
     {
-        _trailLookup.Update(ref state);
-        _localTransformLookup.Update(ref state);
-        _parentLookup.Update(ref state);
-        _postTransformLookup.Update(ref state);
-        
-        var ecb = new EntityCommandBuffer(Allocator.Temp);
-
-        foreach (var (tempTrail, entity) in SystemAPI.Query<RefRW<TempTrail>>().WithEntityAccess())
-        {
-            ecb.RemoveComponent<TempTrail>(entity);
-            AddTrail(entity, ref ecb, ref state, tempTrail.ValueRO);
-        }
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
-        
-        
         var uniqueSharedComponents = new List<TrailTexture>();
         state.EntityManager.GetAllUniqueSharedComponentsManaged(uniqueSharedComponents);
-
+        
+        var query = SystemAPI.QueryBuilder()
+            .WithAll<TrailSystemData>()
+            .WithAll<TrailTexture>()
+            .Build();
+        
         foreach (var texture in uniqueSharedComponents)
         {
-            ecb = new EntityCommandBuffer(Allocator.TempJob);
+            var ecb = new EntityCommandBuffer(Allocator.TempJob);
             if (texture.Position == null) continue;
             
-            var query = SystemAPI.QueryBuilder()
-                .WithAll<TrailSystemData>()
-                .WithAll<TrailTexture>()
-                .Build();
-
             query.SetSharedComponentFilterManaged(texture);
             
             _trailLookup.Update(ref state);
@@ -187,6 +175,26 @@ public partial struct TrailSpawnSystem : ISystem
             ecb.Dispose();
         }
     }
+}
+
+public partial struct TrailSpawnSystem : ISystem
+{
+    public void OnCreate(ref SystemState state) { }
+
+    public void OnDestroy(ref SystemState state) { }
+    
+    public void OnUpdate(ref SystemState state)
+    {
+        var ecb = new EntityCommandBuffer(Allocator.Temp);
+
+        foreach (var (tempTrail, entity) in SystemAPI.Query<RefRW<TempTrail>>().WithEntityAccess())
+        {
+            ecb.RemoveComponent<TempTrail>(entity);
+            AddTrail(entity, ref ecb, ref state, tempTrail.ValueRO);
+        }
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
+    }
 
     private void AddTrail(Entity e, ref EntityCommandBuffer ecb, ref SystemState state, TempTrail t)
     {
@@ -196,6 +204,6 @@ public partial struct TrailSpawnSystem : ISystem
         
         ecb.AddSharedComponentManaged(e, new TrailTexture{Position = data.Positions, ColorLife = data.ColorLife, Size = data.Size, Id = id, Name = t.Name});
         ecb.AddComponent(e, new TrailData {});
-        ecb.AddComponent(e, new TrailSystemData { X = data.X, Y = data.Y, ColorLife = t.ColorLife});
+        ecb.AddComponent(e, new TrailSystemData { X = data.X, Y = data.Y, ColorLife = t.ColorLife, Scale = t.Scale});
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Latios;
 using UnityEngine;
 using TMPro;
 using Unity.Burst;
@@ -10,7 +11,7 @@ using Random = Unity.Mathematics.Random;
 [BurstCompile]
 public class MathsBurst
 {
-    public static quaternion GetRandomRotationWithinCone(ref Random r, float y, float p)
+    public static quaternion GetRandomRotationWithinCone(ref Rng.RngSequence r, float y, float p)
     {
         float randomYaw =  r.NextFloat(-y, y);
         float randomPitch = r.NextFloat(-p, p);

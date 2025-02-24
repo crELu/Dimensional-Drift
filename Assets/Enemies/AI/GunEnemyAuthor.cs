@@ -1,11 +1,11 @@
-﻿using Unity.Collections;
+﻿using Latios;
+using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
 
 namespace Enemies.AI
 {
@@ -34,25 +34,27 @@ namespace Enemies.AI
         public Entity Bullet;
     }
 
-// [BurstCompile]
+    [BurstCompile]
     public partial struct GunEnemyShootAI : ISystem
     {
         private ComponentLookup<LocalTransform> _localTransformLookup;
-        
+        private Rng _rng;
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
             _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
+            _rng = new Rng("GunEnemyShootAI");
         }
 
         public void OnDestroy(ref SystemState state) { }
     
-        // [BurstCompile]
+        [BurstCompile]
         private partial struct GunEnemyShootAIJob : IJobEntity
         {
             public EntityCommandBuffer.ParallelWriter Ecb;
             public float DeltaTime;
             public Vector3 PlayerPosition;
+            public Rng Rng;
             [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
     
             private void Execute([ChunkIndexInQuery] int chunkIndex, 
@@ -63,11 +65,10 @@ namespace Enemies.AI
                     ref enemyWeaponStats, transform);
             }
 
-            private void DoAttackUpdate(int chunkIndex, 
-                ref EnemyStats enemyStats, 
-                ref GunEnemyWeaponStats enemyWeaponStats, 
-                LocalTransform transform)
+            private void DoAttackUpdate([EntityIndexInQuery] int entityIndex, ref EnemyStats enemyStats, 
+                ref GunEnemyWeaponStats enemyWeaponStats, LocalTransform transform)
             {
+                var random = Rng.GetSequence(entityIndex);
                 enemyWeaponStats.AttackDowntime += DeltaTime;
                 if (enemyWeaponStats.AttackDowntime > enemyWeaponStats.AttackCd)
                 {
@@ -76,19 +77,19 @@ namespace Enemies.AI
                     Vector3 d = math.normalize(PlayerPosition - position);
                     Vector3 direction = math.mul(
                         MathsBurst.GetRandomRotationWithinCone(
-                            ref enemyStats.RandomSeed, enemyWeaponStats.Spread.x, 
+                            ref random, enemyWeaponStats.Spread.x, 
                             enemyWeaponStats.Spread.y), d);
                 
-                    Entity newEntity = Ecb.Instantiate(chunkIndex, enemyWeaponStats.Bullet);
+                    Entity newEntity = Ecb.Instantiate(entityIndex, enemyWeaponStats.Bullet);
                     var originalTransform = LocalTransformLookup[enemyWeaponStats.Bullet];
 
-                    Ecb.SetComponent(chunkIndex, newEntity, LocalTransform.FromPositionRotationScale(
+                    Ecb.SetComponent(entityIndex, newEntity, LocalTransform.FromPositionRotationScale(
                         position,
                         originalTransform.Rotation,
                         originalTransform.Scale
                     ));
                     var velocity = new PhysicsVelocity { Linear = direction * enemyWeaponStats.Speed };
-                    Ecb.AddComponent(chunkIndex, newEntity, velocity);
+                    Ecb.AddComponent(entityIndex, newEntity, velocity);
                 }                
             }
         }
@@ -104,6 +105,7 @@ namespace Enemies.AI
                 Ecb = ecb,
                 LocalTransformLookup = _localTransformLookup,
                 PlayerPosition = PlayerManager.Position,
+                Rng = _rng,
             }.ScheduleParallel(); 
         }
 

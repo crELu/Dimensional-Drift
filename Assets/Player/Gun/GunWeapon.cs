@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class GunWeapon: PlayerWeapon
 {
-    public Vector3 position;
-
     protected override Attack BaseWeaponAttack(WeaponStats stats)
     {
-        Attack attack = new Attack{Bullets = new(), bulletStats = stats.bulletStats, projectile = Attack.ProjectileType.GunBasic};
+        AttackInfo info = new AttackInfo() { Stats = stats.bulletStats , Scale = new float3(stats.size), Speed = stats.speed};
+        Attack attack = new Attack{Bullets = new(), Info = info, Projectile = Attack.ProjectileType.GunBasic};
         
         float weaponCd = 1 / stats.attackSpeed;
         float delayAmount = Maths.Sigmoid(stats.attackDelay);
@@ -18,7 +18,7 @@ public class GunWeapon: PlayerWeapon
         
         for (int i = 0; i < count; i++)
         {
-            attack.Bullets.Enqueue(new Bullet {position = position, rotation = Maths.GetRandomRotationWithinCone(stats.accuracy, stats.accuracy), time = i * attackCd});
+            attack.Bullets.Enqueue(new Bullet {position = position.position, rotation = Maths.GetRandomRotationWithinCone(stats.accuracy, stats.accuracy), time = i * attackCd});
         }
 
         return attack;

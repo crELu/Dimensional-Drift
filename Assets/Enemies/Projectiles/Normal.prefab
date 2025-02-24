@@ -137,7 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0571c00ffe415ebcb4567d31239047, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 5
+  damage: 20
   dieOnHit: 1
 --- !u!54 &4955774692025816020
 Rigidbody:
@@ -180,6 +180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 0, g: 40.222755, b: 42.722507, a: 1}
   lifetime: 1
+  scale: {x: 1, y: 1, z: 1, w: 0}
   vfxType: EnemyBullet1
 --- !u!114 &6074844828712467920
 MonoBehaviour:

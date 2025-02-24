@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using UnityEngine.VFX;
 using Collider = UnityEngine.Collider;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
@@ -50,6 +51,7 @@ public class PlayerMovement : MonoBehaviour
     
     private Animator _anim;
     private Camera _camera;
+    
     
     public float3 Position
     {
