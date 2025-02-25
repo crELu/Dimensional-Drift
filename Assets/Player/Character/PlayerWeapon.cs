@@ -5,6 +5,7 @@ using Unity.Entities;
 using UnityEngine;
 
 
+
 public class PlayerWeapon : MonoBehaviour
 {
     /// <summary>
@@ -19,6 +20,9 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] protected List<StatsAugment> BasicAugments = new();
     [SerializeField] protected List<SpecializedAugment> SpecializedAugments = new();
     [SerializeField] protected List<CoreAugment> CoreAugments = new();
+
+    [SerializeField] private AudioSource WeaponTrack;
+    [SerializeField] private AudioClip WeaponSFX;
 
     private float Cd => 1 / BaseStats.attackSpeed;
     private float _cooldown;
@@ -54,6 +58,9 @@ public class PlayerWeapon : MonoBehaviour
             player.UseAmmo(Stats.ammoUse);
             RecalcBullets();
             return true;
+
+            WeaponTrack.clip = WeaponSFX;
+            WeaponTrack.Play();
         }
         return false;
     }
