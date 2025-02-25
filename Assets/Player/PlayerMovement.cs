@@ -58,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
         set => transform.position = value;
     }
     
-    private bool Dim3 => DimensionManager.currentDim == 0;
+    private bool Dim3 => DimensionManager.CurrentDim == 0;
     public Vector3 Right => Dim3 ? transform.right : _camera.transform.right;
     public Vector3 MoveForward => Dim3 ? transform.forward : _camera.transform.up;
     public Vector3 MoveUp => Dim3 ? transform.up : Vector3.zero;
@@ -83,7 +83,7 @@ public class PlayerMovement : MonoBehaviour
         _flyDownAction = InputSystem.actions.FindAction("Fly Down");
         _anim = GetComponent<Animator>();
         _camera = Camera.main;
-        DimensionManager.dimSwitch.AddListener(SwitchDims);
+        DimensionManager.DimSwitch.AddListener(SwitchDims);
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
         _camera.transform.localPosition = normalCameraPos;
         SwitchDims();
@@ -91,9 +91,9 @@ public class PlayerMovement : MonoBehaviour
     
     private void SwitchDims()
     {
-        Debug.Log(DimensionManager.currentDim);
+        Debug.Log(DimensionManager.CurrentDim);
         _camera.transform.localRotation = Quaternion.identity;
-        if (DimensionManager.currentDim > 0) // D < 3
+        if (DimensionManager.CurrentDim > 0) // D < 3
         {
             _camera.transform.localPosition = orthoCameraPos;
             _camera.orthographic = true;
