@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 332376277996907156}
   - component: {fileID: 6074844828712467920}
   m_Layer: 1
-  m_Name: Normal
+  m_Name: Beam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -111,7 +111,7 @@ BoxCollider:
   m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 2}
+  m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-3419706136760470895
 MonoBehaviour:
@@ -137,7 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0571c00ffe415ebcb4567d31239047, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 20
+  damage: 5
   weight: 1
   dieOnHit: 1
 --- !u!54 &4955774692025816020
@@ -179,9 +179,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93dba67b558f492f99d0443b8d32afec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0, g: 40.222755, b: 42.722507, a: 1}
-  lifetime: 1
-  scale: {x: 1, y: 1, z: 1, w: 0}
+  color: {r: 0, g: 5.0278444, b: 5.3403134, a: 1}
+  lifetime: 0.1
+  scale: {x: 2, y: 2, z: 2, w: 0}
   vfxType: EnemyBullet1
 --- !u!114 &6074844828712467920
 MonoBehaviour:

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Latios;
@@ -11,6 +12,29 @@ using Random = Unity.Mathematics.Random;
 [BurstCompile]
 public class MathsBurst
 {
+    public static int ChooseWeightedRandom(ref Rng.RngSequence r, float[] weights, float totalWeight)
+    {
+        if (weights == null || weights.Length == 0)
+            throw new System.ArgumentException("Weights array must not be null or empty.");
+
+        // Pick a random value between 0 (inclusive) and totalWeight (exclusive).
+        float randomValue = r.NextFloat(0f, totalWeight);
+
+        // Iterate through the weights and return the index where the random value falls.
+        float cumulativeWeight = 0f;
+        for (int i = 0; i < weights.Length; i++)
+        {
+            cumulativeWeight += weights[i];
+            if (randomValue < cumulativeWeight)
+            {
+                return i;
+            }
+        }
+
+        // Fallback (should not happen unless due to floating point imprecision).
+        return weights.Length - 1;
+    }
+    
     public static quaternion GetRandomRotationWithinCone(ref Rng.RngSequence r, float y, float p)
     {
         float randomYaw =  r.NextFloat(-y, y);

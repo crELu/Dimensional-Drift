@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3023906274463940837}
   - component: {fileID: 7995303448366776664}
   m_Layer: 1
-  m_Name: Control
+  m_Name: Control X
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 256c07fc49f84cbdbdeff224c7d42f38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxThrust: 12
+  maxThrust: 20
   angle: 85
 --- !u!114 &7995303448366776664
 MonoBehaviour:
@@ -71,7 +71,7 @@ GameObject:
   - component: {fileID: 5542737014807659933}
   - component: {fileID: 7862753168381591138}
   m_Layer: 1
-  m_Name: Control
+  m_Name: Control Y
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -349,7 +349,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
@@ -403,7 +403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43a24b16711d44d799dc4d34aa1bb468, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 10
+  health: 15
   baseMovementSpeed: 30
   baseMoveWeight: 30
   baseCorrectWeight: 5
@@ -445,7 +445,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0571c00ffe415ebcb4567d31239047, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 3
+  damage: 5
   dieOnHit: 0
 --- !u!1 &6291649056924822601
 GameObject:

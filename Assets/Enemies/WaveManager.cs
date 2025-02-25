@@ -96,11 +96,13 @@ namespace Enemies
                 bool waveEarlyDone = _enemies.IsEmpty;
                 var wave = SystemAPI.GetComponent<WaveSingleton>(e);
                 wave.WaveTimer -= SystemAPI.Time.DeltaTime;
+                
                 PlayerManager.waveTimer = wave.WaveTimer;
                 
                 if (waveEarlyDone || wave.WaveTimer < 0)
                 {
-                    var count = wave.Difficulty * 100;
+                    wave.Wave++;
+                    var count = wave.Difficulty * 10 * wave.Wave;
                     
                     wave.WaveTimer = GetWaveTimer(wave.Wave);
                     PlayerManager.maxWaveTimer = wave.WaveTimer;
@@ -109,9 +111,16 @@ namespace Enemies
                     var enemyPrefabs = SystemAPI.GetBuffer<WaveEnemy>(e);
                     
                     var random = _rng.GetSequence(0);
+
+                    float[] weights = { 20, 4, 2};
+                    float totalWeight = 0;
+                    
+                    foreach (var t in weights)
+                        totalWeight += t;
+
                     for (int i = 0; i < count; i++)
                     {
-                        enemiesToSpawn[i] = random.NextInt(0, 2);
+                        enemiesToSpawn[i] = MathsBurst.ChooseWeightedRandom(ref random, weights, totalWeight);
                     }
                     
                     var job = new WaveJob

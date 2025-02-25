@@ -5556,7 +5556,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"x":2.4434454441070558,"y":0.9132729768753052,"z":0.0}'
+      m_SerializableObject: '{"x":0.0,"y":2.4434454441070558,"z":1.4381797313690186}'
     m_Space: -1
   m_Property:
     name: _Color

@@ -34,7 +34,7 @@ public class DimensionManager : MonoBehaviour
 
     void SwitchDimension(Dimension newDim)
     {
-        if (!CanSwitch || Mathf.Abs((int)newDim - (int)CurrentDim) > 1 || newDim == CurrentDim || (newDim < 0) || (Dimension.Zero < newDim)) return;
+        if (!CanSwitch || Mathf.Abs((int)newDim - (int)CurrentDim) > 1 || newDim == CurrentDim || (newDim < 0) || (Dimension.Two < newDim)) return;
         PastDim = CurrentDim;
         burstDim.Data = newDim;
         DimSwitch.Invoke();

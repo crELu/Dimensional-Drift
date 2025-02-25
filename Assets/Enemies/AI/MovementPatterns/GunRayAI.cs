@@ -38,6 +38,7 @@ namespace Enemies.AI
 
         public void OnDestroy(ref SystemState state) { }
         
+        [BurstCompile]
         private partial struct GunRayAIJob : IJobEntity
         {
             public float3 PlayerPosition;
@@ -58,12 +59,12 @@ namespace Enemies.AI
             }
         }
         
-        // [BurstCompile]
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             state.Dependency = new GunRayAIJob
             {
-                PlayerPosition = PlayerManager.Position,
+                PlayerPosition = PlayerManager.burstPos.Data,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
                 Dim = DimensionManager.burstDim.Data,
             }.ScheduleParallel(state.Dependency);

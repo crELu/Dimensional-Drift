@@ -173,7 +173,7 @@ public struct PairsProcessor: IFindPairsProcessor {
                 Ecb.DestroyEntity(0, entityB);
             }
         }
-        if (EnemyLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
+        else if (EnemyLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
         {
             PlayerProjectile playerProj = PlayerWeaponLookup.GetRW(entityB).ValueRW;
             EnemyStats enemy = EnemyLookup.GetRW(entityA).ValueRW;
@@ -189,11 +189,40 @@ public struct PairsProcessor: IFindPairsProcessor {
                 Ecb.DestroyEntity(0, entityB);
             }
         }
-        if (TerrainLookup.HasComponent(entityA) && EnemyWeaponLookup.HasComponent(entityB))
+        else if (EnemyWeaponLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB))
+        {
+            DamagePlayer enemyProj = EnemyWeaponLookup.GetRW(entityA).ValueRW;
+            PlayerProjectile playerProj = PlayerWeaponLookup.GetRW(entityB).ValueRW;
+            if (enemyProj.Mass == -1)
+            {
+                Ecb.DestroyEntity(0, entityB);
+            }
+            else
+            {
+                while (enemyProj.Mass > 0 && playerProj.Health > 0)
+                {
+                    enemyProj.Mass--;
+                    playerProj.Health -= (int)math.ceil(10000f / ((1+playerProj.Stats.pierce)*(1+playerProj.Stats.power)));
+                }
+                
+                EnemyWeaponLookup.GetRW(entityA).ValueRW = enemyProj;
+                PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
+                
+                if (enemyProj.Mass == 0)
+                {
+                    Ecb.DestroyEntity(0, entityA);
+                }
+                if (playerProj.Health == 0)
+                {
+                    Ecb.DestroyEntity(0, entityB);
+                }
+            }
+        }
+        else if (TerrainLookup.HasComponent(entityA) && EnemyWeaponLookup.HasComponent(entityB))
         {
             Ecb.DestroyEntity(0, entityB);
         }
-        if (TerrainLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB))
+        else if (TerrainLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB))
         {
             Ecb.DestroyEntity(0, entityB);
         }
