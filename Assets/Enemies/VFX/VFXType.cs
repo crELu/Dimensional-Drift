@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 using Object = UnityEngine.Object;
@@ -24,6 +25,8 @@ namespace ECS.Enemy
 
         private int _workingGraph;
         
+
+
         public (VFXData, int)? RegisterParticle()
         {
             if (Graphs[_workingGraph] == null || Graphs[_workingGraph].Filled)

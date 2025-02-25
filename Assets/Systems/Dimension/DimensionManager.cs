@@ -19,7 +19,7 @@ public class DimensionManager : MonoBehaviour
     
     private void Awake()
     {
-        burstDim.Data = Dimension.Two;
+        burstDim.Data = Dimension.Three;
         DimSwitch = new UnityEvent();
         _dimUpAction = InputSystem.actions.FindAction("Dim Up");
         _dimDownAction = InputSystem.actions.FindAction("Dim Down");

@@ -12,6 +12,7 @@ using Unity.Transforms;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.VFX;
 using Collider = UnityEngine.Collider;
@@ -85,6 +86,17 @@ public class PlayerManager : MonoBehaviour
         shield = Mathf.Min(stats.flatShield, shield);
         sd.sizeDelta = new Vector2(shield / stats.flatShield * 1000, 32);
         hp.sizeDelta = new Vector2(health / stats.flatHealth * 1000, 64);
+        if (health <= 0)
+        {
+            GameObject deathMessageObject = GameObject.Find("Death Message");
+            if (deathMessageObject != null)
+            {
+                TextMeshProUGUI deathMessage =
+                    deathMessageObject.GetComponent<TextMeshProUGUI>();
+
+                deathMessage.SetText("You Died!");
+            }
+        }
     }
 
     private void DoAttack()
@@ -106,4 +118,5 @@ public class PlayerManager : MonoBehaviour
         Ammo += a;
         Ammo = Mathf.Min(100, Ammo);
     }
+    
 }

@@ -56,10 +56,9 @@ public class PlayerWeapon : MonoBehaviour
             _cooldown = Cd;
             player.UseAmmo(Stats.ammoUse);
             RecalcBullets();
-            return true;
 
-            WeaponTrack.clip = WeaponSFX;
-            WeaponTrack.Play();
+            WeaponTrack.PlayOneShot(WeaponSFX);
+            return true;
         }
         return false;
     }
