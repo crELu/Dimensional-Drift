@@ -65,7 +65,6 @@ public class PlayerManager : MonoBehaviour
     private Animator _anim;
     [HideInInspector] 
     public float3 position;
-    public float3 velocity;
     private bool Dim3 => DimensionManager.CurrentDim == Dimension.Three;
     private Camera _camera;
     public Vector3 Right => Dim3 ? transform.right : _camera.transform.right;
@@ -140,17 +139,9 @@ public class PlayerManager : MonoBehaviour
 
     private void SwitchDims()
     {
-        Debug.Log(DimensionManager.CurrentDim);
-        // _camera.transform.localPosition = orthoCameraPos;
-        // float angle = Mathf.Atan2(transform.forward.z, transform.forward.x) * Mathf.Rad2Deg;
-        // _camera.transform.localRotation = Quaternion.Euler(0, 0, angle - 90f);
-        // Camera.main.orthographic = true;
         switch (DimensionManager.CurrentDim)
         {
             case Dimension.Three:
-                // _camera.transform.localPosition = normalCameraPos;
-                // _camera.transform.localRotation = normalCameraRot;
-                // Camera.main.orthographic = false;
                 StartCoroutine(DoCameraTransition());
                 Cursor.lockState = CursorLockMode.Locked;                       
                 break;
