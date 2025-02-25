@@ -13,39 +13,30 @@ using UnityEngine;
 [UpdateBefore(typeof(PhysicsSimulationGroup))]
 public partial struct CollisionSystem : ISystem
 {
-    // [BurstCompile]
+    [BurstCompile]
     private struct CollisionEventJob : ICollisionEventsJob
     {
-        [ReadOnly] public ComponentLookup<PhysicsCollider> ColliderLookup;
-        [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
         public ComponentLookup<PlayerData> PlayerLookup;
         public ComponentLookup<EnemyStats> EnemyLookup;
+        public ComponentLookup<PlayerProjectile> PlayerWeaponLookup;
         [ReadOnly] public ComponentLookup<DamagePlayer> EnemyWeaponLookup;
-        [ReadOnly] public ComponentLookup<PlayerProjectile> PlayerWeaponLookup;
         [ReadOnly] public ComponentLookup<Obstacle> TerrainLookup;
         
-        [ReadOnly] public NativeArray<RigidBody> AllBodies;
-        [ReadOnly] public float3 PlayerPosition;
         public EntityCommandBuffer.ParallelWriter Ecb;
         
+        [BurstCompile]
         public void Execute(CollisionEvent collisionEvent)
         {
             Entity entityA = collisionEvent.EntityA;
             Entity entityB = collisionEvent.EntityB;
 
-            Calculate(entityA, entityB, collisionEvent);
-            Calculate(entityB, entityA, collisionEvent);
+            Calculate(entityA, entityB);
+            Calculate(entityB, entityA);
         }
         
-        private void Calculate(Entity entityA, Entity entityB, CollisionEvent collisionEvent)
+        [BurstCompile]
+        private void Calculate(Entity entityA, Entity entityB)
         {
-            byte aTags = AllBodies[collisionEvent.BodyIndexA].CustomTags;
-            byte bTags = AllBodies[collisionEvent.BodyIndexB].CustomTags;
-
-            var colliderA = ColliderLookup.GetRefRO(entityA).ValueRO.Value.Value;
-            
-            uint aLayers = colliderA.GetCollisionFilter().BelongsTo;
-            uint bLayers = ColliderLookup.GetRefRO(entityB).ValueRO.Value.Value.GetCollisionFilter().BelongsTo;
             //Debug.Log($"OK! {EnemyLookup.HasComponent(entityA)} {PlayerWeaponLookup.HasComponent(entityB)}");
             if (PlayerLookup.HasComponent(entityA) && EnemyWeaponLookup.HasComponent(entityB)) // Enemy Hit Player
             {
@@ -56,11 +47,19 @@ public partial struct CollisionSystem : ISystem
             }
             if (EnemyLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
             {
-                PlayerProjectile playerProj = PlayerWeaponLookup.GetRefRO(entityB).ValueRO;
+                PlayerProjectile playerProj = PlayerWeaponLookup.GetRefRW(entityB).ValueRW;
                 EnemyStats enemy = EnemyLookup.GetRefRW(entityA).ValueRW;
-                enemy.Health -= playerProj.Damage;
+                enemy.Health -= playerProj.Stats.damage;
+
+                playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
+                
                 EnemyLookup.GetRefRW(entityA).ValueRW = enemy;
-                Ecb.DestroyEntity(0, entityB);
+                PlayerWeaponLookup.GetRefRW(entityB).ValueRW = playerProj;
+                
+                if (playerProj.Health == 0)
+                {
+                    Ecb.DestroyEntity(0, entityB);
+                }
             }
             if (TerrainLookup.HasComponent(entityA) && EnemyWeaponLookup.HasComponent(entityB))
             {
@@ -70,38 +69,24 @@ public partial struct CollisionSystem : ISystem
             {
                 Ecb.DestroyEntity(0, entityB);
             }
-            // if (Compare(aLayers, 0) && Compare(bLayers, 10))
-            // {
-            //     Ecb.DestroyEntity(0, entityA);
-            // }
-            // if (Compare(aLayers, 1) && Compare(bLayers, 0))
-            // {
-            //     
-            // }
-            // if (Compare(aLayers, 2) && Compare(bLayers, 0))
-            // {
-            //
-            // }
         }
     }
     
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         
-        state.Dependency = new CollisionEventJob
-        {
-            ColliderLookup = SystemAPI.GetComponentLookup<PhysicsCollider>(true),
-            TransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true),
-            PlayerLookup = SystemAPI.GetComponentLookup<PlayerData>(),
-            EnemyWeaponLookup = SystemAPI.GetComponentLookup<DamagePlayer>(true),
-            EnemyLookup = SystemAPI.GetComponentLookup<EnemyStats>(),
-            PlayerWeaponLookup = SystemAPI.GetComponentLookup<PlayerProjectile>(true),
-            TerrainLookup = SystemAPI.GetComponentLookup<Obstacle>(true),
-            AllBodies = physicsWorld.CollisionWorld.Bodies,
-            Ecb = GetEntityCommandBuffer(ref state),
-        }.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
-        state.Dependency.Complete();
+        // state.Dependency = new CollisionEventJob
+        // {
+        //     PlayerLookup = SystemAPI.GetComponentLookup<PlayerData>(),
+        //     EnemyWeaponLookup = SystemAPI.GetComponentLookup<DamagePlayer>(true),
+        //     EnemyLookup = SystemAPI.GetComponentLookup<EnemyStats>(),
+        //     PlayerWeaponLookup = SystemAPI.GetComponentLookup<PlayerProjectile>(),
+        //     TerrainLookup = SystemAPI.GetComponentLookup<Obstacle>(true),
+        //     Ecb = GetEntityCommandBuffer(ref state),
+        // }.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
+        // state.Dependency.Complete();
 
     }
 

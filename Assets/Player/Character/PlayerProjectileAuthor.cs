@@ -19,6 +19,6 @@ public class PlayerProjectileAuthor : BaseAuthor
 
 public struct PlayerProjectile : IComponentData
 {
-    public float Health;
-    public float Damage;
+    public BulletStats Stats;
+    public int Health;
 }

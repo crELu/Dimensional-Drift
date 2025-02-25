@@ -138,6 +138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 5
+  dieOnHit: 0
 --- !u!114 &800315103076703991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d807149377da41d2a7120ebb5c5d5db1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homingSpeed: 1
+  homingSpeed: 90
 --- !u!114 &517192096073113519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -164,6 +165,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 10
+  baseMovementSpeed: 0
+  baseRotationSpeed: 0
+  baseAcceleration: 0
+  baseDrag: 0
   bullet: {fileID: 2006387325404477191, guid: 9c05f0c8269444a48a013d4f9b17d137, type: 3}
   fireRate: 0.5
   fireSpeed: 15
