@@ -122,8 +122,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5440c2fb71345c6bead029119140300, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Bullets: []
   baseStats:
+    size: 1
+    speed: 60
     attackSpeed: 3
     attackDelay: 1
     accuracy: 1
@@ -131,8 +132,6 @@ MonoBehaviour:
     count: 0
     bulletStats:
       damage: 8
-      size: 1
-      speed: 30
       duration: 1
       extraction: 0
       power: 0
@@ -142,7 +141,7 @@ MonoBehaviour:
   CoreAugments: []
   WeaponTrack: {fileID: 6247009144885427980}
   WeaponSFX: {fileID: 8300000, guid: 91e3613d19c82024986b6231cca3d570, type: 3}
-  position: {x: -2, y: 4, z: 3}
+  position: {fileID: 0}
 --- !u!82 &6247009144885427980
 AudioSource:
   m_ObjectHideFlags: 0

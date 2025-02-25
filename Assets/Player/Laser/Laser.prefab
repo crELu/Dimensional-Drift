@@ -121,8 +121,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcadc0b72db94644a66c7dfd5fe9afd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Bullets: []
   baseStats:
+    size: 1
+    speed: 5
     attackSpeed: 5
     attackDelay: 0.2
     accuracy: 0.75
@@ -130,13 +131,11 @@ MonoBehaviour:
     count: 1
     bulletStats:
       damage: 50
-      size: 1
-      speed: 0
       duration: 0.5
       extraction: 0
-      power: 0
-      pierce: 0
+      power: 10000
+      pierce: 10000
+  position: {fileID: 0}
   BasicAugments: []
   SpecializedAugments: []
   CoreAugments: []
-  position: {x: -1, y: 0.5, z: 1}
