@@ -14,7 +14,9 @@ public class EnemyShootingAuthor : BaseAuthor
     public float range;
     public float speed;
     public Vector2 visionCone;
-    public float cd;
+    public float cd = 1; 
+    public int bursts = 1;
+    public float burstLength = .5f;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
         var guns = GetComponentsInChildren<EnemyGunTag>();
@@ -30,7 +32,9 @@ public class EnemyShootingAuthor : BaseAuthor
                 Range = range,
                 Speed = speed,
                 VisionConeMinMax = visionCone,
-                MaxCooldown = cd
+                MaxCooldown = cd,
+                BurstCount = bursts,
+                BurstLength = burstLength,
             });
         }
         base.Bake(baker, entity);
@@ -48,6 +52,10 @@ public struct EnemyShoot : IBufferElementData
     public float2 VisionConeMinMax; // x = min angle, y = max angle (degrees)
     public float MaxCooldown;
     public float CurrentCooldown;
+    public int BurstCount; // Number of shots in a burst
+    public float BurstLength; // Time between shots in a burst
+    public int ShotsFired; // Number of shots fired in the current burst
+    public float CurrentBurstTimer; // Timer between burst shots
 }
 
 [BurstCompile]
@@ -80,7 +88,8 @@ public partial struct EnemyShootingSystem : ISystem
         {
             PlayerPosition = playerPos,
             DeltaTime = deltaTime,
-            ECB = ecb
+            ECB = ecb,
+            Dim = DimensionManager.burstDim.Data,
         }.ScheduleParallel();
     }
 
@@ -90,18 +99,36 @@ public partial struct EnemyShootingSystem : ISystem
         [ReadOnly] public float3 PlayerPosition;
         public float DeltaTime;
         public EntityCommandBuffer.ParallelWriter ECB;
+        public Dimension Dim;
         
         void Execute([EntityIndexInQuery] int index, ref DynamicBuffer<EnemyShoot> shoots, in LocalTransform transform)
         {
             for (int i = 0; i < shoots.Length; i++)
             {
                 var shoot = shoots[i];
-                
-                // Update cooldown
+
+                // Update cooldown and burst timer
                 shoot.CurrentCooldown = math.max(shoot.CurrentCooldown - DeltaTime, 0f);
-                
-                // Skip if inactive or cooling down
-                if (!shoot.Active || shoot.CurrentCooldown > 0)
+                shoot.CurrentBurstTimer = math.max(shoot.CurrentBurstTimer - DeltaTime, 0f);
+
+                // Skip if inactive
+                if (!shoot.Active)
+                {
+                    shoots[i] = shoot;
+                    continue;
+                }
+
+                // If in a burst, wait for the burst delay
+                if (shoot.ShotsFired > 0 && shoot.ShotsFired < shoot.BurstCount)
+                {
+                    if (shoot.CurrentBurstTimer > 0)
+                    {
+                        shoots[i] = shoot;
+                        continue;
+                    }
+                }
+                // If no burst shots remain, wait for the full cooldown
+                else if (shoot.CurrentCooldown > 0)
                 {
                     shoots[i] = shoot;
                     continue;
@@ -109,6 +136,7 @@ public partial struct EnemyShootingSystem : ISystem
 
                 // Calculate to-player vector
                 float3 toPlayer = PlayerPosition - transform.Position;
+                if (Dim == Dimension.Two) toPlayer.y = 0;
                 float distance = math.length(toPlayer);
                 float3 forward = transform.TransformDirection(shoot.Forward);
                 
@@ -119,14 +147,17 @@ public partial struct EnemyShootingSystem : ISystem
                     continue;
                 }
 
-                // Vision cone check
-                float3 dirToPlayer = math.normalize(toPlayer);
-                float angle = math.degrees(math.acos(math.dot(forward, dirToPlayer)));
-                
-                if (angle < shoot.VisionConeMinMax.x || angle > shoot.VisionConeMinMax.y)
+                if (shoot.ShotsFired == 0)
                 {
-                    shoots[i] = shoot;
-                    continue;
+                    // Vision cone check
+                    float3 dirToPlayer = math.normalize(toPlayer);
+                    float angle = math.degrees(math.acos(math.dot(forward, dirToPlayer)));
+                    
+                    if (angle < shoot.VisionConeMinMax.x || angle > shoot.VisionConeMinMax.y)
+                    {
+                        shoots[i] = shoot;
+                        continue;
+                    }
                 }
 
                 // Fire projectile
@@ -138,8 +169,18 @@ public partial struct EnemyShootingSystem : ISystem
                     Scale = 1f
                 });
                 ECB.SetComponent(index, projectile, new PhysicsVelocity { Linear = forward * shoot.Speed });
-                // Reset cooldown
-                shoot.CurrentCooldown = shoot.MaxCooldown;
+
+                // Update burst counters
+                shoot.ShotsFired++;
+                shoot.CurrentBurstTimer = shoot.BurstLength / shoot.BurstCount;
+
+                // Reset burst if all shots fired
+                if (shoot.ShotsFired >= shoot.BurstCount)
+                {
+                    shoot.ShotsFired = 0;
+                    shoot.CurrentCooldown = shoot.MaxCooldown;
+                }
+
                 shoots[i] = shoot;
             }
         }

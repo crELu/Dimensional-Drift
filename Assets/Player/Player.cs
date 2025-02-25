@@ -22,7 +22,10 @@ using Vector3 = UnityEngine.Vector3;
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager main;
-    public static Vector3 Position => main.transform.position;
+    public static float3 Position => burstPos.Data;
+    private class IntFieldKey {}
+    public static readonly SharedStatic<float3> burstPos = SharedStatic<float3>.GetOrCreate<PlayerManager, IntFieldKey>();
+    
     public static float waveTimer, maxWaveTimer;
     
     public PlayerMovement movement;
@@ -42,6 +45,7 @@ public class PlayerManager : MonoBehaviour
     private Animator _anim;
     
     public VisualEffect minimap;
+    public RectTransform minimapIcon;
     public GraphicsBuffer Px;
     
     void Start()
@@ -57,6 +61,11 @@ public class PlayerManager : MonoBehaviour
         CheckHealth();
         DoAttack();
         waveCounter.text = $"Wave in {Mathf.Ceil(waveTimer)}s";
+        burstPos.Data = transform.position;
+        
+        var v = transform.forward;
+        v.y = 0;
+        minimapIcon.transform.rotation = Quaternion.Euler(0, 0, -Quaternion.LookRotation(v).eulerAngles.y);
     }
 
     public void DoDamage(float damage)
@@ -73,8 +82,8 @@ public class PlayerManager : MonoBehaviour
         health = Mathf.Min(stats.flatHealth, health);
         shield += stats.shieldRegen * Time.deltaTime;
         shield = Mathf.Min(stats.flatShield, shield);
-        sd.sizeDelta = new Vector2(shield / stats.flatShield * 1000, 64);
-        hp.sizeDelta = new Vector2(health / stats.flatHealth * 1000, 32);
+        sd.sizeDelta = new Vector2(shield / stats.flatShield * 1000, 32);
+        hp.sizeDelta = new Vector2(health / stats.flatHealth * 1000, 64);
     }
 
     private void DoAttack()

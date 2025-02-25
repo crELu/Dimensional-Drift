@@ -4,83 +4,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e55ef862-8198-434e-a97f-d1a3e83e6ecd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/GunRayAI.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/MeleeRayAI.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Player/Minimap.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Player/Minimap.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/shelf/Uncommitted_changes_before_Checkout_at_2_15_2025_2_18_PM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/shelf/Uncommitted_changes_before_Checkout_at_2_15_2025_2_18_PM__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/shelf/Uncommitted_changes_before_Update_at_2_15_2025_2_10_PM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/shelf/Uncommitted_changes_before_Update_at_2_15_2025_2_10_PM__Changes_.xml" beforeDir="false" />
+    <list default="true" id="e55ef862-8198-434e-a97f-d1a3e83e6ecd" name="Changes" comment="physic et al&#10;and some other stuff probably&#10;i helped">
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/SpikeBallAI.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/SpikeBallAI.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Dimensional-Drift/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/BaseEnemyAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/BaseEnemyAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/GunEnemyAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/GunEnemyAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/Movement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/Movement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/ChasePattern.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/ChasePattern.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/GunRayAI.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/WanderPattern.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/WanderPattern.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/MeleeRayAI.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/PatternManager.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/PatternManager.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Homing.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Homing.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/GunRayAI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/GunRayAI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/MeleeRayAI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/AI/MovementPatterns/MeleeRayAI.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Normal.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Projectiles/Normal.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Ray Body 1.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Ray Body 1.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Ray body.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Ray body.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Spike/Spike.controller" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Spike/Spike.controller" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Spike/spike.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Spike/spike.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Systems/DamagePlayerAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/DamagePlayerAuthor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyProjectile.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyProjectile.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyShootingAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/Systems/EnemyShootingAuthor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Enemies/VFX/Engine.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/VFX/Engine.vfx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/VFX/VFXAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/VFX/VFXAuthor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Enemies/WaveManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/WaveManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/ray 1.prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/ray 1.prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/ray 2 .prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/ray 2 .prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/rays.fbx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/rays.fbx.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/spike.fbx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Enemies/spike.fbx.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/LatiosBootstrap1.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/LatiosBootstrap1.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Cannon/BombWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Cannon/BombWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Cannon/VFX_Rocket/Final_Rocket.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Cannon/VFX_Rocket/Final_Rocket.vfx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Cannon/VFX_Rocket/rocks.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Cannon/VFX_Rocket/rocks.vfx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Character/PlayerProjectileAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Character/PlayerProjectileAuthor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Character/PlayerWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Character/PlayerWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Character/Stats.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Character/Stats.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Glow.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Glow.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Glowing.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Glowing.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/Core/EveryNShot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/Core/EveryNShot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/G - Basic.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/G - Basic.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/ray/ray 1.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/ray/ray 1.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Enemies/ray/ray 2 .prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Enemies/ray/ray 2 .prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/G - Crit.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/G - Crit.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/Gun.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/Gun.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/GunWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/GunWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/Jhin.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/Jhin.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/VFX_Bullet/ADF.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/VFX_Bullet/ADF.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/VFX_Bullet/Final_Bulletsss.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/VFX_Bullet/Final_Bulletsss.vfx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/VFX_Bullet/Trail.shadergraph" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/VFX_Bullet/Trail.shadergraph" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Gun/VFX_Bullet/ray.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Gun/VFX_Bullet/ray.vfx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Laser/L - Basic.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Laser/L - Basic.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Laser/Laser.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Laser/Laser.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Laser/LaserWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Laser/LaserWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Laser/VFX/Final_Laser.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Laser/VFX/Final_Laser.vfx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Player/Minimap.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Minimap.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Player/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/PlayerAuthor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/PlayerAuthor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Player/PlayerMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/PlayerMovement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/Sword/SwordWeapon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/Sword/SwordWeapon.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Player/material/VFX/VFX/ray.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Player/material/VFX/VFX/ray.vfx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/SceneDependencyCache/f5dd90e93acf671f1322823585776941.sceneWithBuildSettings" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/SceneDependencyCache/f5dd90e93acf671f1322823585776941.sceneWithBuildSettings" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main Scene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS2.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Subscene/MainECS2.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/HDRP Performant.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/HDRP Performant.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Systems/Dimension/DimensionManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Dimension/DimensionManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/General VFX/BufferManager.vfxblock" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/General VFX/BufferManager.vfxblock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/Input/InputSystem_Actions.inputactions" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Input/InputSystem_Actions.inputactions" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Systems/Physics/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Physics/Collision.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Systems/Physics/PhysicsSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Physics/PhysicsSystem.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Systems/Util/MathsBurst.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Systems/Util/MathsBurst.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/VFX package/General VFX/Every Trail.vfx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/VFX package/General VFX/Every Trail.vfx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/BurstAotSettings_StandaloneWindows.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/BurstAotSettings_StandaloneWindows.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/CommonBurstAotSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/CommonBurstAotSettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -250,7 +199,7 @@
       <workItem from="1740106152910" duration="11185000" />
       <workItem from="1740281441833" duration="7950000" />
       <workItem from="1740357753729" duration="29366000" />
-      <workItem from="1740439184147" duration="1031000" />
+      <workItem from="1740439184147" duration="10300000" />
     </task>
     <task id="LOCAL-00001" summary="did some stuff probably">
       <option name="closed" value="true" />
@@ -300,7 +249,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740164477551</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="physic et al&#10;and some other stuff probably&#10;i helped">
+      <option name="closed" value="true" />
+      <created>1740440339817</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1740440339817</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -334,6 +291,7 @@
     <MESSAGE value="Lots of stuff done, can't write it all here." />
     <MESSAGE value="lots of stuff probably" />
     <MESSAGE value="i love unsafe code" />
-    <option name="LAST_COMMIT_MESSAGE" value="i love unsafe code" />
+    <MESSAGE value="physic et al&#10;and some other stuff probably&#10;i helped" />
+    <option name="LAST_COMMIT_MESSAGE" value="physic et al&#10;and some other stuff probably&#10;i helped" />
   </component>
 </project>

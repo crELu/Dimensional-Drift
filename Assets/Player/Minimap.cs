@@ -54,7 +54,7 @@ namespace Player
 
             // Define the range in the XZ plane.
             float3 playerPos = PlayerManager.Position;
-            float2 maxXZ = new float2(300) + playerPos.xz;
+            float2 maxXZ = new float2(500) + playerPos.xz;
 
             // Schedule the job.
             var job = new EnemyFilterJob

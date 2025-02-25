@@ -7,62 +7,66 @@ using UnityEngine;
 
 namespace Enemies.AI
 {
-    class MeleeRayAI : BaseEnemyAuthor
+    class SpikeBallAI : BaseEnemyAuthor
     {
-        [Header("Melee Ray Settings")] 
+        [Header("Gun Ray Settings")]
+        public float spacingRange;
         public float turnSpeed;
         public override void Bake(UniversalBaker baker, Entity entity)
         {
-            baker.AddComponent(entity, new MeleeRay
+            baker.AddComponent(entity, new SpikeBall
             {
                 TurnSpeed = turnSpeed,
+                SpacingRange = spacingRange * spacingRange,
             });
             base.Bake(baker, entity);
         }
     }
     
-    public struct MeleeRay : IComponentData
+    public struct SpikeBall : IComponentData
     {
         public float TurnSpeed;
+        public float SpacingRange;
     }
     
     [BurstCompile]
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     [UpdateBefore(typeof(BaseEnemyAI))]
-    public partial struct MeleeRayAISystem : ISystem
+    public partial struct SpikeBallAISystem : ISystem
     {
         public void OnCreate(ref SystemState state) { }
 
         public void OnDestroy(ref SystemState state) { }
         
         [BurstCompile]
-        private partial struct MeleeRayAIJob : IJobEntity
+        private partial struct SpikeBallAIJob : IJobEntity
         {
             public float3 PlayerPosition;
             public float DeltaTime;
             public Dimension Dim;
-            private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, ref EnemyMovement movement, ref MeleeRay ray)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, ref EnemyMovement movement, ref SpikeBall ball)
             {
                 var toPlayer = PlayerPosition - transform.Position;
+                
                 if (Dim != Dimension.Three) toPlayer.y = 0;
                 
-                toPlayer = math.normalize(toPlayer);
-                toPlayer = MathsBurst.RotateVectorTowards(transform.Forward(), toPlayer, ray.TurnSpeed * DeltaTime);
-                movement.TargetRoll = 1;
-                movement.TargetFaceDir = toPlayer;
-                movement.TargetMoveDir = toPlayer;
+                movement.TargetRoll = 0;
+                movement.TargetFaceDir = math.normalize(toPlayer);
+                
+                if (math.lengthsq(toPlayer) < ball.SpacingRange) toPlayer *= -1;
+                movement.TargetMoveDir = math.normalize(toPlayer);
             }
         }
         
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            state.Dependency = new MeleeRayAIJob
+            state.Dependency = new SpikeBallAIJob
             {
                 PlayerPosition = PlayerManager.burstPos.Data,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
-                Dim = DimensionManager.burstDim.Data
-            }.ScheduleParallel(state.Dependency); 
+                Dim = DimensionManager.burstDim.Data,
+            }.ScheduleParallel(state.Dependency);
         }
     }
 }

@@ -84,9 +84,9 @@ public class PlayerMovement : MonoBehaviour
         _anim = GetComponent<Animator>();
         _camera = Camera.main;
         DimensionManager.dimSwitch.AddListener(SwitchDims);
-        SwitchDims();
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
         _camera.transform.localPosition = normalCameraPos;
+        SwitchDims();
     }
     
     private void SwitchDims()
