@@ -1,4 +1,5 @@
 using System;
+using Unity.Burst;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -7,7 +8,9 @@ public class DimensionManager : MonoBehaviour
 {
     public static UnityEvent DimSwitch;
 
-    public static Dimension CurrentDim;
+    public static Dimension CurrentDim => burstDim.Data;
+    private class IntFieldKey {}    
+    public static readonly SharedStatic<Dimension> burstDim = SharedStatic<Dimension>.GetOrCreate<DimensionManager, IntFieldKey>();    
     public static Dimension PastDim;
     public static bool CanSwitch;
     
@@ -16,6 +19,7 @@ public class DimensionManager : MonoBehaviour
     
     private void Awake()
     {
+        burstDim.Data = Dimension.Two;
         DimSwitch = new UnityEvent();
         _dimUpAction = InputSystem.actions.FindAction("Dim Up");
         _dimDownAction = InputSystem.actions.FindAction("Dim Down");
@@ -32,11 +36,11 @@ public class DimensionManager : MonoBehaviour
     {
         if (!CanSwitch || Mathf.Abs((int)newDim - (int)CurrentDim) > 1 || newDim == CurrentDim || (newDim < 0) || (Dimension.Zero < newDim)) return;
         PastDim = CurrentDim;
-        CurrentDim = newDim;
+        burstDim.Data = newDim;
         DimSwitch.Invoke();
     }
 }
-// Three = 0, Two = 1, etc. Done for convenience of the default being 0.
+
 public enum Dimension
 {
     Three,

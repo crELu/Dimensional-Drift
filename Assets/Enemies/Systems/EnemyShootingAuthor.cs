@@ -110,6 +110,7 @@ public partial struct EnemyShootingSystem : ISystem
                 // Calculate to-player vector
                 float3 toPlayer = PlayerPosition - transform.Position;
                 float distance = math.length(toPlayer);
+                float3 forward = transform.TransformDirection(shoot.Forward);
                 
                 // Range check
                 if (distance > shoot.Range)
@@ -120,7 +121,7 @@ public partial struct EnemyShootingSystem : ISystem
 
                 // Vision cone check
                 float3 dirToPlayer = math.normalize(toPlayer);
-                float angle = math.degrees(math.acos(math.dot(shoot.Forward, dirToPlayer)));
+                float angle = math.degrees(math.acos(math.dot(forward, dirToPlayer)));
                 
                 if (angle < shoot.VisionConeMinMax.x || angle > shoot.VisionConeMinMax.y)
                 {
@@ -133,10 +134,10 @@ public partial struct EnemyShootingSystem : ISystem
                 ECB.SetComponent(index, projectile, new LocalTransform
                 {
                     Position = transform.TransformPoint(shoot.Position),
-                    Rotation = quaternion.LookRotation(shoot.Forward, math.up()),
+                    Rotation = quaternion.LookRotation(forward, math.up()),
                     Scale = 1f
                 });
-                ECB.SetComponent(index, projectile, new PhysicsVelocity { Linear = shoot.Forward * shoot.Speed });
+                ECB.SetComponent(index, projectile, new PhysicsVelocity { Linear = forward * shoot.Speed });
                 // Reset cooldown
                 shoot.CurrentCooldown = shoot.MaxCooldown;
                 shoots[i] = shoot;

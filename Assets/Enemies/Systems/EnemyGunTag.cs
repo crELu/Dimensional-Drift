@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace Enemies.Systems
 {
-    public class EnemyGunTag: BakingOnlyEntityAuthoring
+    [RequireComponent(typeof(BakingOnlyEntityAuthoring))]
+    public class EnemyGunTag: MonoBehaviour
     {
         public bool debug = true;
         private void OnDrawGizmos()
