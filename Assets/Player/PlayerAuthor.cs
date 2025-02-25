@@ -12,14 +12,11 @@ using UnityEngine;
 
 public class PlayerAuthor : BaseAuthor
 {
-    public GameObject projectile;
     public List<GameObject> projectiles;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
         baker.AddComponent(entity, new PlayerData
         {
-            Health = 100,
-            Shield = 100
         });
         var buffer = baker.AddBuffer<PlayerProjectilePrefab>(entity);
         for (int i = 0; i < projectiles.Count; i++)
@@ -41,9 +38,8 @@ public struct PlayerProjectilePrefab: IBufferElementData
 
 public struct PlayerData : IComponentData
 {
-    public int Health;
-    public int Shield;
     public float AttackTime;
+    public float LastDamage;
 }
 
 public readonly partial struct PlayerAspect : IAspect
@@ -89,7 +85,7 @@ public partial struct PlayerSystem : ISystem
     {
         public EntityCommandBuffer.ParallelWriter ECB;
         public NativeArray<BulletEntity> BulletsToFire;
-        public NativeArray<LocalTransform> PlayerTransform;
+        public LocalTransform PlayerTransform;
         public quaternion PlayerLookRotation;
         public float3 PlayerPosition;
     
@@ -103,7 +99,7 @@ public partial struct PlayerSystem : ISystem
 
             var originalTransform = TransformLookup[prefab];
         
-            var position = PlayerPosition + math.mul(PlayerTransform[0].Rotation, bullet.position);
+            var position = bullet.position;
             var rotation = math.mul(PlayerLookRotation, bullet.rotation);
 
             Entity newEntity = ECB.Instantiate(index, prefab);
@@ -113,15 +109,18 @@ public partial struct PlayerSystem : ISystem
                 rotation,
                 originalTransform.Scale
             ));
-        
-            ECB.AddComponent(index, newEntity, new Lifetime { Time = be.Stats.duration });
+            ECB.AddComponent(index, newEntity, new PostTransformMatrix{Value = float4x4.Scale(be.Stats.Scale)});
+            
+            ECB.AddComponent(index, newEntity, new Lifetime { Time = be.Stats.Stats.duration });
+            
             ECB.AddComponent(index, newEntity, new PhysicsVelocity
             {
-                Linear = math.mul(rotation, math.forward()) * be.Stats.speed
+                Linear = math.mul(rotation, math.forward()) * be.Stats.Speed
             });
             ECB.AddComponent(index, newEntity, new PlayerProjectile()
             {
-                Damage = be.Stats.damage
+                Stats = be.Stats.Stats,
+                Health = 10000,
             });
         }
     }
@@ -129,7 +128,7 @@ public partial struct PlayerSystem : ISystem
     public struct BulletEntity
     {
         public Bullet Bullet;
-        public BulletStats Stats;
+        public AttackInfo Stats;
         public Entity Prefab;
     }
 
@@ -148,7 +147,9 @@ public partial struct PlayerSystem : ISystem
         var projectilePrefabs = SystemAPI.GetBuffer<PlayerProjectilePrefab>(player);
         
         PlayerData pData = p.Player;
-
+        PlayerManager.main.DoDamage(pData.LastDamage);
+        pData.LastDamage = 0;
+        
         if (PlayerManager.fire)
         {
             pData.AttackTime = 0;
@@ -174,28 +175,12 @@ public partial struct PlayerSystem : ISystem
             while (bulletQueue.Count > 0 && pData.AttackTime > bulletQueue.Peek().time)
             {
                 var bulletData = bulletQueue.Dequeue();
-                var prefab = _projectiles[(int)attack.projectile];
+                var prefab = _projectiles[(int)attack.Projectile];
                 bulletsToFire.Add(new() {
                     Bullet = bulletData,
-                    Stats = attack.bulletStats,
+                    Stats = attack.Info,
                     Prefab = prefab
                 });
-                
-                //Entity newEntity = ecb.Instantiate(prefab);
-                
-                // var originalTransform = _localTransformLookup[prefab];
-                //
-                // var position = p.Transform.TransformPoint(bulletData.position);
-                // var rotation = math.mul(PlayerManager.main.LookRotation, bulletData.rotation);
-                //
-                // ecb.SetComponent(newEntity, LocalTransform.FromPositionRotationScale(
-                //     position,
-                //     rotation,
-                //     originalTransform.Scale
-                // ));
-                // ecb.SetComponent(newEntity, new Lifetime(){Time = attack.lifetime});
-                // var v = new PhysicsVelocity { Linear = math.mul(rotation, math.forward()) * attack.speed };
-                // ecb.AddComponent(newEntity, v);
             }
         }
         
@@ -203,8 +188,8 @@ public partial struct PlayerSystem : ISystem
         {
             ECB = ecb,
             BulletsToFire = new NativeArray<BulletEntity>(bulletsToFire.ToArray(), Allocator.TempJob),
-            PlayerTransform = new NativeArray<LocalTransform>(new[] { playerTransform }, Allocator.TempJob),
-            PlayerLookRotation = PlayerManager.main.LookRotation,
+            PlayerTransform = playerTransform,
+            PlayerLookRotation = PlayerManager.main.movement.LookRotation,
             PlayerPosition = playerTransform.Position,
             TransformLookup = _localTransformLookup,
         };
@@ -213,7 +198,7 @@ public partial struct PlayerSystem : ISystem
         JobHandle handle = job.Schedule(bulletsToFire.Count, 64, state.Dependency);
 
         // Combine disposals with main handle
-        handle = job.PlayerTransform.Dispose(handle);
+        //handle = job.PlayerTransform.Dispose(handle);
 
         state.Dependency = handle;
     
@@ -250,13 +235,13 @@ public partial struct PlayerPhysicsSystem : ISystem
             var playerData = PlayerManager.main;
             var transform = player.Transform;
             var playerPhysics = player.PhysicsVelocity;
-            var impulse = playerData.GetMovement(player.PhysicsVelocity.Linear) * dt + playerData.GetDash();
+            var impulse = playerData.movement.GetMovement(player.PhysicsVelocity.Linear) * dt + playerData.movement.GetDash();
             
 
             playerPhysics.ApplyImpulse(player.PhysicsMass, transform.Position, transform.Rotation, impulse, transform.Position);
             //playerPhysics.ApplyAngularImpulse(player.PhysicsMass, playerData.GetRotation(transform.Rotation) * dt);
             playerPhysics.Angular = float3.zero;
-            playerData.position = player.Transform.Position;
+            playerData.movement.Position = player.Transform.Position;
             transform.Rotation = playerData.transform.rotation;
             
             player.Transform = transform;

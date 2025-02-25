@@ -17,9 +17,9 @@ namespace Player.Gun.Core
                 for (int i = 0; i < attacks.Count; i++)
                 {
                     var a = attacks[i];
-                    a.bulletStats.speed *= 2;
-                    a.bulletStats.damage *= 2;
-                    a.projectile = Attack.ProjectileType.GunCrit;
+                    a.Info.Speed *= 2;
+                    a.Info.Stats.damage *= 2;
+                    a.Projectile = Attack.ProjectileType.GunCrit;
                     attacks[i] = a;
                 }
             }

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class LaserWeapon: PlayerWeapon
 {
-    public Vector3 position;
     private float _chargeTimer;
     public override bool Fire(PlayerManager player, bool pressed)
     {
@@ -27,9 +27,10 @@ public class LaserWeapon: PlayerWeapon
     }
     protected override Attack BaseWeaponAttack(WeaponStats stats)
     {
-        Attack attack = new Attack{Bullets = new(), bulletStats = stats.bulletStats, projectile = Attack.ProjectileType.LaserBasic};
+        AttackInfo info = new AttackInfo() { Stats = stats.bulletStats , Scale = new float3(stats.size, stats.size, stats.speed), Speed = 0};
+        Attack attack = new Attack{Bullets = new(), Info = info, Projectile = Attack.ProjectileType.LaserBasic};
         
-        attack.Bullets.Enqueue(new Bullet {position = position, rotation = Quaternion.identity, time = 0});
+        attack.Bullets.Enqueue(new Bullet {position = position.position, rotation = Quaternion.identity, time = 0});
 
         return attack;
     }

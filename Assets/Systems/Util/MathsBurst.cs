@@ -1,14 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Latios;
 using UnityEngine;
 using TMPro;
+using Unity.Burst;
 using Unity.Mathematics;
 using Random = Unity.Mathematics.Random;
 
+[BurstCompile]
 public class MathsBurst
 {
-    public static quaternion GetRandomRotationWithinCone(ref Random r, float y, float p)
+    public static quaternion GetRandomRotationWithinCone(ref Rng.RngSequence r, float y, float p)
     {
         float randomYaw =  r.NextFloat(-y, y);
         float randomPitch = r.NextFloat(-p, p);
@@ -49,6 +52,57 @@ public class MathsBurst
         while (angle > 180) angle -= 360;
         while (angle < -180) angle += 360;
         return angle;
+    }
+    
+    public static quaternion RotateTowards(quaternion from, quaternion to, float maxDegreesDelta)
+    {
+        if (maxDegreesDelta <= 0.0f)
+            return from;
+
+        float dot = math.dot(from, to);
+        quaternion target = to;
+
+        if (dot < 0.0f)
+        {
+            target = new quaternion(-to.value.x, -to.value.y, -to.value.z, -to.value.w);
+            dot = -dot;
+        }
+
+        dot = math.clamp(dot, -1.0f, 1.0f);
+        float theta = math.acos(dot) * 2.0f * Mathf.Rad2Deg;
+
+        if (theta < math.EPSILON)
+            return target;
+
+        float t = math.clamp(maxDegreesDelta / theta, 0, 1);
+        return math.slerp(from, target, t);
+    }
+    
+    public static float3 RotateVectorTowards(float3 current, float3 target, float maxDegreesDelta)
+    {
+        // Normalize the input vectors
+        float3 currentNormalized = math.normalize(current);
+        float3 targetNormalized = math.normalize(target);
+
+        // Calculate the angle between the two vectors in radians
+        float angle = math.acos(math.dot(currentNormalized, targetNormalized));
+
+        // If the angle is already within the limit, return the target vector
+        if (angle <= math.radians(maxDegreesDelta))
+        {
+            return targetNormalized * math.length(current); // Preserve the original magnitude
+        }
+
+        // Calculate the rotation axis using the cross product
+        float3 axis = math.normalize(math.cross(currentNormalized, targetNormalized));
+
+        // Create a quaternion for the rotation
+        quaternion rotation = quaternion.AxisAngle(axis, math.radians(maxDegreesDelta));
+
+        // Apply the rotation to the current vector
+        float3 newDirection = math.mul(rotation, currentNormalized) * math.length(current);
+
+        return newDirection;
     }
     
     public static Quaternion Rotate(Transform current, Vector3 target, Vector3 localAxis, Vector3 localForward, float rotationSpeed, float min = -180, float max = 180)
