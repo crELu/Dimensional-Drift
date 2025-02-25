@@ -6,12 +6,13 @@ using UnityEngine.InputSystem;
 
 public class DimensionManager : MonoBehaviour
 {
-    public static UnityEvent dimSwitch;
+    public static UnityEvent DimSwitch;
 
-    public static Dimension currentDim => burstDim.Data;
-    private class IntFieldKey {}
-    public static readonly SharedStatic<Dimension> burstDim = SharedStatic<Dimension>.GetOrCreate<DimensionManager, IntFieldKey>();
-    public static Dimension pastDim;
+    public static Dimension CurrentDim => burstDim.Data;
+    private class IntFieldKey {}    
+    public static readonly SharedStatic<Dimension> burstDim = SharedStatic<Dimension>.GetOrCreate<DimensionManager, IntFieldKey>();    
+    public static Dimension PastDim;
+    public static bool CanSwitch;
     
     private InputAction _dimUpAction;
     private InputAction _dimDownAction;
@@ -19,23 +20,24 @@ public class DimensionManager : MonoBehaviour
     private void Awake()
     {
         burstDim.Data = Dimension.Two;
-        dimSwitch = new UnityEvent();
+        DimSwitch = new UnityEvent();
         _dimUpAction = InputSystem.actions.FindAction("Dim Up");
         _dimDownAction = InputSystem.actions.FindAction("Dim Down");
+        CanSwitch = true;
     }
     
     void Update()
     {
-        _dimUpAction.performed += _ => SwitchDimension(currentDim + 1);
-        _dimDownAction.performed += _ => SwitchDimension(currentDim - 1);
+        _dimUpAction.performed += _ => SwitchDimension(CurrentDim + 1);
+        _dimDownAction.performed += _ => SwitchDimension(CurrentDim - 1);
     }
 
     void SwitchDimension(Dimension newDim)
     {
-        if (Mathf.Abs((int)newDim - (int)currentDim) > 1 || newDim == currentDim || (newDim < 0) || (Dimension.Zero < newDim)) return;
-        pastDim = currentDim;
+        if (!CanSwitch || Mathf.Abs((int)newDim - (int)CurrentDim) > 1 || newDim == CurrentDim || (newDim < 0) || (Dimension.Zero < newDim)) return;
+        PastDim = CurrentDim;
         burstDim.Data = newDim;
-        dimSwitch.Invoke();
+        DimSwitch.Invoke();
     }
 }
 
