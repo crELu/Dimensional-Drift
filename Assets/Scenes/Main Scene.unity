@@ -8450,8 +8450,8 @@ MonoBehaviour:
   normalCameraRot: {x: 0.008726535, y: 0, z: 0, w: 0.9999619}
   orthoCameraRot: {x: 0.70710677, y: 0, z: 0, w: 0.70710677}
   normalCameraPos: {x: 3, y: 7, z: -12}
-  orthoCameraPos: {x: 0, y: 0, z: -80}
-  orthographicSize: 40
+  orthoCameraPos: {x: 0, y: 0, z: -2000}
+  orthographicSize: 60
   fov: 80
   baseAccel: 1000
   moveSpeed: 100
@@ -11197,7 +11197,7 @@ Camera:
   far clip plane: 2000
   field of view: 70
   orthographic: 0
-  orthographic size: 50
+  orthographic size: 60
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
