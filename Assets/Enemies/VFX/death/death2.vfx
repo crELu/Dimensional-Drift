@@ -43,10 +43,10 @@ MonoBehaviour:
   categories: []
   uiBounds:
     serializedVersion: 2
-    x: -500
-    y: 262
-    width: 1303
-    height: 2153
+    x: -474
+    y: 0
+    width: 1278
+    height: 2390
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2847,7 +2847,7 @@ MonoBehaviour:
   - {fileID: 8926484042661615062}
   m_ExposedName: ColorLife
   m_Exposed: 1
-  m_Order: 0
+  m_Order: 1
   m_Category: 
   m_Min:
     m_Type:
@@ -3841,7 +3841,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"2e2055f51a4fc3d49b4afe7e0ce56f06","type":3}}'
+      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"c841ca6ca2655c04d8c87e1195c2c3c7","type":3}}'
     m_Space: -1
   m_Property:
     name: _Texture2D
