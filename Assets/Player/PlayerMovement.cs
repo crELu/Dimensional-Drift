@@ -236,31 +236,13 @@ public class PlayerMovement : MonoBehaviour
 
         DimensionManager.CanSwitch = true;
     }
-
-    /// <summary>
-    /// Calculates a distance based on a size and field of view.
-    /// </summary>
-    /// <param name="size">The size of the camera.</param>
-    /// <param name="fov">The camera's field of view.</param>
-    /// <returns>The distance away the camera should be.</returns>
+    
     private static float DistanceFromFieldOfViewAndSize(float size, float fov)
         => size / (2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * fov));
-
-    /// <summary>
-    /// Gets a camera size value based on a distance and field of view.
-    /// </summary>
-    /// <param name="distance">The distance away the camera is.</param>
-    /// <param name="fov">The camera's field of view.</param>
-    /// <returns>The size value.</returns>
+    
     private static float SizeFromDistanceAndFieldOfView(float distance, float fov)
         => 2.0f * distance * Mathf.Tan(fov * 0.5f * Mathf.Deg2Rad);
-
-    /// <summary>
-    /// Calculates the field of view needed to get a given frustum size at a given distance.
-    /// </summary>
-    /// <param name="size">The size of the camera.</param>
-    /// <param name="distance">The distance away the camera is.</param>
-    /// <returns>The field of view.</returns>
+    
     private static float FieldOfViewFromSizeAndDistance(float size, float distance)
         => 2.0f * Mathf.Atan(size * 0.5f / distance) * Mathf.Rad2Deg;
        
