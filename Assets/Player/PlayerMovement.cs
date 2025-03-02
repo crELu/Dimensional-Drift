@@ -311,7 +311,7 @@ public class PlayerMovement : MonoBehaviour
                                      accelSpeedScaling.Evaluate(velocity.magnitude/moveSpeed);
             impulse = baseAccel * speedMultipliers * inputVector;
         }
-        impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude)); 
+        impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude / moveSpeed)); 
         return impulse;
     }
     
