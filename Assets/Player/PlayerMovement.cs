@@ -53,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Dimension Switching Settings")]
     public float dimSwitchDuration;
+    public AnimationCurve transitionCurve;
     
     private InputAction _moveAction;
     private InputAction _lookAction;
@@ -190,17 +191,17 @@ public class PlayerMovement : MonoBehaviour
             !Dim3 ? _camera.orthographicSize * 4 : perspectiveSize;
 
         Quaternion nearEndRotation = Quaternion.identity;
-        float nearEndTransitionTime = 0.7f;
-        while (timer < 1f)
+        float nearEndTransitionTime = 0.7f * dimSwitchDuration;
+        while (timer < dimSwitchDuration)
         {
-            timer += Time.deltaTime / dimSwitchDuration;
-            float smoothStep = Mathf.SmoothStep(0, 1, timer);
+            timer += Time.deltaTime;
+            float timeStep = transitionCurve.Evaluate(timer / dimSwitchDuration);
             
-            float currentSize = Mathf.Lerp(startSize, targetSize, smoothStep);
-            _camera.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, smoothStep);
+            float currentSize = Mathf.Lerp(startSize, targetSize, timeStep);
+            _camera.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, timeStep);
             cameraFixture.rotation = Quaternion.Euler(
                     Mathf.Lerp(startFixtureRotation, targetFixtureRotation,
-                        smoothStep), cameraFixture.eulerAngles.y,
+                        timeStep), cameraFixture.eulerAngles.y,
                     cameraFixture.eulerAngles.z);
             
             Vector3 directionToPlayer = transform.position - _camera.transform.position;
@@ -214,7 +215,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     nearEndRotation = _camera.transform.localRotation;
                 }
-                _camera.transform.localRotation = Quaternion.Slerp(nearEndRotation, targetCameraRotation, (smoothStep - nearEndTransitionTime) / (1 - nearEndTransitionTime));
+                _camera.transform.localRotation = Quaternion.Slerp(nearEndRotation, targetCameraRotation, (timeStep - nearEndTransitionTime) / (dimSwitchDuration - nearEndTransitionTime));
             }
             yield return null;
         }
