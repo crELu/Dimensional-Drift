@@ -62,6 +62,25 @@ public struct GeometryHelper {
             // TODO: support for box colliders
         }
     }
+
+    // Project the given collider and position into 2D, if the given `Dimension`
+    // is 2D. Otherwise, the collider and position are unchanged.
+    [BurstCompile]
+    public static void Project2D(
+            in Dimension dim, in float3 projectDirection2D, in Collider c,
+            in float3 position, in quaternion rotation,
+            out Collider projectedCollider, out float3 projectedPosition)
+    {
+        if (dim == Dimension.Two) {
+            GeometryHelper.ProjectPoint2D(
+                projectDirection2D, position, out projectedPosition);
+            GeometryHelper.ProjectCollider2D(
+                projectDirection2D, c, rotation, out projectedCollider);
+        } else {
+            projectedCollider = c;
+            projectedPosition = position;
+        }
+    }
 }
 
 // Initializes the array of `ColliderBody` that gets used to build the Latios
@@ -81,14 +100,11 @@ partial struct ColliderBodiesJob: IJobParallelFor {
         var t = entityTransforms[i];
         float3 projectedPosition = t.Position;
         Collider projectedCollider = entityColliders[i];
-        
-        if (Dim == Dimension.Two)
-        {
-            GeometryHelper.ProjectPoint2D(
-                projectDirection2D, t.Position, out projectedPosition);
-            GeometryHelper.ProjectCollider2D(
-                projectDirection2D, entityColliders[i], t.Rotation, out projectedCollider);
-        }
+
+        GeometryHelper.Project2D(
+                Dim, projectDirection2D, entityColliders[i],
+                t.Position, t.Rotation,
+                out projectedCollider, out projectedPosition);
 
         colliderBodies[i] = new ColliderBody {
             collider = projectedCollider,
@@ -100,7 +116,21 @@ partial struct ColliderBodiesJob: IJobParallelFor {
     }
 }
 
+// Build a mapping from each `Entity` to the index of its `ColliderBody` in the
+// current collision layer
+[BurstCompile]
+partial struct BodyIndicesJob: IJobParallelFor {
+    public NativeArray<ColliderBody>.ReadOnly colliderBodies;
+    public NativeParallelHashMap<Entity, int>.ParallelWriter writer;
+
+    [BurstCompile]
+    public void Execute(int i) {
+        writer.TryAdd(colliderBodies[i].entity, i);
+    }
+}
+
 // Collision handling implementation.
+[BurstCompile]
 public struct PairsProcessor: IFindPairsProcessor {
     public PhysicsComponentLookup<Unity.Physics.PhysicsVelocity> velocity;
     public PhysicsComponentLookup<Unity.Physics.PhysicsMass> mass;
@@ -128,31 +158,11 @@ public struct PairsProcessor: IFindPairsProcessor {
     
     public void Execute(in FindPairsResult result) {
         ColliderDistanceResult r;
-        // Query for bodies that are intersecting. A max distance < 0 is used
-        // so that only pairs which are _slightly_ overlapping are considered.
-        //
-        // This is intended to make sure we only end up considering pairs which
-        // are colliding in 2D, but are NOT colliding in 3D in order to avoid
-        // duplicated collisions.
-        //
-        // The idea is that if a pair is colliding in 3D, then the Unity
-        // physics system will have prevented them from overlapping, and the
-        // collision will be ignored here.
-        const float epsilon = 1f / 1000f;
         if (Physics.DistanceBetween(
                     result.bodyA.collider, result.bodyA.transform,
                     result.bodyB.collider, result.bodyB.transform,
                     0, out r))
         {
-            // TODO: proper collision resolution, instead of just pushing the
-            // bodies away from each other
-            // PhysicsDebug.DrawCollider(result.bodyA.collider, result.bodyA.transform, UnityEngine.Color.red);
-            // PhysicsDebug.DrawCollider(result.bodyB.collider, result.bodyB.transform, UnityEngine.Color.red);
-            var velA = velocity.GetRW(result.entityA);
-            var velB = velocity.GetRW(result.entityB);
-            //velA.ValueRW.Linear -= r.normalA;
-            //velB.ValueRW.Linear -= r.normalB;
-
             Calculate(result.entityA, result.entityB);
             Calculate(result.entityB, result.entityA);
         }
@@ -234,6 +244,7 @@ public struct PairsProcessor: IFindPairsProcessor {
 public partial struct PhysicsSystem: ISystem {
     LatiosWorldUnmanaged latiosWorld;
 
+    NativeParallelHashMap<Entity, int> entitiesToBodyIndices;
     CollisionLayer collisionLayer;
     PairsProcessor pairsProcessor;
 
@@ -267,11 +278,14 @@ public partial struct PhysicsSystem: ISystem {
         componentTypes[i++] = ComponentType.ReadOnly<Unity.Physics.PhysicsMass>();
         componentTypes[i++] = ComponentType.ReadWrite<LocalTransform>();
         physicsObjectQuery = state.GetEntityQuery(componentTypes);
+
+        entitiesToBodyIndices = new NativeParallelHashMap<Entity, int>(0, Allocator.Persistent);
     }
 
     [BurstCompile]
     public void OnDestroy(ref SystemState state) {
         collisionLayer.Dispose();
+        entitiesToBodyIndices.Dispose();
     }
 
     [BurstCompile]
@@ -297,6 +311,16 @@ public partial struct PhysicsSystem: ISystem {
         // Build the current collision layer
         Physics.BuildCollisionLayer(colliderBodies).WithSubdivisions(32, 5, 32).WithWorldBounds(-1000, 1000)
             .ScheduleParallel(out collisionLayer, Allocator.Persistent).Complete();
+
+        // update the mapping from entities to their body indices
+        entitiesToBodyIndices.Clear();
+        if (entities.Length > entitiesToBodyIndices.Capacity) {
+            entitiesToBodyIndices.Capacity = entities.Length;
+        }
+        new BodyIndicesJob {
+            colliderBodies = collisionLayer.colliderBodies,
+            writer = entitiesToBodyIndices.AsParallelWriter()
+        }.Schedule(entities.Length, 64).Complete();
 
         // Run the pairs processor to handle collisions
         pairsProcessor.Update(ref state);
@@ -324,5 +348,17 @@ public partial struct PhysicsSystem: ISystem {
         var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
         return ecb.AsParallelWriter();
+    }
+
+    // Get the collider body associated with the given entity in the current
+    // collisionlayer
+    public bool GetColliderBody(in Entity entity, out ColliderBody body) {
+        if (entitiesToBodyIndices.ContainsKey(entity)) {
+            body = collisionLayer.colliderBodies[entitiesToBodyIndices[entity]];
+            return true;
+        } else {
+            body = new ColliderBody {};
+            return false;
+        }
     }
 }
