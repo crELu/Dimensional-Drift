@@ -119,7 +119,6 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         DoRotation();
-        Debug.Log(_isUsingController);
     }    
     
     private void HandleInputChange(InputUser user, InputUserChange change, InputDevice device)
