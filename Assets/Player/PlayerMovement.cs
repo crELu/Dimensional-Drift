@@ -112,6 +112,7 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
         _camera.transform.localPosition = normalCameraPos;
         _camera.orthographicSize = orthographicSize;
+        _camera.fieldOfView = fov;
         InputUser.onChange += HandleInputChange;
         SwitchDims();
         _isUsingController = Gamepad.all.Count > 0;
