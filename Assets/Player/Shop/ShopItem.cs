@@ -12,24 +12,16 @@ public enum ShopItemType
     CharacterAugment
 }
 
+// Data class
 [Serializable]
-public class ShopItem : MonoBehaviour
+public class ShopItemData
 {
-    [Header("UI Elements")]
-    public Image itemIcon;
-    public TextMeshProUGUI itemName;
-    public TextMeshProUGUI costText;
-    public Button purchaseButton;
-
-    [Header("Item Data")]
     public string itemTitle;
     public string description;
     public float cost;
     public Sprite icon;
     public Augment augment;
     
-    private ShopManager shopManager;
-
     public ShopItemType Type
     {
         get
@@ -44,51 +36,46 @@ public class ShopItem : MonoBehaviour
             };
         }
     }
-    
-    public bool CanPurchase(PlayerInventory inventory)
-    {
-        foreach (var req in augment.Requirements)
-        {
-            if (req.exclusion)
-            {
-                if (inventory.HasAugment(req.augment, req.minTier))
-                    return false;
-            }
-            else
-            {
-                if (!inventory.HasAugment(req.augment, req.minTier))
-                    return false;
-            }
-        }
-        return true;
-    }
-    
-    public void Apply(PlayerInventory inventory, PlayerManager player)
-    {
-        inventory.AddAugment(augment);
-    }
+}
 
-    public void Initialize(ShopItem data, ShopManager manager)
+// MonoBehaviour for UI
+public class ShopItem : MonoBehaviour
+{
+    [Header("UI Elements")]
+    public Image itemIcon;
+    public TextMeshProUGUI itemName;
+    public TextMeshProUGUI costText;
+    public Button purchaseButton;
+
+    private ShopItemData data;
+    private ShopManager shopManager;
+
+    public void Initialize(ShopItemData itemData, ShopManager manager)
     {
-        itemTitle = data.itemTitle;
-        description = data.description;
-        cost = data.cost;
-        icon = data.icon;
-        augment = data.augment;
+        data = itemData;
         shopManager = manager;
         
-        itemIcon.sprite = icon;
-        itemName.text = itemTitle;
-        costText.text = $"{cost} Intel";
+        itemIcon.sprite = data.icon;
+        itemName.text = data.itemTitle;
+        costText.text = $"{data.cost} Intel";
         
         purchaseButton.onClick.AddListener(() => OnPurchaseClicked());
     }
 
     private void OnPurchaseClicked()
     {
-        if (shopManager.PurchaseItem(this))
+        if (shopManager.PurchaseItem(data))
         {
             purchaseButton.interactable = false;
         }
+    }
+
+    public bool CanPurchase(PlayerInventory inventory) => data.augment.Requirements.All(req => 
+        req.exclusion ? !inventory.HasAugment(req.augment, req.minTier) 
+                     : inventory.HasAugment(req.augment, req.minTier));
+
+    public void Apply(PlayerInventory inventory, PlayerManager player)
+    {
+        inventory.AddAugment(data.augment);
     }
 } 
