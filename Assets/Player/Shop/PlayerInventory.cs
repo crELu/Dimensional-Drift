@@ -5,6 +5,7 @@ using System.Linq;
 public class PlayerInventory : MonoBehaviour
 {
     [SerializeField] public int maxWeaponSlots = 3;
+    [SerializeField] private Transform weaponSlotsContainer;
     public Dictionary<AugmentType, PlayerWeapon> equippedWeapons = new();
     public List<Augment> ownedAugments = new();
     
@@ -83,4 +84,6 @@ public class PlayerInventory : MonoBehaviour
         }
         return false;
     }
+
+
 } 
