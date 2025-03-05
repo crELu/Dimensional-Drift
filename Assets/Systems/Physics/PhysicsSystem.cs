@@ -129,6 +129,22 @@ partial struct BodyIndicesJob: IJobParallelFor {
     }
 }
 
+// Helpers to find objects within a radius
+public interface IRadiusProcessor {
+    // objectResult stores the object that was within the radius
+    // distanceResult stores information about how close the object was, etc.
+    void Execute(in FindObjectsResult objectResult, in PointDistanceResult distanceResult);
+}
+
+// An implementation of IRadiusProcessor that draws the collider (for testing)
+[BurstCompile]
+public struct DebugDrawRadiusProcessor: IRadiusProcessor {
+    [BurstCompile]
+    public void Execute(in FindObjectsResult objectResult, in PointDistanceResult _) {
+        PhysicsDebug.DrawCollider(objectResult.collider, objectResult.transform, UnityEngine.Color.red);
+    }
+}
+
 // Collision handling implementation.
 [BurstCompile]
 public struct PairsProcessor: IFindPairsProcessor {
@@ -143,7 +159,7 @@ public struct PairsProcessor: IFindPairsProcessor {
     public PhysicsComponentLookup<Obstacle> TerrainLookup;
         
     public EntityCommandBuffer.ParallelWriter Ecb;
-    
+
     public void Update(ref SystemState state)
     {
         velocity.Update(ref state);
@@ -265,7 +281,7 @@ public partial struct PhysicsSystem: ISystem {
             EnemyWeaponLookup = state.GetComponentLookup<DamagePlayer>(),
             EnemyLookup = state.GetComponentLookup<EnemyStats>(),
             PlayerWeaponLookup = state.GetComponentLookup<PlayerProjectile>(),
-            TerrainLookup = state.GetComponentLookup<Obstacle>()
+            TerrainLookup = state.GetComponentLookup<Obstacle>(),
         };
 
         // Top-down 2D projection
@@ -315,7 +331,7 @@ public partial struct PhysicsSystem: ISystem {
         // update the mapping from entities to their body indices
         entitiesToBodyIndices.Clear();
         if (entities.Length > entitiesToBodyIndices.Capacity) {
-            entitiesToBodyIndices.Capacity = entities.Length;
+            entitiesToBodyIndices.Capacity = entities.Length * 2;
         }
         new BodyIndicesJob {
             colliderBodies = collisionLayer.colliderBodies,
@@ -332,15 +348,19 @@ public partial struct PhysicsSystem: ISystem {
         
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
-        
+
+        /*
+        // Example of using GetColliderBodiesInRange to draw the colliders on
+        // all the objects within 100 units of the origin
+        var ddrp = new DebugDrawRadiusProcessor {};
+        GetColliderBodiesInRange(new float3(0f), 100f, ddrp);
+        */
+
         // Dispose of temporary allocations
         entities.Dispose();
         colliderBodies.Dispose();
         entityColliders.Dispose();
         entityTransforms.Dispose();
-
-        // Draw bounding box gizmos
-        //PhysicsDebug.DrawLayer(collisionLayer).Run();
     }
     
     private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
@@ -359,6 +379,23 @@ public partial struct PhysicsSystem: ISystem {
         } else {
             body = new ColliderBody {};
             return false;
+        }
+    }
+
+    // Get the collider bodies within the range
+    [BurstCompile]
+    public void GetColliderBodiesInRange<T>(in float3 _point, float radius, in T processor) where T: struct, IRadiusProcessor {
+        float3 point = _point;
+        if (DimensionManager.burstDim.Data == Dimension.Two) {
+            GeometryHelper.ProjectPoint2D(projectDirection2D, point, out point);
+        }
+        var radiusAabb = new Aabb(point + new float3(-radius), point + new float3(radius));
+        var candidates = Physics.FindObjects(radiusAabb, collisionLayer);
+        foreach (ref readonly FindObjectsResult objectResult in candidates) {
+            PointDistanceResult distanceResult;
+            if (Physics.DistanceBetween(point, objectResult.collider, objectResult.transform, radius, out distanceResult)) {
+                processor.Execute(objectResult, distanceResult);
+            }
         }
     }
 }
