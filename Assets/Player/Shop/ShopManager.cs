@@ -21,22 +21,24 @@ public class ShopManager : MonoBehaviour
     [SerializeField] private Button pageToggleButton;
     [SerializeField] private TextMeshProUGUI toggleButtonText;
     [SerializeField] private Transform weaponSlotsContainer;
-    [SerializeField] private GameObject weaponSlotPrefab;
     [SerializeField] private Transform shopItemsContainer;
     [SerializeField] private GameObject shopItemPrefab;
+    [SerializeField] private TextMeshProUGUI waveCounter;
+
+    [SerializeField] private TextMeshProUGUI placeholderAugmentsText;
+    [SerializeField] private TextMeshProUGUI placeholderStatsText;
     
     [Header("Shop Items")]
     [SerializeField] private List<ShopItemData> availableItems = new();
 
     [Header("UI Navigation")]
     [SerializeField] private PlayerInput playerInput;
-    [SerializeField] private GameObject firstShopItem;
+    [SerializeField] private GameObject firstShopItem;  // PLACEHOLDER RRRHGH
     private bool shopActive => shopInvParentPanel.activeSelf;
 
     private void Start()
     {
         shopInvParentPanel.SetActive(false);
-        InitializeWeaponSlots();
         InitializeShopItems();
         
         // Setup single toggle button
@@ -87,23 +89,38 @@ public class ShopManager : MonoBehaviour
 
     private void UpdateUI()
     {
-        intelText.text = $"Intel: {playerInventory.Intel:F0}";
-        UpdateWeaponSlots();
-    }
-
-    private void InitializeWeaponSlots()
-    {
-        // Clear existing slots if any
-        foreach (Transform child in weaponSlotsContainer)
+        // Update intel text
+        intelText.text = $"{playerInventory.Intel:F0}";
+        
+        // idk how to make wave stuff work atm will do it later
+        // // Update wave counter text
+        // if (PlayerManager.waveTimer > 0)
+        // {
+        //     waveCounter.text = $"Wave {Enemies.WaveManager.WaveSingleton.Wave} in {Mathf.Ceil(PlayerManager.waveTimer)}s";
+        // }
+        // else
+        // {
+        //     waveCounter.text = $"Wave {Enemies.WaveManager.WaveSingleton.Wave}";
+        // }
+        if (inventoryPage.activeSelf)
         {
-            Destroy(child.gameObject);
-        }
+            var augments = playerInventory.GetCharacterAugments();
+            placeholderAugmentsText.text = "Equipped Augments:\n" + string.Join("\n", augments.Select(a => a.name));
 
-        // Create new weapon slots
-        for (int i = 0; i < playerInventory.maxWeaponSlots; i++)
-        {
-            Instantiate(weaponSlotPrefab, weaponSlotsContainer);
+            var stats = playerManager.stats;
+            placeholderStatsText.text = $"Stats:\n" +
+            $"Health: {stats.flatHealth}\n" +
+            $"Shield: {stats.flatShield}\n" +
+            $"Health Regen: {stats.percentHealth}\n" +
+            $"Shield Regen: {stats.percentShield}\n" +
+            $"Move Speed: {stats.moveSpeed}\n" +
+            $"Contact Damage: {stats.contactDamage}\n" +
+            $"Dash Cooldown: {stats.dashCd}\n" +
+            $"Pickup Radius: {stats.pickupRadius}\n";
+
+            UpdateWeaponSlots();
         }
+        
     }
 
     private void InitializeShopItems()
@@ -128,6 +145,7 @@ public class ShopManager : MonoBehaviour
         var slots = weaponSlotsContainer.GetComponentsInChildren<WeaponSlotUI>();
         var equippedWeapons = playerInventory.equippedWeapons;
 
+        // Update each slot
         for (int i = 0; i < slots.Length; i++)
         {
             if (i < equippedWeapons.Count)
@@ -143,8 +161,9 @@ public class ShopManager : MonoBehaviour
 
     private void SwitchToPage(bool showShop)
     {
-        shopPage.SetActive(showShop);
         inventoryPage.SetActive(!showShop);
+        shopPage.SetActive(showShop);
+        
         toggleButtonText.text = showShop ? "Inventory" : "Shop";
         UpdateUI();
     }
@@ -169,7 +188,7 @@ public class ShopManager : MonoBehaviour
             playerInput.actions.FindActionMap("Player").Enable();
         }
         
-        UpdateUI();
+        // UpdateUI();
     }
 
     public bool PurchaseItem(ShopItemData item)

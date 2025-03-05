@@ -43,7 +43,6 @@ public class ShopItem : MonoBehaviour
 {
     [Header("UI Elements")]
     public Image itemIcon;
-    public TextMeshProUGUI itemName;
     public TextMeshProUGUI costText;
     public Button purchaseButton;
 
@@ -56,7 +55,6 @@ public class ShopItem : MonoBehaviour
         shopManager = manager;
         
         itemIcon.sprite = data.icon;
-        itemName.text = data.itemTitle;
         costText.text = $"{data.cost} Intel";
         
         purchaseButton.onClick.AddListener(() => OnPurchaseClicked());

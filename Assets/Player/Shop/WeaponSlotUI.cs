@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting;
 
 public class WeaponSlotUI : MonoBehaviour
 {
     [SerializeField] private Image weaponIcon;
     [SerializeField] private TextMeshProUGUI weaponName;
+    public bool IsEmpty { get; private set; } = true;
 
     public void SetWeapon(PlayerWeapon weapon)
     {
@@ -15,19 +17,20 @@ public class WeaponSlotUI : MonoBehaviour
             return;
         }
 
-        // emptyState.SetActive(false);
-        // filledState.SetActive(true);
-        // weaponIcon.sprite = weapon.Icon;
-        // weaponName.text = weapon.WeaponName;
-        weaponIcon.sprite = Resources.Load<Sprite>("Sprites/Weapons/GunBasic");
-        weaponName.text = "weapon";
+        IsEmpty = false;
+        string weaponTypeName = weapon.WeaponType.ToString();
+        weaponName.text = weaponTypeName;
+        
+        string iconPath = $"Sprites/Weapons/{weaponTypeName}";
+        weaponIcon.sprite = Resources.Load<Sprite>(iconPath);
+        weaponIcon.color = Color.white;
     }
 
     public void Clear()
     {
-        // emptyState.SetActive(true);
-        // filledState.SetActive(false);
+        IsEmpty = true;
         weaponIcon.sprite = null;
+        weaponIcon.color = Color.clear;
         weaponName.text = "";
     }
 } 
