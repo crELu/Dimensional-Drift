@@ -86,6 +86,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 1, g: 0.23783004, b: 0, a: 1}
   lifetime: 3
+  scale: {x: 1, y: 1, z: 1, w: 0}
+  vfxType: PlayerCannon
 --- !u!114 &7918589941069970403
 MonoBehaviour:
   m_ObjectHideFlags: 0

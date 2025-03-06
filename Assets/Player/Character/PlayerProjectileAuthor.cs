@@ -10,9 +10,14 @@ using UnityEngine;
 
 public class PlayerProjectileAuthor : BaseAuthor
 {
+    public bool isLaser;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
         baker.AddComponent(entity, new PlayerProjectile());
+        if (isLaser)
+        {
+            baker.AddComponent<LaserTag>(entity);
+        }
         base.Bake(baker, entity);
     }
 }
@@ -22,3 +27,5 @@ public struct PlayerProjectile : IComponentData
     public BulletStats Stats;
     public int Health;
 }
+
+public struct LaserTag : IComponentData {}

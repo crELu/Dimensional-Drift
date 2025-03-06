@@ -21,6 +21,7 @@ public partial struct CollisionSystem : ISystem
         public ComponentLookup<PlayerProjectile> PlayerWeaponLookup;
         [ReadOnly] public ComponentLookup<DamagePlayer> EnemyWeaponLookup;
         [ReadOnly] public ComponentLookup<Obstacle> TerrainLookup;
+        [ReadOnly] public ComponentLookup<LaserTag> LaserTagLookup;
         
         public EntityCommandBuffer.ParallelWriter Ecb;
         
@@ -49,9 +50,16 @@ public partial struct CollisionSystem : ISystem
             {
                 PlayerProjectile playerProj = PlayerWeaponLookup.GetRefRW(entityB).ValueRW;
                 EnemyStats enemy = EnemyLookup.GetRefRW(entityA).ValueRW;
-                enemy.Health -= playerProj.Stats.damage;
+                if (LaserTagLookup.HasComponent(entityB))
+                {
+                    enemy.Health -= playerProj.Stats.damage * Time.deltaTime;
+                }
+                else
+                {
+                    enemy.Health -= playerProj.Stats.damage;
+                    playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
+                }
 
-                playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
                 
                 EnemyLookup.GetRefRW(entityA).ValueRW = enemy;
                 PlayerWeaponLookup.GetRefRW(entityB).ValueRW = playerProj;
