@@ -34,15 +34,21 @@ public class ShopManager : MonoBehaviour
     [Header("UI Navigation")]
     [SerializeField] private PlayerInput playerInput;
     [SerializeField] private GameObject firstShopItem;  // PLACEHOLDER RRRHGH
-    private bool shopActive => shopInvParentPanel.activeSelf;
 
     private void Start()
     {
+        Debug.Log($"Shop panel reference: {shopInvParentPanel != null}");
         shopInvParentPanel.SetActive(false);
         InitializeShopItems();
         
+        // Setup input callbacks for both action maps
+        playerInput.actions["Player/Shop"].performed += OnShopAction;
+        playerInput.actions["UI/Shop"].performed += OnShopAction;
+        
         // Setup single toggle button
         pageToggleButton.onClick.AddListener(() => SwitchToPage(!shopPage.activeSelf));
+
+        // Debug.Log(playerInput);
         
         // Start with shop inv page disabled
         // SwitchToPage(true);
@@ -69,22 +75,30 @@ public class ShopManager : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void OnDestroy()
     {
-        if (InputSystem.actions.FindAction("Shop").WasPressedThisFrame() && PlayerManager.waveTimer > 0)
+        // Clean up input callbacks
+        if (playerInput != null)
+        {
+            playerInput.actions["Player/Shop"].performed -= OnShopAction;
+            playerInput.actions["UI/Shop"].performed -= OnShopAction;
+        }
+    }
+
+    private void OnShopAction(InputAction.CallbackContext context)
+    {
+        if (shopInvParentPanel.activeSelf || PlayerManager.waveTimer > 0)
         {
             ToggleShop();
         }
-        
-        if (shopActive)
-        {
-            UpdateUI();
-            
-            if (InputSystem.actions.FindAction("Shop").WasPressedThisFrame())
-            {
-                ToggleShop();
-            }
-        }
+    }
+
+    private void Update()
+    {
+        // if (shopActive)
+        // {
+        //     UpdateUI();
+        // }
     }
 
     private void UpdateUI()
@@ -170,25 +184,24 @@ public class ShopManager : MonoBehaviour
 
     public void ToggleShop()
     {
-        shopInvParentPanel.SetActive(!shopActive);
+        bool newState = !shopInvParentPanel.activeSelf;
+        Debug.Log($"ToggleShop called. Current state: {shopInvParentPanel.activeSelf}");
+        shopInvParentPanel.SetActive(newState);
+        Debug.Log($"Panel should now be: {newState}");
         
-        if (shopActive)
+        if (newState)
         {
             Time.timeScale = 0f;
-            playerInput.actions.FindActionMap("Player").Disable();
-            playerInput.actions.FindActionMap("UI").Enable();
+            playerInput.SwitchCurrentActionMap("UI");
             UpdateWeaponSlots();
             EventSystem.current.SetSelectedGameObject(firstShopItem);
-            SwitchToPage(false);  // Start with inventory page
+            SwitchToPage(false);
         }
         else
         {
             Time.timeScale = 1f;
-            playerInput.actions.FindActionMap("UI").Disable();
-            playerInput.actions.FindActionMap("Player").Enable();
+            playerInput.SwitchCurrentActionMap("Player");
         }
-        
-        // UpdateUI();
     }
 
     public bool PurchaseItem(ShopItemData item)
