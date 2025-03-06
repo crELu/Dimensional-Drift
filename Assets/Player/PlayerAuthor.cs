@@ -88,6 +88,7 @@ public partial struct PlayerSystem : ISystem
         public LocalTransform PlayerTransform;
         public quaternion PlayerLookRotation;
         public float3 PlayerPosition;
+        public PhysicsVelocity PlayerVelocity;
     
         [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
 
@@ -115,7 +116,7 @@ public partial struct PlayerSystem : ISystem
             
             ECB.AddComponent(index, newEntity, new PhysicsVelocity
             {
-                Linear = math.mul(rotation, math.forward()) * be.Stats.Speed
+                Linear = PlayerVelocity.Linear + math.mul(rotation, math.forward()) * be.Stats.Speed
             });
             ECB.AddComponent(index, newEntity, new PlayerProjectile()
             {
@@ -144,6 +145,7 @@ public partial struct PlayerSystem : ISystem
         Entity player = SystemAPI.GetSingletonEntity<PlayerAspect>();
         PlayerAspect p = SystemAPI.GetAspect<PlayerAspect>(player);
         var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
+        var playerVelocity = SystemAPI.GetComponent<PhysicsVelocity>(player);
         var projectilePrefabs = SystemAPI.GetBuffer<PlayerProjectilePrefab>(player);
         
         PlayerData pData = p.Player;
@@ -191,6 +193,7 @@ public partial struct PlayerSystem : ISystem
             PlayerTransform = playerTransform,
             PlayerLookRotation = PlayerManager.main.movement.LookRotation,
             PlayerPosition = playerTransform.Position,
+            PlayerVelocity = playerVelocity,
             TransformLookup = _localTransformLookup,
         };
 
