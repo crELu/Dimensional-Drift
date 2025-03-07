@@ -19,7 +19,7 @@ public class LaserWeapon : PlayerWeapon
     public static float3 LaserRotationOffset;
     
     private float _chargeTimer;
-    public static bool IsLaserActive = false;
+    public static bool LaserIsActive = false;
     private int _laserCount;
 
     protected new void Start()
@@ -37,10 +37,10 @@ public class LaserWeapon : PlayerWeapon
             if (_chargeTimer > BaseStats.attackDelay && base.Fire(player, true))
             {
                 _chargeTimer = 0;
-                if (!IsLaserActive)
+                if (!LaserIsActive)
                 {
                     maxLaserCount++;
-                    IsLaserActive = true;
+                    LaserIsActive = true;
                 }
                 return true;
             }
@@ -49,7 +49,7 @@ public class LaserWeapon : PlayerWeapon
         {
             _chargeTimer = 0;
             maxLaserCount = 0;
-            IsLaserActive = false;
+            LaserIsActive = false;
         }
 
         return false;
