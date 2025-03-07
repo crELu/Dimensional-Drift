@@ -10,13 +10,18 @@ using UnityEngine;
 
 public class PlayerProjectileAuthor : BaseAuthor
 {
-    public bool isLaser;
+    public AttackType attack;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
         baker.AddComponent(entity, new PlayerProjectile());
-        if (isLaser)
+        switch (attack)
         {
-            baker.AddComponent<LaserTag>(entity);
+            case AttackType.Laser:
+                baker.AddComponent<LaserTag>(entity);
+                break;
+            case AttackType.Melee:
+                baker.AddComponent<MeleeTag>(entity);
+                break;
         }
         base.Bake(baker, entity);
     }
@@ -29,3 +34,12 @@ public struct PlayerProjectile : IComponentData
 }
 
 public struct LaserTag : IComponentData {}
+
+public struct MeleeTag : IComponentData {}
+
+public enum AttackType
+{
+    Projectile,
+    Laser,
+    Melee
+}
