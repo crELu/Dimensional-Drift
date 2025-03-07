@@ -8690,14 +8690,14 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.49174458
-      value: 0.48761803
-      inSlope: 3.007341
-      outSlope: 3.007341
+      time: 0.5412596
+      value: 0.5617489
+      inSlope: 3.3075268
+      outSlope: 3.3075268
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.035576645
+      outWeight: 0.034307268
     - serializedVersion: 3
       time: 1
       value: 1
