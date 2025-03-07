@@ -51,6 +51,11 @@ public class MathsBurst
         return (1 + a / 100f) * (1 + b / 100f) - 1;
     }
     
+    public static float3 DimSwitcher(float3 a, bool dim3)
+    {
+        return dim3 ? a : new float3(a.x, 0, a.z);
+    }
+    
     public static Vector3 ApplyRot(Quaternion r, Vector3 v)
     {
         return Quaternion.LookRotation(v) * r * Vector3.forward;
@@ -77,6 +82,17 @@ public class MathsBurst
         while (angle < -180) angle += 360;
         return angle;
     }
+    
+    public static float3 ClampMagnitude(float3 v, float maxMag)
+    {
+        if (math.lengthsq(v) > math.square(maxMag))
+        {
+            v = math.normalize(v) * maxMag;
+        }
+        return v;
+    }
+    
+    
     
     public static quaternion RotateTowards(quaternion from, quaternion to, float maxDegreesDelta)
     {

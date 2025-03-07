@@ -30,15 +30,10 @@ public readonly partial struct SpawnerAspect : IAspect
     public readonly Entity Self;
     
     readonly RefRW<LocalTransform> localTransform;
-    readonly RefRW<LocalToWorld> worldTransform;
     readonly RefRW<Spawner> spawner;
     public LocalTransform Transform {
         get => localTransform.ValueRW;
         set => localTransform.ValueRW = value;
-    }
-    public LocalToWorld WTransform {
-        get => worldTransform.ValueRW;
-        set => worldTransform.ValueRW = value;
     }
     public Entity Prefab => spawner.ValueRO.Prefab;
     public float NextSpawnTime

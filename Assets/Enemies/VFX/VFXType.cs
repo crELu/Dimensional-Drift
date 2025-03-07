@@ -88,6 +88,7 @@ namespace ECS.Enemy
         public void Free(int count)
         {
             _active -= count;
+            Effect.gameObject.name = $"Effect {_active}";
         }
         public void CleanUp()
         {

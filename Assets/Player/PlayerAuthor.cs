@@ -40,6 +40,7 @@ public struct PlayerData : IComponentData
 {
     public float AttackTime;
     public float LastDamage;
+    public float LastIntel;
 }
 
 public readonly partial struct PlayerAspect : IAspect
@@ -59,6 +60,7 @@ public readonly partial struct PlayerAspect : IAspect
         get => _localTransform.ValueRW;
         set => _localTransform.ValueRW = value;
     }
+
     public PhysicsVelocity PhysicsVelocity {
         get => _physicsVelocity.ValueRW;
         set => _physicsVelocity.ValueRW = value;
@@ -149,6 +151,8 @@ public partial struct PlayerSystem : ISystem
         PlayerData pData = p.Player;
         PlayerManager.main.DoDamage(pData.LastDamage);
         pData.LastDamage = 0;
+        PlayerManager.main.intel += pData.LastIntel;
+        pData.LastIntel = 0;
         
         if (PlayerManager.fire)
         {
@@ -220,7 +224,6 @@ public partial struct PlayerPhysicsSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
-        // state.RequireForUpdate<PlayerAspect>();
     }
 
     public void OnDestroy(ref SystemState state)
@@ -233,19 +236,18 @@ public partial struct PlayerPhysicsSystem : ISystem
         {
             var dt = SystemAPI.Time.fixedDeltaTime;
             var playerData = PlayerManager.main;
-            var transform = player.Transform;
-            var playerPhysics = player.PhysicsVelocity;
-            var impulse = playerData.movement.GetMovement(player.PhysicsVelocity.Linear) * dt + playerData.movement.GetDash();
+             var transform = player.Transform;
+             var playerPhysics = player.PhysicsVelocity;
+             var impulse = playerData.movement.GetMovement(player.PhysicsVelocity.Linear) * dt + playerData.movement.GetDash();
             
-
-            playerPhysics.ApplyImpulse(player.PhysicsMass, transform.Position, transform.Rotation, impulse, transform.Position);
-            //playerPhysics.ApplyAngularImpulse(player.PhysicsMass, playerData.GetRotation(transform.Rotation) * dt);
+            playerPhysics.Linear += (float3)impulse;
+            
             playerPhysics.Angular = float3.zero;
             playerData.movement.Position = player.Transform.Position;
             transform.Rotation = playerData.transform.rotation;
             
-            player.Transform = transform;
-            player.PhysicsVelocity = playerPhysics;
+             player.Transform = transform;
+             player.PhysicsVelocity = playerPhysics;
         }
     }
 }

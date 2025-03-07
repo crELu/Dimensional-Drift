@@ -10,7 +10,7 @@ public class AuthorManager : MonoBehaviour
     {
         get
         {
-            var l = GetComponents<BaseAuthor>().ToList();
+            var l = GetComponents<BaseAuthor>().Where(a => a.enabled).ToList();
             if (!ValidateNoOverlappingTypes(l))
             {
                 Debug.Log("Hey theres overlapping types!!!");

@@ -69,7 +69,7 @@ namespace Player
 
             NativeArray<float2> enemyArray = enemyQueue.ToArray(Allocator.Temp);
             
-            if (PlayerManager.main.Px != null)
+            if (PlayerManager.main && PlayerManager.main.Px != null)
             {
                 PlayerManager.main.Px.Dispose();
             }

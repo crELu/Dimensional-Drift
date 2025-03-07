@@ -1,7 +1,10 @@
 ﻿using System;
+using Latios;
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Extensions;
@@ -17,31 +20,35 @@ namespace Enemies.AI
     class BaseEnemyAuthor : BaseAuthor
     {
         [Header("Enemy Settings")]
-        public int health = 10;
+        public float health = 10;
+
+        public float size = 10;
+
+        public GameObject intel;
         
         [Header("Linear Settings")]
-        public float baseMovementSpeed = 5;
-        public float baseMoveWeight = 30;
-        public float baseCorrectWeight = 5;
+        public float3 baseMoveSpeed = new(1);
+        public PID linearPid = new() {Kd=.5f, Ki = .1f, Kp = 4};
         
         [Header("Angular Settings")]
         public float3 baseRotationSpeed = new(1);
-        public PID angularPid = new() {Kd=new float3(.5f), Ki = new float3(.1f), Kp = new float3(4)};
+        public PID angularPid = new() {Kd=.5f, Ki = .1f, Kp = 4};
         
         public override void Bake(UniversalBaker baker, Entity entity)
         {
+            linearPid.SetBounds(baseMoveSpeed);
             angularPid.SetBounds(baseRotationSpeed);
             
             baker.AddComponent(entity, new EnemyStats
             {
                 Health = health,
                 MaxHealth = health,
+                IntelPrefab = baker.ToEntity(intel),
+                Size = size,
             });
             baker.AddComponent(entity, new EnemyMovement
             {
-                BaseMovementSpeed = baseMovementSpeed,
-                BaseMoveWeight = baseMoveWeight,
-                BaseCorrectWeight = baseCorrectWeight,
+                LinearPid = linearPid,
                 AngularPid = angularPid,
             });
             var control = baker.AddBuffer<ThrusterPair>(entity);
@@ -57,19 +64,21 @@ namespace Enemies.AI
         }
     }
     
-    public struct EnemyStats : IComponentData 
+    public struct EnemyStats : IComponentData
     {
-        public float Health, MaxHealth;
+        public float Health, MaxHealth, Size;
+        public bool Invulnerable;
+        public Entity IntelPrefab;
     }
     
     public struct EnemyMovement : IComponentData 
     {
-        public float3 TargetMoveDir;
+        public float3 TargetMoveVel;
         public float3 TargetFaceDir;
-        public float TargetRoll;
+        public float3 TargetUpDir;
         
-        public float BaseMovementSpeed;
-        public float BaseMoveWeight, BaseCorrectWeight;
+        public PID LinearPid;
+
         public PID AngularPid;
     }
 
@@ -79,13 +88,16 @@ namespace Enemies.AI
     {
         private BufferLookup<Thruster> _tBuffer;
         private BufferLookup<ThrusterPair> _tPBbuffer;
+        private ComponentLookup<LocalTransform> _localTransform;
         
         [BurstCompile]
         public void OnCreate(ref SystemState state)
-        {
+        { 
+            state.InitSystemRng("BaseEnemyAI");
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
-            _tBuffer = state.GetBufferLookup<Thruster>(true);
-            _tPBbuffer = state.GetBufferLookup<ThrusterPair>(true);
+            _tBuffer = state.GetBufferLookup<Thruster>();
+            _tPBbuffer = state.GetBufferLookup<ThrusterPair>();
+            _localTransform = state.GetComponentLookup<LocalTransform>(true);
         }
 
         public void OnDestroy(ref SystemState state) { }
@@ -99,31 +111,28 @@ namespace Enemies.AI
                 
             [ReadOnly] public BufferLookup<Thruster> MainThrusters;
             [ReadOnly] public BufferLookup<ThrusterPair> Stabilizers;
-            private float3 ComputeCurveNormal(float3 velocity)
-            {
-                // Estimate curvature using the velocity change (assumes smooth paths)
-                float3 perp = math.cross(velocity, new float3(0, 1, 0)); // Assume Y-up world
-                return math.normalize(perp);
-            }
             
-            private void DoStuff(Entity e, ref LocalTransform transform, ref EnemyMovement enemy, PhysicsMass mass, ref PhysicsVelocity physicsVelocity, float3 moveDir, float3 lookDir, float roll)
+            private void DoStuff(Entity e, ref LocalTransform transform, ref EnemyMovement enemy, PhysicsMass mass, ref PhysicsVelocity physicsVelocity)
             { 
-                moveDir = transform.InverseTransformDirection(moveDir);
-                lookDir = transform.InverseTransformDirection(lookDir);
+                var moveDir = transform.InverseTransformDirection(enemy.TargetMoveVel);
+                var lookDir = transform.InverseTransformDirection(enemy.TargetFaceDir);
+                var upDir = transform.InverseTransformDirection(enemy.TargetUpDir);
                 
-                float3 targetMoveDir = math.normalize(moveDir);
+                //float3 targetMoveDir = math.normalize(moveDir);
                 float3 targetLookDir = math.normalize(lookDir);
+                float3 targetUpDir = math.normalize(upDir);
                 
                 float3 velocity = transform.InverseTransformDirection(physicsVelocity.Linear);
                 
                 // Decompose velocity into desired and undesired components
-                float speedTowardsTarget = math.clamp(math.dot(velocity, targetMoveDir), 0, enemy.BaseMovementSpeed);
-                float3 desiredVelocity = speedTowardsTarget * targetMoveDir;
-                float3 unwantedVelocity = velocity - desiredVelocity;
+               // float speedTowardsTarget = math.clamp(math.dot(velocity, targetMoveDir), 0, enemy.BaseTargetSpeed);
+                //float3 desiredVelocity = speedTowardsTarget * targetMoveDir;
+                //float3 unwantedVelocity = velocity - desiredVelocity;
                 
-                float3 correctionThrustLocal = -unwantedVelocity * enemy.BaseCorrectWeight;
-
-                float3 targetThrust = targetMoveDir * enemy.BaseMoveWeight + correctionThrustLocal;
+                //float3 correctionThrustLocal = -unwantedVelocity * enemy.BaseCorrectWeight;
+                
+                float3 targetThrust = enemy.LinearPid.Cycle(velocity, moveDir, DeltaTime);
+                
                 float3 totalThrust = float3.zero;
                 
                 if (Stabilizers.TryGetBuffer(e, out DynamicBuffer<ThrusterPair> pairs))
@@ -149,11 +158,19 @@ namespace Enemies.AI
                 physicsVelocity.Linear += transform.TransformDirection(totalThrust) * DeltaTime;
                 {
                     var targetAngularVelocity = math.cross(math.forward(), targetLookDir * 10);
-                    targetAngularVelocity.z = roll;
+
+                    if (math.all(targetUpDir == float3.zero))
+                    {
+                        targetAngularVelocity.z = 0;
+                    }
+                    else
+                    {
+                        targetAngularVelocity.z = math.cross(math.up(), targetUpDir).z;
+                    }
+                    
                     var curAngularVelocity = physicsVelocity.Angular;               
-               
-                    enemy.AngularPid.Cycle(curAngularVelocity, targetAngularVelocity, DeltaTime);
-                    physicsVelocity.Angular += enemy.AngularPid.output * DeltaTime;
+                    
+                    physicsVelocity.Angular += DeltaTime * enemy.AngularPid.Cycle(curAngularVelocity, targetAngularVelocity, DeltaTime);;
                 }
                 if (Dim != Dimension.Three)
                 {
@@ -169,19 +186,37 @@ namespace Enemies.AI
                 ref LocalTransform transform,
                 ref PhysicsVelocity physicsVelocity)
             {
-                DoStuff(enemy, ref transform, ref enemyStats, mass, ref physicsVelocity, enemyStats.TargetMoveDir, enemyStats.TargetFaceDir, enemyStats.TargetRoll);
+                DoStuff(enemy, ref transform, ref enemyStats, mass, ref physicsVelocity);
             }
         }
         
         [BurstCompile]
-        public partial struct BaseEnemyHealthJob : IJobEntity
+        public partial struct BaseEnemyHealthJob : IJobEntity, IJobEntityChunkBeginEnd
         {
             public EntityCommandBuffer.ParallelWriter Ecb;
+            [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
+            public SystemRng Rng;
             
+            public bool OnChunkBegin(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            {
+                Rng.BeginChunk(unfilteredChunkIndex);
+                return true;
+            }
+
+            public void OnChunkEnd(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask,
+                bool chunkWasExecuted)
+            {
+            }
+
             private void Execute([ChunkIndexInQuery] int chunkIndex, Entity enemy, EnemyStats enemyStats)
             {
                 if (enemyStats.Health <= 0)
                 {
+                    var transform = TransformLookup[enemy];
+                    var intel = Ecb.Instantiate(chunkIndex, enemyStats.IntelPrefab);
+                    var s = TransformLookup[enemyStats.IntelPrefab];
+                    Ecb.SetComponent(chunkIndex, intel, LocalTransform.FromPositionRotationScale(transform.Position, transform.Rotation, s.Scale));
+                    Ecb.SetComponent(chunkIndex, intel, new PhysicsVelocity{Linear = Rng.NextFloat3Direction() * 5});
                     Ecb.DestroyEntity(chunkIndex, enemy);
                 }
             }
@@ -192,21 +227,28 @@ namespace Enemies.AI
         {
             _tBuffer.Update(ref state);
             _tPBbuffer.Update(ref state);
+            
             EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
-            new BaseEnemyMoveJob
+            var d1 = new BaseEnemyMoveJob
             {
                 MainThrusters = _tBuffer,
                 Stabilizers = _tPBbuffer,
                 Ecb = ecb,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
                 Dim = DimensionManager.burstDim.Data,
-            }.ScheduleParallel();
+            }.ScheduleParallel(state.Dependency);
             
+            d1.Complete();
+            
+            _localTransform.Update(ref state);
             ecb = GetEntityCommandBuffer(ref state);
-            state.Dependency = new BaseEnemyHealthJob
+            var d2 = new BaseEnemyHealthJob
             {
                 Ecb = ecb,
+                TransformLookup = _localTransform,
+                Rng = state.GetJobRng(),
             }.ScheduleParallel(state.Dependency);
+            state.Dependency = d2;
         }
 
         private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)

@@ -10,9 +10,10 @@ using UnityEngine;
 
 public class PlayerProjectileAuthor : BaseAuthor
 {
+    public bool infPierce;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
-        baker.AddComponent(entity, new PlayerProjectile());
+        baker.AddComponent(entity, new PlayerProjectile{InfPierce = infPierce});
         base.Bake(baker, entity);
     }
 }
@@ -21,4 +22,5 @@ public struct PlayerProjectile : IComponentData
 {
     public BulletStats Stats;
     public int Health;
+    public bool InfPierce;
 }

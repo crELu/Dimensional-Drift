@@ -49,6 +49,7 @@ public class PlayerManager : MonoBehaviour
     public VisualEffect minimap;
     public RectTransform minimapIcon;
     public GraphicsBuffer Px;
+    public float intel;
     
     void Start()
     {
