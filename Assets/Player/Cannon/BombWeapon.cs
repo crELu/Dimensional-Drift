@@ -18,7 +18,6 @@ public class BombWeapon: PlayerWeapon
         {
             if (_chargeTimer > BaseStats.attackDelay && base.Fire(player, true))
             {
-                Debug.Log("ok");
                 _chargeTimer = 0;
                 return true;
             }

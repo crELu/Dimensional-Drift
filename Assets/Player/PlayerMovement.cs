@@ -53,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Dimension Switching Settings")]
     public float dimSwitchDuration;
+    public AnimationCurve transitionCurve;
     
     private InputAction _moveAction;
     private InputAction _lookAction;
@@ -111,6 +112,7 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
         _camera.transform.localPosition = normalCameraPos;
         _camera.orthographicSize = orthographicSize;
+        _camera.fieldOfView = fov;
         InputUser.onChange += HandleInputChange;
         SwitchDims();
         _isUsingController = Gamepad.all.Count > 0;
@@ -118,7 +120,6 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         DoRotation();
-        Debug.Log(_isUsingController);
     }    
     
     private void HandleInputChange(InputUser user, InputUserChange change, InputDevice device)
@@ -190,17 +191,17 @@ public class PlayerMovement : MonoBehaviour
             !Dim3 ? _camera.orthographicSize * 4 : perspectiveSize;
 
         Quaternion nearEndRotation = Quaternion.identity;
-        float nearEndTransitionTime = 0.7f;
-        while (timer < 1f)
+        float nearEndTransitionTime = 0.7f * dimSwitchDuration;
+        while (timer < dimSwitchDuration)
         {
-            timer += Time.deltaTime / dimSwitchDuration;
-            float smoothStep = Mathf.SmoothStep(0, 1, timer);
+            timer += Time.deltaTime;
+            float timeStep = transitionCurve.Evaluate(timer / dimSwitchDuration);
             
-            float currentSize = Mathf.Lerp(startSize, targetSize, smoothStep);
-            _camera.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, smoothStep);
+            float currentSize = Mathf.Lerp(startSize, targetSize, timeStep);
+            _camera.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, timeStep);
             cameraFixture.rotation = Quaternion.Euler(
                     Mathf.Lerp(startFixtureRotation, targetFixtureRotation,
-                        smoothStep), cameraFixture.eulerAngles.y,
+                        timeStep), cameraFixture.eulerAngles.y,
                     cameraFixture.eulerAngles.z);
             
             Vector3 directionToPlayer = transform.position - _camera.transform.position;
@@ -214,7 +215,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     nearEndRotation = _camera.transform.localRotation;
                 }
-                _camera.transform.localRotation = Quaternion.Slerp(nearEndRotation, targetCameraRotation, (smoothStep - nearEndTransitionTime) / (1 - nearEndTransitionTime));
+                _camera.transform.localRotation = Quaternion.Slerp(nearEndRotation, targetCameraRotation, (timeStep - nearEndTransitionTime) / (dimSwitchDuration - nearEndTransitionTime));
             }
             yield return null;
         }
@@ -236,31 +237,13 @@ public class PlayerMovement : MonoBehaviour
 
         DimensionManager.CanSwitch = true;
     }
-
-    /// <summary>
-    /// Calculates a distance based on a size and field of view.
-    /// </summary>
-    /// <param name="size">The size of the camera.</param>
-    /// <param name="fov">The camera's field of view.</param>
-    /// <returns>The distance away the camera should be.</returns>
+    
     private static float DistanceFromFieldOfViewAndSize(float size, float fov)
         => size / (2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * fov));
-
-    /// <summary>
-    /// Gets a camera size value based on a distance and field of view.
-    /// </summary>
-    /// <param name="distance">The distance away the camera is.</param>
-    /// <param name="fov">The camera's field of view.</param>
-    /// <returns>The size value.</returns>
+    
     private static float SizeFromDistanceAndFieldOfView(float distance, float fov)
         => 2.0f * distance * Mathf.Tan(fov * 0.5f * Mathf.Deg2Rad);
-
-    /// <summary>
-    /// Calculates the field of view needed to get a given frustum size at a given distance.
-    /// </summary>
-    /// <param name="size">The size of the camera.</param>
-    /// <param name="distance">The distance away the camera is.</param>
-    /// <returns>The field of view.</returns>
+    
     private static float FieldOfViewFromSizeAndDistance(float size, float distance)
         => 2.0f * Mathf.Atan(size * 0.5f / distance) * Mathf.Rad2Deg;
        
@@ -329,7 +312,7 @@ public class PlayerMovement : MonoBehaviour
                                      accelSpeedScaling.Evaluate(velocity.magnitude/moveSpeed);
             impulse = baseAccel * speedMultipliers * inputVector;
         }
-        impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude)); 
+        impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude / moveSpeed)); 
         return impulse;
     }
     

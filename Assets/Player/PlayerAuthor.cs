@@ -9,6 +9,8 @@ using Unity.Physics.Extensions;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
+using Random = UnityEngine.Random;
 
 public class PlayerAuthor : BaseAuthor
 {
@@ -71,11 +73,14 @@ public readonly partial struct PlayerAspect : IAspect
 public partial struct PlayerSystem : ISystem
 {
     private ComponentLookup<LocalTransform> _localTransformLookup;
+    private ComponentLookup<LaserTag> _laserTagLookup;
     private NativeArray<Entity> _projectiles;
+
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerData>();
         _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
+        _laserTagLookup = state.GetComponentLookup<LaserTag>(isReadOnly: true);
     }
 
     public void OnDestroy(ref SystemState state) { }
@@ -90,6 +95,7 @@ public partial struct PlayerSystem : ISystem
         public float3 PlayerPosition;
     
         [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
+        [ReadOnly] public ComponentLookup<LaserTag> LaserTagLookup;
 
         public void Execute(int index)
         {
@@ -111,17 +117,32 @@ public partial struct PlayerSystem : ISystem
             ));
             ECB.AddComponent(index, newEntity, new PostTransformMatrix{Value = float4x4.Scale(be.Stats.Scale)});
             
-            ECB.AddComponent(index, newEntity, new Lifetime { Time = be.Stats.Stats.duration });
             
-            ECB.AddComponent(index, newEntity, new PhysicsVelocity
+            if (IsLaser(prefab))
             {
-                Linear = math.mul(rotation, math.forward()) * be.Stats.Speed
-            });
+                ECB.AddComponent(index, newEntity, new LaserTag());
+                ECB.AddComponent(index, newEntity, new Lifetime { Time = float.MaxValue});
+            }
+            else 
+            {
+                // Add PhysicsVelocity for regular bullets
+                ECB.AddComponent(index, newEntity, new PhysicsVelocity
+                {
+                    Linear = math.mul(rotation, math.forward()) * be.Stats.Speed
+                });
+                ECB.AddComponent(index, newEntity, new Lifetime { Time = be.Stats.Stats.duration });
+
+            }
             ECB.AddComponent(index, newEntity, new PlayerProjectile()
             {
                 Stats = be.Stats.Stats,
                 Health = 10000,
             });
+        }
+        
+        private bool IsLaser(Entity prefab)
+        {
+            return LaserTagLookup.HasComponent(prefab);
         }
     }
 
@@ -136,6 +157,7 @@ public partial struct PlayerSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         _localTransformLookup.Update(ref state);
+        _laserTagLookup.Update(ref state);
         
         var deltaTime = SystemAPI.Time.DeltaTime;
         var bullets = PlayerManager.Bullets;
@@ -184,6 +206,7 @@ public partial struct PlayerSystem : ISystem
             }
         }
         
+        
         var job = new BulletFiringJob
         {
             ECB = ecb,
@@ -192,11 +215,13 @@ public partial struct PlayerSystem : ISystem
             PlayerLookRotation = PlayerManager.main.movement.LookRotation,
             PlayerPosition = playerTransform.Position,
             TransformLookup = _localTransformLookup,
+            LaserTagLookup = _laserTagLookup
         };
 
         // Schedule with initial dependency chain
         JobHandle handle = job.Schedule(bulletsToFire.Count, 64, state.Dependency);
-
+        
+        
         // Combine disposals with main handle
         //handle = job.PlayerTransform.Dispose(handle);
 
@@ -205,6 +230,7 @@ public partial struct PlayerSystem : ISystem
         p.Player = pData;
         
     }
+    
     
     private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
     {
@@ -247,5 +273,57 @@ public partial struct PlayerPhysicsSystem : ISystem
             player.Transform = transform;
             player.PhysicsVelocity = playerPhysics;
         }
+    }
+}
+
+[UpdateAfter(typeof(LateSimulationSystemGroup))]
+public partial struct LaserSystem : ISystem
+{
+    public void OnCreate(ref SystemState state)
+    {
+        state.RequireForUpdate<PlayerData>();
+    }
+
+    public void OnUpdate(ref SystemState state)
+    {
+        // Update the laser's position and rotation to follow the player
+        Entity player = SystemAPI.GetSingletonEntity<PlayerAspect>();
+        var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
+        if (LaserWeapon.LaserIsActive)
+        {
+            foreach (var (laserTransform, _) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<LaserTag>>())
+            {
+                laserTransform.ValueRW.Position = playerTransform.Position + 
+                                                  math.rotate(playerTransform.Rotation, LaserWeapon.LaserOffset);
+                laserTransform.ValueRW.Rotation = math.mul(playerTransform.Rotation, Quaternion.Euler(LaserWeapon.LaserOffset));
+            }
+        }
+        else
+        {
+            DespawnLasers(ref state);
+        }
+    }
+    
+    [BurstCompile]
+    partial struct DespawnLasersJob : IJobEntity
+    {
+        public EntityCommandBuffer.ParallelWriter ECB;
+    
+        public void Execute(Entity entity, [EntityIndexInQuery] int index, in LaserTag laser)
+        {
+            ECB.DestroyEntity(index, entity);
+        }
+    }
+
+    private void DespawnLasers(ref SystemState state)
+    {
+        var ecb = new EntityCommandBuffer(Allocator.TempJob);
+        var job = new DespawnLasersJob { ECB = ecb.AsParallelWriter() };
+    
+        state.Dependency = job.ScheduleParallel(state.Dependency);
+    
+        state.Dependency.Complete();
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
     }
 }
