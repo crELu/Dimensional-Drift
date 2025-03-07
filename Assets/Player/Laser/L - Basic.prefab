@@ -82,7 +82,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce6cc9a555fb49608113f06e21757afa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isLaser: 1
+  attack: 1
 --- !u!114 &-5267809409064220718
 MonoBehaviour:
   m_ObjectHideFlags: 0
