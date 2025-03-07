@@ -33,15 +33,20 @@ public class PlayerManager : MonoBehaviour
     public PlayerMovement movement;
     
     private InputAction _fireAction;
+    private InputAction _weaponUpAction;
+    private InputAction _weaponDownAction;
     
     [Header("Weapon Settings")] 
-    public PlayerWeapon currentWeapon;
+    public PlayerWeapon CurrentWeapon => weapons[currentWeapon];
+    public int currentWeapon;
+    public TextMeshProUGUI weaponText;
+    public List<PlayerWeapon> weapons;
 
     public CharacterStats stats;
     public float health, shield;
     [field:SerializeField] public float Ammo { get; private set; }
     public static bool fire;
-    public static List<Attack> Bullets => main.currentWeapon.Bullets;
+    public static List<Attack> Bullets => main.CurrentWeapon.Bullets;
     public RectTransform hp, sd;
     public TextMeshProUGUI waveCounter;
     private Animator _anim;
@@ -54,6 +59,8 @@ public class PlayerManager : MonoBehaviour
     void Start()
     {
         _fireAction = InputSystem.actions.FindAction("Fire 1");
+        _weaponUpAction  = InputSystem.actions.FindAction("Weapon Up");
+        _weaponDownAction  = InputSystem.actions.FindAction("Weapon Down");
         _anim = GetComponent<Animator>();
         main = this;
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
@@ -65,7 +72,17 @@ public class PlayerManager : MonoBehaviour
         DoAttack();
         waveCounter.text = $"Wave in {Mathf.Ceil(waveTimer)}s";
         burstPos.Data = transform.position;
-        
+        if (_weaponUpAction.triggered)
+        {
+            currentWeapon++;
+            currentWeapon %= weapons.Count;
+        } else if (_weaponDownAction.triggered)
+        {
+            currentWeapon--;
+            if (currentWeapon < 0) currentWeapon = weapons.Count - 1;
+        }
+
+        weaponText.text = $"Weapon: {currentWeapon + 1}";
         var v = transform.forward;
         v.y = 0;
         minimapIcon.transform.rotation = Quaternion.Euler(0, 0, -Quaternion.LookRotation(v).eulerAngles.y);
@@ -102,7 +119,7 @@ public class PlayerManager : MonoBehaviour
 
     private void DoAttack()
     {
-        fire = currentWeapon.Fire(this, _fireAction.IsPressed());
+        fire = CurrentWeapon.Fire(this, _fireAction.IsPressed());
     }
 
     public void UseAmmo(float a)

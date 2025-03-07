@@ -83,7 +83,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 MoveInput => _moveAction.ReadValue<Vector2>();
     private float FlyInput => _flyUpAction.ReadValue<float>() - _flyDownAction.ReadValue<float>();
     public Quaternion LookRotation => Dim3 ? Camera.main.transform.rotation : transform.rotation;
-
+    public GameObject crosshair;
     private bool _isUsingController;
     private Vector3 LookInput
     {
@@ -157,11 +157,13 @@ public class PlayerMovement : MonoBehaviour
         {
             case Dimension.Three:
                 StartCoroutine(DoCameraTransition());
-                if (!_isUsingController) Cursor.lockState = CursorLockMode.Locked;                       
+                if (!_isUsingController) Cursor.lockState = CursorLockMode.Locked;   
+                crosshair.SetActive(true);
                 break;
             case Dimension.Two:
                 StartCoroutine(DoCameraTransition());
                 if (!_isUsingController) Cursor.lockState = CursorLockMode.Confined;
+                crosshair.SetActive(false);
                 break;
             case Dimension.One:
                 break;

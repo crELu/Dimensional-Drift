@@ -358,7 +358,7 @@ MonoBehaviour:
   attackRange: 150
   hideRange: 20
   spacingRange: 75
-  hideHealthFactor: 10
+  hideHealthFactor: 2
   turnSpeed: 20
 --- !u!114 &1611954033966093485
 MonoBehaviour:

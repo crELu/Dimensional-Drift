@@ -24,7 +24,7 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] private AudioClip WeaponSFX;
 
     private float Cd => 1 / BaseStats.attackSpeed;
-    private float _cooldown;
+    protected float Cooldown;
 
     protected void Start()
     {
@@ -42,18 +42,18 @@ public class PlayerWeapon : MonoBehaviour
         BaseStats = baseStats * Stats;
     }
 
-    private void Update()
+    protected void Update()
     {
-        _cooldown -= Time.deltaTime;
+        Cooldown -= Time.deltaTime;
     }
 
     public virtual bool Fire(PlayerManager player, bool pressed)
     {
         Compile();
         
-        if (pressed && _cooldown < 0 && Stats.ammoUse >= player.Ammo)
+        if (pressed && Cooldown < 0 && Stats.ammoUse >= player.Ammo)
         {
-            _cooldown = Cd;
+            Cooldown = Cd;
             player.UseAmmo(Stats.ammoUse);
             RecalcBullets();
 

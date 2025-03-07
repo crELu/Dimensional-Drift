@@ -419,9 +419,9 @@ MonoBehaviour:
       y: 0
       z: 0
   baseRotationSpeed:
-    x: 6
-    y: 2
-    z: 2
+    x: 8
+    y: 3
+    z: 3
   angularPid:
     Kp: 4
     Ki: 0.1
@@ -430,8 +430,8 @@ MonoBehaviour:
       x: 0
       y: 0
       z: 0
-  turnSpeed: 180
-  moveWeight: 30
+  turnSpeed: 270
+  moveWeight: 50
 --- !u!114 &3899002820088160831
 MonoBehaviour:
   m_ObjectHideFlags: 0

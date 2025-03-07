@@ -488,7 +488,7 @@ MonoBehaviour:
       z: 0
   spacingRange: 20
   turnSpeed: 120
-  moveWeight: 30
+  moveWeight: 40
 --- !u!1 &5327507964916551619
 GameObject:
   m_ObjectHideFlags: 0

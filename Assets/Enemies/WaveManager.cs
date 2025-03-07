@@ -121,14 +121,14 @@ namespace Enemies
             {
                 bool waveEarlyDone = _enemies.IsEmpty;
                 var wave = SystemAPI.GetComponent<WaveSingleton>(e);
-                wave.WaveTimer -= SystemAPI.Time.DeltaTime;
+                wave.WaveTimer -= SystemAPI.Time.DeltaTime * GetWaveSpeed(wave.Wave, _enemies.CalculateEntityCount());
                 
                 PlayerManager.waveTimer = wave.WaveTimer;
                 
                 if (waveEarlyDone || wave.WaveTimer < 0)
                 {
                     wave.Wave++;
-                    var count = wave.Difficulty * 10 * wave.Wave;
+                    var count = wave.Difficulty * 2 * wave.Wave;
                     
                     wave.WaveTimer = GetWaveTimer(wave.Wave);
                     PlayerManager.maxWaveTimer = wave.WaveTimer;
@@ -172,7 +172,11 @@ namespace Enemies
 
         private float GetWaveTimer(int wave)
         {
-            return 120;
+            return 240;
+        }
+        private float GetWaveSpeed(int wave, int enemyCount)
+        {
+            return enemyCount <= 10 ? 10 - enemyCount : 1;
         }
         
         private float GetCatRate(int wave)
