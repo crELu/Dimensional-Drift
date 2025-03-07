@@ -117,12 +117,11 @@ public partial struct PlayerSystem : ISystem
             ));
             ECB.AddComponent(index, newEntity, new PostTransformMatrix{Value = float4x4.Scale(be.Stats.Scale)});
             
-
+            
             if (IsLaser(prefab))
             {
                 ECB.AddComponent(index, newEntity, new LaserTag());
                 ECB.AddComponent(index, newEntity, new Lifetime { Time = float.MaxValue});
-
             }
             else 
             {
@@ -207,21 +206,6 @@ public partial struct PlayerSystem : ISystem
             }
         }
         
-        // Update the laser's position and rotation to follow the player
-        if (LaserWeapon.IsLaserActive)
-        {
-            foreach (var (laserTransform, _) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<LaserTag>>())
-            {
-                laserTransform.ValueRW.Position = playerTransform.Position + 
-                                                  math.rotate(playerTransform.Rotation, LaserWeapon.LaserOffset);
-                laserTransform.ValueRW.Rotation = math.mul(playerTransform.Rotation, Quaternion.Euler(LaserWeapon.LaserOffset));
-            }
-
-        }
-        else
-        {
-            DespawnLasers(ref state);
-        }
         
         var job = new BulletFiringJob
         {
@@ -245,29 +229,6 @@ public partial struct PlayerSystem : ISystem
     
         p.Player = pData;
         
-    }
-    
-    [BurstCompile]
-    partial struct DespawnLasersJob : IJobEntity
-    {
-        public EntityCommandBuffer.ParallelWriter ECB;
-    
-        public void Execute(Entity entity, [EntityIndexInQuery] int index, in LaserTag laser)
-        {
-            ECB.DestroyEntity(index, entity);
-        }
-    }
-
-    private void DespawnLasers(ref SystemState state)
-    {
-        var ecb = new EntityCommandBuffer(Allocator.TempJob);
-        var job = new DespawnLasersJob { ECB = ecb.AsParallelWriter() };
-    
-        state.Dependency = job.ScheduleParallel(state.Dependency);
-    
-        state.Dependency.Complete();
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
     }
     
     
@@ -312,5 +273,57 @@ public partial struct PlayerPhysicsSystem : ISystem
             player.Transform = transform;
             player.PhysicsVelocity = playerPhysics;
         }
+    }
+}
+
+[UpdateAfter(typeof(LateSimulationSystemGroup))]
+public partial struct LaserSystem : ISystem
+{
+    public void OnCreate(ref SystemState state)
+    {
+        state.RequireForUpdate<PlayerData>();
+    }
+
+    public void OnUpdate(ref SystemState state)
+    {
+        // Update the laser's position and rotation to follow the player
+        Entity player = SystemAPI.GetSingletonEntity<PlayerAspect>();
+        var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
+        if (LaserWeapon.LaserIsActive)
+        {
+            foreach (var (laserTransform, _) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<LaserTag>>())
+            {
+                laserTransform.ValueRW.Position = playerTransform.Position + 
+                                                  math.rotate(playerTransform.Rotation, LaserWeapon.LaserOffset);
+                laserTransform.ValueRW.Rotation = math.mul(playerTransform.Rotation, Quaternion.Euler(LaserWeapon.LaserOffset));
+            }
+        }
+        else
+        {
+            DespawnLasers(ref state);
+        }
+    }
+    
+    [BurstCompile]
+    partial struct DespawnLasersJob : IJobEntity
+    {
+        public EntityCommandBuffer.ParallelWriter ECB;
+    
+        public void Execute(Entity entity, [EntityIndexInQuery] int index, in LaserTag laser)
+        {
+            ECB.DestroyEntity(index, entity);
+        }
+    }
+
+    private void DespawnLasers(ref SystemState state)
+    {
+        var ecb = new EntityCommandBuffer(Allocator.TempJob);
+        var job = new DespawnLasersJob { ECB = ecb.AsParallelWriter() };
+    
+        state.Dependency = job.ScheduleParallel(state.Dependency);
+    
+        state.Dependency.Complete();
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
     }
 }
