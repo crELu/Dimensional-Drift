@@ -70,6 +70,7 @@ public class PlayerMovement : MonoBehaviour
     private Animator _anim;
     private Camera _camera;
     
+    
     public float3 Position
     {
         set => transform.position = value;
@@ -116,6 +117,7 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
         _camera.transform.localPosition = normalCameraPos;
         _camera.orthographicSize = orthographicSize;
+        _camera.fieldOfView = fov;
         InputUser.onChange += HandleInputChange;
         
         _isUsingController = Gamepad.all.Count > 0;
@@ -207,31 +209,13 @@ public class PlayerMovement : MonoBehaviour
             _camera.orthographic = true;
         }
     }
-
-    /// <summary>
-    /// Calculates a distance based on a size and field of view.
-    /// </summary>
-    /// <param name="size">The size of the camera.</param>
-    /// <param name="fov">The camera's field of view.</param>
-    /// <returns>The distance away the camera should be.</returns>
+    
     private static float DistanceFromFieldOfViewAndSize(float size, float fov)
         => size / (2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * fov));
-
-    /// <summary>
-    /// Gets a camera size value based on a distance and field of view.
-    /// </summary>
-    /// <param name="distance">The distance away the camera is.</param>
-    /// <param name="fov">The camera's field of view.</param>
-    /// <returns>The size value.</returns>
+    
     private static float SizeFromDistanceAndFieldOfView(float distance, float fov)
         => 2.0f * distance * Mathf.Tan(fov * 0.5f * Mathf.Deg2Rad);
-
-    /// <summary>
-    /// Calculates the field of view needed to get a given frustum size at a given distance.
-    /// </summary>
-    /// <param name="size">The size of the camera.</param>
-    /// <param name="distance">The distance away the camera is.</param>
-    /// <returns>The field of view.</returns>
+    
     private static float FieldOfViewFromSizeAndDistance(float size, float distance)
         => 2.0f * Mathf.Atan(size * 0.5f / distance) * Mathf.Rad2Deg;
        
@@ -299,11 +283,12 @@ public class PlayerMovement : MonoBehaviour
                                      accelSpeedScaling.Evaluate(velocity.magnitude/moveSpeed);
             impulse = baseAccel * speedMultipliers * inputVector;
         }
-        impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude));
+        impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude / moveSpeed)); 
         if (transform.position.magnitude > 900)
         {
             impulse -= Vector3.ClampMagnitude(transform.position, transform.position.magnitude - 900 + 100) * wallForce;
         }
+        
         return impulse;
     }
     

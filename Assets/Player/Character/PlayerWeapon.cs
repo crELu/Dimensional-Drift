@@ -26,7 +26,7 @@ public class PlayerWeapon : MonoBehaviour
     private float Cd => 1 / BaseStats.attackSpeed;
     private float _cooldown;
 
-    private void Start()
+    protected void Start()
     {
         Compile();
     }

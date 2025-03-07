@@ -104,15 +104,18 @@ partial struct ColliderBodiesJob: IJobParallelFor {
         var t = entityTransforms[i];
         float3 projectedPosition = t.Position;
         Collider projectedCollider = entityColliders[i];
-
-        GeometryHelper.Project2D(
-                Dim, projectDirection2D, entityColliders[i],
-                t.Position, t.Rotation,
-                out projectedCollider, out projectedPosition);
+        
+        if (Dim == Dimension.Two)
+        {
+            GeometryHelper.ProjectPoint2D(
+                projectDirection2D, t.Position, out projectedPosition);
+            GeometryHelper.ProjectCollider2D(
+                projectDirection2D, entityColliders[i], t.Rotation, out projectedCollider);
+        }
 
         colliderBodies[i] = new ColliderBody {
             collider = projectedCollider,
-            transform = new TransformQvvs(projectedPosition, t.Rotation, t.Scale, 1),
+            transform = new TransformQvvs(projectedPosition, t.Rotation, 1, t.Scale),
             entity = entities[i]
         };
 
@@ -133,6 +136,22 @@ partial struct BodyIndicesJob: IJobParallelFor {
     }
 }
 
+// Helpers to find objects within a radius
+public interface IRadiusProcessor {
+    // objectResult stores the object that was within the radius
+    // distanceResult stores information about how close the object was, etc.
+    void Execute(in FindObjectsResult objectResult, in PointDistanceResult distanceResult);
+}
+
+// An implementation of IRadiusProcessor that draws the collider (for testing)
+[BurstCompile]
+public struct DebugDrawRadiusProcessor: IRadiusProcessor {
+    [BurstCompile]
+    public void Execute(in FindObjectsResult objectResult, in PointDistanceResult _) {
+        PhysicsDebug.DrawCollider(objectResult.collider, objectResult.transform, UnityEngine.Color.red);
+    }
+}
+
 // Collision handling implementation.
 [BurstCompile]
 public struct PairsProcessor: IFindPairsProcessor {
@@ -148,7 +167,7 @@ public struct PairsProcessor: IFindPairsProcessor {
     public PhysicsComponentLookup<Intel> IntelLookup;
         
     public EntityCommandBuffer.ParallelWriter Ecb;
-    
+
     public void Update(ref SystemState state)
     {
         velocity.Update(ref state);
@@ -343,7 +362,7 @@ public partial struct PhysicsSystem: ISystem {
         // update the mapping from entities to their body indices
         entitiesToBodyIndices.Clear();
         if (entities.Length > entitiesToBodyIndices.Capacity) {
-            entitiesToBodyIndices.Capacity = entities.Length;
+            entitiesToBodyIndices.Capacity = entities.Length * 2;
         }
         new BodyIndicesJob {
             colliderBodies = collisionLayer.colliderBodies,
@@ -360,7 +379,14 @@ public partial struct PhysicsSystem: ISystem {
         
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
-        
+
+        /*
+        // Example of using GetColliderBodiesInRange to draw the colliders on
+        // all the objects within 100 units of the origin
+        var ddrp = new DebugDrawRadiusProcessor {};
+        GetColliderBodiesInRange(new float3(0f), 100f, ddrp);
+        */
+
         // Dispose of temporary allocations
         entities.Dispose();
         colliderBodies.Dispose();
@@ -387,6 +413,23 @@ public partial struct PhysicsSystem: ISystem {
         } else {
             body = new ColliderBody {};
             return false;
+        }
+    }
+
+    // Get the collider bodies within the range
+    [BurstCompile]
+    public void GetColliderBodiesInRange<T>(in float3 _point, float radius, in T processor) where T: struct, IRadiusProcessor {
+        float3 point = _point;
+        if (DimensionManager.burstDim.Data == Dimension.Two) {
+            GeometryHelper.ProjectPoint2D(projectDirection2D, point, out point);
+        }
+        var radiusAabb = new Aabb(point + new float3(-radius), point + new float3(radius));
+        var candidates = Physics.FindObjects(radiusAabb, collisionLayer);
+        foreach (ref readonly FindObjectsResult objectResult in candidates) {
+            PointDistanceResult distanceResult;
+            if (Physics.DistanceBetween(point, objectResult.collider, objectResult.transform, radius, out distanceResult)) {
+                processor.Execute(objectResult, distanceResult);
+            }
         }
     }
 }
