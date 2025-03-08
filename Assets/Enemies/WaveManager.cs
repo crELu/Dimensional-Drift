@@ -18,11 +18,13 @@ namespace Enemies
     {
         public List<GameObject> enemies;
         public int difficulty;
+        public GameObject yuumi;
         public override void Bake(UniversalBaker baker, Entity entity)
         {
             baker.AddComponent(entity, new WaveSingleton
             {
                 Difficulty=difficulty,
+                CatPrefab = baker.ToEntity(yuumi),
             });
             var buffer = baker.AddBuffer<WaveEnemy>(entity);
             for (int i = 0; i < enemies.Count; i++)
@@ -41,6 +43,7 @@ namespace Enemies
         public int Difficulty;
         public int Wave;
         public float WaveTimer;
+        public Entity CatPrefab;
     }
     
     public struct WaveEnemy : IBufferElementData
@@ -49,9 +52,11 @@ namespace Enemies
     }
 
     //[BurstCompile]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     public partial struct WaveManagerSystem : ISystem
     {
         private ComponentLookup<LocalTransform> _localTransformLookup;
+        private ComponentLookup<EnemyStats> _enemyStatsLookup;
         private EntityQuery _enemies;
         private Rng _rng;
         
@@ -60,8 +65,9 @@ namespace Enemies
             _rng = new Rng("WaveManagerSystem");
             _enemies = state.GetEntityQuery(ComponentType.ReadOnly<EnemyStats>());
             _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
+            _enemyStatsLookup = state.GetComponentLookup<EnemyStats>(isReadOnly: true);
         }
-
+ 
         public void OnDestroy(ref SystemState state) { }
     
         //[BurstCompile]
@@ -70,7 +76,10 @@ namespace Enemies
             public EntityCommandBuffer.ParallelWriter Ecb;
             [ReadOnly] public NativeArray<int> EntitiesToSpawn;
             public int Radius;
-            [ReadOnly] public ComponentLookup<LocalTransform> LocalTransform;
+            public Entity YuumiPrefab;
+            public float CatRate;
+            [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
+            [ReadOnly] public ComponentLookup<EnemyStats> EnemyStats;
             [ReadOnly] public DynamicBuffer<WaveEnemy> Enemies;
             public Rng Rng;
             
@@ -81,8 +90,24 @@ namespace Enemies
                 var xz = math.normalize(position.xz) * Radius;
                 position.xz = xz;
                 var i = EntitiesToSpawn[jobIndex];
+                
                 var entity = Ecb.Instantiate(jobIndex, Enemies[i].Prefab);
-                var originalTransform = LocalTransform.GetRefRO(Enemies[i].Prefab).ValueRO;
+
+                if (random.NextFloat(0, 1) < CatRate) {
+                    var stats = EnemyStats[Enemies[i].Prefab];
+                    var catStats = EnemyStats[YuumiPrefab];
+                    var cat = Ecb.Instantiate(jobIndex, YuumiPrefab);
+                    Ecb.AddComponent(jobIndex, cat, new Yuumi { Attached = entity });
+                    float hp = stats.Health * catStats.Health;
+                    Ecb.AddComponent(jobIndex, cat,
+                        new EnemyStats { IntelPrefab = catStats.IntelPrefab, MaxHealth = hp, Health = hp });
+                    Ecb.AddComponent(jobIndex, cat, LocalTransform.FromScale(stats.Size));
+
+                    stats.Invulnerable = true;
+                    Ecb.SetComponent(jobIndex, entity, stats);
+                }
+                
+                var originalTransform = LocalTransformLookup.GetRefRO(Enemies[i].Prefab).ValueRO;
                 Ecb.SetComponent(jobIndex, entity, new LocalTransform{Position = position, Rotation = quaternion.identity, Scale = originalTransform.Scale});
             }
         }
@@ -91,18 +116,19 @@ namespace Enemies
         public void OnUpdate(ref SystemState state)
         {
             _localTransformLookup.Update(ref state);
+            _enemyStatsLookup.Update(ref state);
             if (SystemAPI.TryGetSingletonEntity<WaveSingleton>(out Entity e))
             {
                 bool waveEarlyDone = _enemies.IsEmpty;
                 var wave = SystemAPI.GetComponent<WaveSingleton>(e);
-                wave.WaveTimer -= SystemAPI.Time.DeltaTime;
+                wave.WaveTimer -= SystemAPI.Time.DeltaTime * GetWaveSpeed(wave.Wave, _enemies.CalculateEntityCount());
                 
                 PlayerManager.waveTimer = wave.WaveTimer;
                 
                 if (waveEarlyDone || wave.WaveTimer < 0)
                 {
                     wave.Wave++;
-                    var count = wave.Difficulty * 10 * wave.Wave;
+                    var count = wave.Difficulty * 2 * wave.Wave;
                     
                     wave.WaveTimer = GetWaveTimer(wave.Wave);
                     PlayerManager.maxWaveTimer = wave.WaveTimer;
@@ -112,7 +138,7 @@ namespace Enemies
                     
                     var random = _rng.GetSequence(0);
 
-                    float[] weights = { 20, 4, 2};
+                    float[] weights = { 20, 4, 2, 1};
                     float totalWeight = 0;
                     
                     foreach (var t in weights)
@@ -122,20 +148,22 @@ namespace Enemies
                     {
                         enemiesToSpawn[i] = MathsBurst.ChooseWeightedRandom(ref random, weights, totalWeight);
                     }
-                    
+
+                    var ecb = GetEntityCommandBuffer(ref state);
                     var job = new WaveJob
                     {
-                        Ecb = GetEntityCommandBuffer(ref state),
+                        Ecb = ecb.AsParallelWriter(),
                         Enemies = enemyPrefabs,
                         EntitiesToSpawn = enemiesToSpawn,
-                        LocalTransform = _localTransformLookup,
+                        YuumiPrefab = wave.CatPrefab,
+                        CatRate = GetCatRate(wave.Wave),
+                        LocalTransformLookup = _localTransformLookup,
+                        EnemyStats = _enemyStatsLookup,
                         Radius = 1000,
                         Rng = _rng,
                     };
 
-                    JobHandle handle = job.Schedule(enemiesToSpawn.Length, 16, state.Dependency);
-
-                    state.Dependency = handle;
+                    job.Schedule(enemiesToSpawn.Length, 16, state.Dependency).Complete();
                 }
                 
                 SystemAPI.SetComponent(e, wave);
@@ -144,14 +172,23 @@ namespace Enemies
 
         private float GetWaveTimer(int wave)
         {
-            return 120;
+            return 240;
+        }
+        private float GetWaveSpeed(int wave, int enemyCount)
+        {
+            return enemyCount <= 10 ? 10 - enemyCount : 1;
+        }
+        
+        private float GetCatRate(int wave)
+        {
+            return 1 - math.pow(.8f, wave);
         }
 
-        private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
+        private EntityCommandBuffer GetEntityCommandBuffer(ref SystemState state)
         {
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-            return ecb.AsParallelWriter();
+            return ecb;
         }
     }
 }

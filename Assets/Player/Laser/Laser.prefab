@@ -124,14 +124,14 @@ MonoBehaviour:
   baseStats:
     size: 1
     speed: 5
-    attackSpeed: 5
+    attackSpeed: 0.5
     attackDelay: 0.2
     accuracy: 0.75
     ammoUse: 0
     count: 1
     bulletStats:
-      damage: 50
-      duration: 0.5
+      damage: 20
+      duration: 2
       extraction: 0
       power: 10000
       pierce: 10000
@@ -139,3 +139,12 @@ MonoBehaviour:
   BasicAugments: []
   SpecializedAugments: []
   CoreAugments: []
+  WeaponTrack: {fileID: 0}
+  WeaponSFX: {fileID: 0}
+  maxLaserCount: 0
+  laserRotationOffset:
+    x: 0
+    y: 0
+    z: 0
+  _chargeTimer: 0
+  _laserDuration: 0

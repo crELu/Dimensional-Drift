@@ -10,10 +10,11 @@ using UnityEngine;
 
 public class PlayerProjectileAuthor : BaseAuthor
 {
+    public bool infPierce;
     public AttackType attack;
     public override void Bake(UniversalBaker baker, Entity entity)
     {
-        baker.AddComponent(entity, new PlayerProjectile());
+        baker.AddComponent(entity, new PlayerProjectile{InfPierce = infPierce});
         switch (attack)
         {
             case AttackType.Laser:
@@ -31,6 +32,7 @@ public struct PlayerProjectile : IComponentData
 {
     public BulletStats Stats;
     public int Health;
+    public bool InfPierce;
 }
 
 public struct LaserTag : IComponentData {}

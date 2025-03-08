@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using Player;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -16,6 +17,7 @@ using UnityEngine.Serialization;
 using UnityEngine.VFX;
 using Collider = UnityEngine.Collider;
 using Math = Unity.Physics.Math;
+using Matrix4x4 = UnityEngine.Matrix4x4;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
@@ -27,8 +29,13 @@ public class PlayerMovement : MonoBehaviour
     public Quaternion normalCameraRot, orthoCameraRot;
     public Vector3 normalCameraPos, orthoCameraPos;
     public float orthographicSize;
-    public float fov;
-
+    public AnimationCurve rotationCurve2D, movementCurve2D;
+    public AnimationCurve rotationCurve3D, movementCurve3D;
+    
+    public float fov = 60f, near = .3f, far = 1000f;
+    private float _aspect;
+    [SerializeField] private MatrixBlender blender;
+    private Matrix4x4 _ortho, _perspective;
     
     [Header("Movement Settings")]
     public float baseAccel;
@@ -37,6 +44,8 @@ public class PlayerMovement : MonoBehaviour
     public AnimationCurve accelDotScaling;
     public float baseDrag = 5f;
     public AnimationCurve dragSpeedScaling;
+    public float wallForce;
+    public MeshRenderer wall;
     
     [Header("Dash Settings")]
     public float dashDur;
@@ -50,10 +59,6 @@ public class PlayerMovement : MonoBehaviour
     private float _dashSpeed;
     private bool _isDashing;
     private Vector3 _dashDir;
-
-    [Header("Dimension Switching Settings")]
-    public float dimSwitchDuration;
-    public AnimationCurve transitionCurve;
     
     private InputAction _moveAction;
     private InputAction _lookAction;
@@ -78,7 +83,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 MoveInput => _moveAction.ReadValue<Vector2>();
     private float FlyInput => _flyUpAction.ReadValue<float>() - _flyDownAction.ReadValue<float>();
     public Quaternion LookRotation => Dim3 ? Camera.main.transform.rotation : transform.rotation;
-
+    public GameObject crosshair;
     private bool _isUsingController;
     private Vector3 LookInput
     {
@@ -114,12 +119,20 @@ public class PlayerMovement : MonoBehaviour
         _camera.orthographicSize = orthographicSize;
         _camera.fieldOfView = fov;
         InputUser.onChange += HandleInputChange;
-        SwitchDims();
+        
         _isUsingController = Gamepad.all.Count > 0;
+        
+        _aspect = (float) Screen.width / Screen.height;
+        _ortho = Matrix4x4.Ortho(-orthographicSize * _aspect, orthographicSize * _aspect, -orthographicSize, orthographicSize, near, far);
+        _perspective = Matrix4x4.Perspective(fov, _aspect, near, far);
+        Camera.main.projectionMatrix = _perspective;
+        SwitchDims();
     }
     void Update()
     {
         DoRotation();
+        wall.material.SetVector("_PlayerPos", transform.position);
+        //Debug.Log(_isUsingController);
     }    
     
     private void HandleInputChange(InputUser user, InputUserChange change, InputDevice device)
@@ -144,11 +157,13 @@ public class PlayerMovement : MonoBehaviour
         {
             case Dimension.Three:
                 StartCoroutine(DoCameraTransition());
-                if (!_isUsingController) Cursor.lockState = CursorLockMode.Locked;                       
+                if (!_isUsingController) Cursor.lockState = CursorLockMode.Locked;   
+                crosshair.SetActive(true);
                 break;
             case Dimension.Two:
                 StartCoroutine(DoCameraTransition());
                 if (!_isUsingController) Cursor.lockState = CursorLockMode.Confined;
+                crosshair.SetActive(false);
                 break;
             case Dimension.One:
                 break;
@@ -157,85 +172,44 @@ public class PlayerMovement : MonoBehaviour
     
     IEnumerator DoCameraTransition()
     {
-        
         if (!Dim3 == _camera.orthographic)
         {
             yield break;
         }
 
-        DimensionManager.CanSwitch = false;
         if (Dim3)
         {
             _camera.orthographic = false;
         }        
-        float timer = 0f;
-
-        Vector3 orthoSimulatedPosition = new Vector3(0, 0,
-            -DistanceFromFieldOfViewAndSize(orthographicSize, 1));
-        float perspectiveSize = SizeFromDistanceAndFieldOfView(
-            normalCameraPos.magnitude, fov);
         
-        Vector3 startPosition = Dim3 ? orthoSimulatedPosition : normalCameraPos;
-        float startFixtureRotation = cameraFixture.rotation.eulerAngles.x;
-        if (startFixtureRotation > 180f)
-            startFixtureRotation -= 360f;
-        float startSize = Dim3 ? _camera.orthographicSize * 4 : perspectiveSize;
+        Vector3 startPosition = Dim3 ? orthoCameraPos : normalCameraPos;
+        Quaternion startRotation = Dim3 ? orthoCameraRot : normalCameraRot;
 
         Quaternion targetCameraRotation = Dim3 ? normalCameraRot : orthoCameraRot;
-        float targetFixtureRotation = !Dim3
-            ? orthoCameraRot.eulerAngles.x
-            : normalCameraRot.eulerAngles.x;
-        Vector3 targetPosition =
-            !Dim3 ? orthoSimulatedPosition : normalCameraPos;
-        float targetSize =
-            !Dim3 ? _camera.orthographicSize * 4 : perspectiveSize;
 
-        Quaternion nearEndRotation = Quaternion.identity;
-        float nearEndTransitionTime = 0.7f * dimSwitchDuration;
-        while (timer < dimSwitchDuration)
+        Vector3 targetPosition = !Dim3 ? orthoCameraPos : normalCameraPos;
+        
+        blender.BlendToMatrix(Dim3 ? _perspective : _ortho, DimensionManager.Duration);
+        var movementCurve = Dim3 ? movementCurve3D : movementCurve2D;
+        var rotationCurve = Dim3 ? rotationCurve3D : rotationCurve2D;
+        
+        while (DimensionManager.t < 1f)
         {
-            timer += Time.deltaTime;
-            float timeStep = transitionCurve.Evaluate(timer / dimSwitchDuration);
+            var t = !Dim3 ? DimensionManager.t : DimensionManager.t;
+            _camera.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, movementCurve.Evaluate(t));
             
-            float currentSize = Mathf.Lerp(startSize, targetSize, timeStep);
-            _camera.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, timeStep);
-            cameraFixture.rotation = Quaternion.Euler(
-                    Mathf.Lerp(startFixtureRotation, targetFixtureRotation,
-                        timeStep), cameraFixture.eulerAngles.y,
-                    cameraFixture.eulerAngles.z);
+            _camera.transform.localRotation = Quaternion.Slerp(startRotation, targetCameraRotation, rotationCurve.Evaluate(t));
             
-            Vector3 directionToPlayer = transform.position - _camera.transform.position;
-            Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer, Vector3.up);
-            _camera.transform.rotation = targetRotation;
-
-            _camera.fieldOfView = Mathf.Clamp(FieldOfViewFromSizeAndDistance(currentSize, -_camera.transform.localPosition.z), 1, fov);
-            if (Dim3 && timer > nearEndTransitionTime)
-            {
-                if (nearEndRotation == Quaternion.identity)
-                {
-                    nearEndRotation = _camera.transform.localRotation;
-                }
-                _camera.transform.localRotation = Quaternion.Slerp(nearEndRotation, targetCameraRotation, (timeStep - nearEndTransitionTime) / (dimSwitchDuration - nearEndTransitionTime));
-            }
             yield return null;
         }
-        // Set all values to their target value
-        cameraFixture.rotation = Quaternion.Euler(new Vector3(
-            targetFixtureRotation, cameraFixture.eulerAngles.y,
-            cameraFixture.eulerAngles.z));
+        
         _camera.transform.localPosition = targetPosition;
-        cameraFixture.rotation = Quaternion.Euler(targetFixtureRotation,
-            cameraFixture.eulerAngles.y, cameraFixture.eulerAngles.z);
         _camera.transform.localRotation = targetCameraRotation;
         
         if (!Dim3)
         {
-            _camera.transform.localRotation = Quaternion.identity;
             _camera.orthographic = true;
-            _camera.transform.localPosition = orthoCameraPos;
         }
-
-        DimensionManager.CanSwitch = true;
     }
     
     private static float DistanceFromFieldOfViewAndSize(float size, float fov)
@@ -292,9 +266,8 @@ public class PlayerMovement : MonoBehaviour
             }
             float angleDegrees = -angle * Mathf.Rad2Deg + 90f + cameraFixture.eulerAngles.y;
             Quaternion targetRotation = Quaternion.Euler(0f, angleDegrees, 0f);
-            Quaternion fixtureRotation = cameraFixture.rotation;
             transform.rotation = targetRotation;
-            cameraFixture.rotation = fixtureRotation;
+            cameraFixture.rotation = Quaternion.identity;
         }
     }
     
@@ -313,6 +286,11 @@ public class PlayerMovement : MonoBehaviour
             impulse = baseAccel * speedMultipliers * inputVector;
         }
         impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude / moveSpeed)); 
+        if (transform.position.magnitude > 900)
+        {
+            impulse -= Vector3.ClampMagnitude(transform.position, transform.position.magnitude - 900 + 100) * wallForce;
+        }
+        
         return impulse;
     }
     

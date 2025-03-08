@@ -42,6 +42,7 @@ public struct PlayerData : IComponentData
 {
     public float AttackTime;
     public float LastDamage;
+    public float LastIntel;
 }
 
 public readonly partial struct PlayerAspect : IAspect
@@ -61,6 +62,7 @@ public readonly partial struct PlayerAspect : IAspect
         get => _localTransform.ValueRW;
         set => _localTransform.ValueRW = value;
     }
+
     public PhysicsVelocity PhysicsVelocity {
         get => _physicsVelocity.ValueRW;
         set => _physicsVelocity.ValueRW = value;
@@ -173,6 +175,8 @@ public partial struct PlayerSystem : ISystem
         PlayerData pData = p.Player;
         PlayerManager.main.DoDamage(pData.LastDamage);
         pData.LastDamage = 0;
+        PlayerManager.main.intel += pData.LastIntel;
+        pData.LastIntel = 0;
         
         if (PlayerManager.fire)
         {
@@ -249,7 +253,6 @@ public partial struct PlayerPhysicsSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
-        // state.RequireForUpdate<PlayerAspect>();
     }
 
     public void OnDestroy(ref SystemState state)
@@ -266,39 +269,40 @@ public partial struct PlayerPhysicsSystem : ISystem
             var playerPhysics = player.PhysicsVelocity;
             var impulse = playerData.movement.GetMovement(player.PhysicsVelocity.Linear) * dt + playerData.movement.GetDash();
             
-
-            playerPhysics.ApplyImpulse(player.PhysicsMass, transform.Position, transform.Rotation, impulse, transform.Position);
-            //playerPhysics.ApplyAngularImpulse(player.PhysicsMass, playerData.GetRotation(transform.Rotation) * dt);
+            playerPhysics.Linear += (float3)impulse;
+            
             playerPhysics.Angular = float3.zero;
             playerData.movement.Position = player.Transform.Position;
             transform.Rotation = playerData.transform.rotation;
-            
+                
             player.Transform = transform;
             player.PhysicsVelocity = playerPhysics;
         }
     }
 }
 
-[UpdateAfter(typeof(LateSimulationSystemGroup))]
+[UpdateInGroup(typeof(PresentationSystemGroup ))]
 public partial struct LaserSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
+        //state.RequireForUpdate<PlayerAspect>();
         state.RequireForUpdate<PlayerData>();
     }
 
     public void OnUpdate(ref SystemState state)
     {
-        // Update the laser's position and rotation to follow the player
-        Entity player = SystemAPI.GetSingletonEntity<PlayerAspect>();
-        var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
+        Entity playerE = SystemAPI.GetSingletonEntity<PlayerAspect>();
+        PlayerAspect player = SystemAPI.GetAspect<PlayerAspect>(playerE);
+        var playerTransform = player.Transform;
+        var playerData = PlayerManager.main;
         if (LaserWeapon.LaserIsActive)
         {
             foreach (var (laserTransform, _) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<LaserTag>>())
             {
                 laserTransform.ValueRW.Position = playerTransform.Position + 
-                                                  math.rotate(playerTransform.Rotation, LaserWeapon.LaserOffset);
-                laserTransform.ValueRW.Rotation = math.mul(playerTransform.Rotation, Quaternion.Euler(LaserWeapon.LaserOffset));
+                                                  math.rotate(playerData.transform.rotation, LaserWeapon.LaserOffset);
+                laserTransform.ValueRW.Rotation = playerData.movement.LookRotation;
             }
         }
         else

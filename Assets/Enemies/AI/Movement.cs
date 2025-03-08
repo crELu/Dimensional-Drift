@@ -7,42 +7,28 @@ namespace Enemies.AI
     [Serializable]
     public struct PID {
    
-        public float3 Kp;
-        public float3 Ki;
-        public float3 Kd;
+        public float Kp;
+        public float Ki;
+        public float Kd;
    
-        private float3 _outputMax;
-        private float3 _outputMin;
+        private float3 _outputLimit;
 
         private float3 _preError;
    
         public float3 integral;
-        private float3 _integralMax;
-        private float3 _integralMin;
-   
-        public float3 output;
-   
+        
         public void SetBounds(float3 torque)
         {
-            _outputMax = torque;
-            _outputMin = -torque;
-            _integralMax = Divide(_outputMax, Ki);
-            _integralMin = Divide(_outputMin, Ki);       
+            _outputLimit = torque;
         }
    
-        public float3 Divide(float3 a, float3 b){
-            Func<float, float> inv = (n) => 1/(n != 0? n : 1);
-            var iVec = new float3(inv(b.x), inv(b.x), inv(b.z));
-            return a * iVec;
-        }
-   
-        public float3 Cycle(float3 pv, float3 setPoint, float dt){
+        public float3 Cycle(float3 pv, float3 setPoint, float dt) {
             var error = setPoint - pv;
-            integral = math.clamp(integral + (error * dt), _integralMin, _integralMax);
+            integral = math.clamp(integral + (error * dt), -_outputLimit/Ki, _outputLimit/Ki);
        
             var derivative = (error - _preError) / dt;
-            output = Kp * error + Ki * integral + Kd * derivative;
-            output = math.clamp(output, _outputMin, _outputMax);
+            var output = Kp * error + Ki * integral + Kd * derivative;
+            output = math.clamp(output, -_outputLimit, _outputLimit);
        
             _preError = error;
             return output;

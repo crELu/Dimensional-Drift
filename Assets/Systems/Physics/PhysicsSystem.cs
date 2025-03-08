@@ -18,7 +18,11 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics.Extensions;
 using Unity.Transforms;
+using UnityEngine;
 using static Unity.Mathematics.math;
+using CapsuleCollider = Latios.Psyshock.CapsuleCollider;
+using Collider = Latios.Psyshock.Collider;
+using Physics = Latios.Psyshock.Physics;
 
 
 // Static helper methods
@@ -100,11 +104,14 @@ partial struct ColliderBodiesJob: IJobParallelFor {
         var t = entityTransforms[i];
         float3 projectedPosition = t.Position;
         Collider projectedCollider = entityColliders[i];
-
-        GeometryHelper.Project2D(
-                Dim, projectDirection2D, entityColliders[i],
-                t.Position, t.Rotation,
-                out projectedCollider, out projectedPosition);
+        
+        if (Dim == Dimension.Two)
+        {
+            GeometryHelper.ProjectPoint2D(
+                projectDirection2D, t.Position, out projectedPosition);
+            GeometryHelper.ProjectCollider2D(
+                projectDirection2D, entityColliders[i], t.Rotation, out projectedCollider);
+        }
 
         colliderBodies[i] = new ColliderBody {
             collider = projectedCollider,
@@ -157,6 +164,7 @@ public struct PairsProcessor: IFindPairsProcessor {
     public PhysicsComponentLookup<PlayerProjectile> PlayerWeaponLookup;
     public PhysicsComponentLookup<DamagePlayer> EnemyWeaponLookup;
     public PhysicsComponentLookup<Obstacle> TerrainLookup;
+    public PhysicsComponentLookup<Intel> IntelLookup;
         
     public EntityCommandBuffer.ParallelWriter Ecb;
 
@@ -170,6 +178,7 @@ public struct PairsProcessor: IFindPairsProcessor {
         PlayerWeaponLookup.Update(ref state);
         EnemyWeaponLookup.Update(ref state);
         TerrainLookup.Update(ref state);
+        IntelLookup.Update(ref state);
     }
     
     public void Execute(in FindPairsResult result) {
@@ -201,16 +210,17 @@ public struct PairsProcessor: IFindPairsProcessor {
         }
         else if (EnemyLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
         {
-            PlayerProjectile playerProj = PlayerWeaponLookup.GetRW(entityB).ValueRW;
             EnemyStats enemy = EnemyLookup.GetRW(entityA).ValueRW;
-            enemy.Health -= playerProj.Stats.damage;
+            PlayerProjectile playerProj = PlayerWeaponLookup.GetRW(entityB).ValueRW;
+            Debug.Log($"{enemy.Invulnerable}");
+            if (!enemy.Invulnerable) enemy.Health -= playerProj.Stats.damage;
 
             playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
-                
+
             EnemyLookup.GetRW(entityA).ValueRW = enemy;
             PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
                 
-            if (playerProj.Health == 0)
+            if (playerProj.Health <= 0)
             {
                 Ecb.DestroyEntity(0, entityB);
             }
@@ -219,9 +229,21 @@ public struct PairsProcessor: IFindPairsProcessor {
         {
             DamagePlayer enemyProj = EnemyWeaponLookup.GetRW(entityA).ValueRW;
             PlayerProjectile playerProj = PlayerWeaponLookup.GetRW(entityB).ValueRW;
-            if (enemyProj.Mass == -1)
+            if (enemyProj.Mass < 0 || playerProj.InfPierce)
             {
-                Ecb.DestroyEntity(0, entityB);
+                if (enemyProj.Mass < 0 && playerProj.InfPierce) return;
+                if (playerProj.InfPierce) Ecb.DestroyEntity(0, entityA);
+                else
+                {
+                    playerProj.Health -= (int)math.ceil(-(float)enemyProj.Mass / ((1+playerProj.Stats.pierce)*(1+playerProj.Stats.power)));
+                    
+                    PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
+                    
+                    if (playerProj.Health <= 0)
+                    {
+                        Ecb.DestroyEntity(0, entityB);
+                    }
+                }
             }
             else
             {
@@ -234,11 +256,11 @@ public struct PairsProcessor: IFindPairsProcessor {
                 EnemyWeaponLookup.GetRW(entityA).ValueRW = enemyProj;
                 PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
                 
-                if (enemyProj.Mass == 0)
+                if (enemyProj.Mass <= 0)
                 {
                     Ecb.DestroyEntity(0, entityA);
                 }
-                if (playerProj.Health == 0)
+                if (playerProj.Health <= 0)
                 {
                     Ecb.DestroyEntity(0, entityB);
                 }
@@ -250,6 +272,14 @@ public struct PairsProcessor: IFindPairsProcessor {
         }
         else if (TerrainLookup.HasComponent(entityA) && PlayerWeaponLookup.HasComponent(entityB))
         {
+            Ecb.DestroyEntity(0, entityB);
+        }
+        else if (PlayerLookup.HasComponent(entityA) && IntelLookup.HasComponent(entityB))
+        {
+            PlayerData player = PlayerLookup.GetRW(entityA).ValueRW;
+            Intel intel = IntelLookup.GetRW(entityB).ValueRW;
+            player.LastIntel += intel.BaseValue;
+            PlayerLookup.GetRW(entityA).ValueRW = player;
             Ecb.DestroyEntity(0, entityB);
         }
     }
@@ -282,6 +312,7 @@ public partial struct PhysicsSystem: ISystem {
             EnemyLookup = state.GetComponentLookup<EnemyStats>(),
             PlayerWeaponLookup = state.GetComponentLookup<PlayerProjectile>(),
             TerrainLookup = state.GetComponentLookup<Obstacle>(),
+            IntelLookup = state.GetComponentLookup<Intel>()
         };
 
         // Top-down 2D projection
@@ -361,6 +392,9 @@ public partial struct PhysicsSystem: ISystem {
         colliderBodies.Dispose();
         entityColliders.Dispose();
         entityTransforms.Dispose();
+
+        // Draw bounding box gizmos
+        PhysicsDebug.DrawLayer(collisionLayer).Run();
     }
     
     private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)

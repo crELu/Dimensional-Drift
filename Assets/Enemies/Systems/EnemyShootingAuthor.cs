@@ -10,31 +10,42 @@ using UnityEngine;
 
 public class EnemyShootingAuthor : BaseAuthor
 {
+    [Header("Base Settings")]
+    public bool active = true;
     public GameObject projectile;
     public float range;
     public float speed;
     public Vector2 visionCone;
     public float cd = 1; 
+    
+    [Header("Burst Settings")]
     public int bursts = 1;
     public float burstLength = .5f;
+     
     public override void Bake(UniversalBaker baker, Entity entity)
     {
         var guns = GetComponentsInChildren<EnemyGunTag>();
         var buffer = baker.AddBuffer<EnemyShoot>(entity);
+        buffer.Capacity = 0;
         for (int i = 0; i < guns.Length; i++)
         {
+            var data = guns[i];
             buffer.Add(new EnemyShoot
             {
                 Projectile = baker.ToEntity(projectile),
-                Active = true,
+                Active = active,
                 Position = guns[i].transform.localPosition,
-                Forward = guns[i].transform.forward,
+                Forward = guns[i].transform.localRotation * Vector3.forward,
+                Up = guns[i].transform.localRotation * Vector3.up,
                 Range = range,
                 Speed = speed,
                 VisionConeMinMax = visionCone,
                 MaxCooldown = cd,
                 BurstCount = bursts,
                 BurstLength = burstLength,
+                SpreadAngle = data.spreadAngle,
+                SpreadCount = data.spreadCount,
+                Distance = data.distance,
             });
         }
         base.Bake(baker, entity);
@@ -47,11 +58,15 @@ public struct EnemyShoot : IBufferElementData
     public bool Active;
     public float3 Position;
     public float3 Forward;
+    public float3 Up;
     public float Range;
     public float Speed;
     public float2 VisionConeMinMax; // x = min angle, y = max angle (degrees)
     public float MaxCooldown;
     public float CurrentCooldown;
+    public int SpreadCount;
+    public float SpreadAngle;
+    public float Distance;
     public int BurstCount; // Number of shots in a burst
     public float BurstLength; // Time between shots in a burst
     public int ShotsFired; // Number of shots fired in the current burst
@@ -62,11 +77,13 @@ public struct EnemyShoot : IBufferElementData
 public partial struct EnemyShootingSystem : ISystem
 {
     private EntityQuery _playerQuery;
+    private ComponentLookup<LocalTransform> _transformLookup;
     
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         _playerQuery = state.GetEntityQuery(ComponentType.ReadOnly<PlayerData>());
+        _transformLookup = state.GetComponentLookup<LocalTransform>();
         state.RequireForUpdate<PlayerData>();
     }
 
@@ -74,7 +91,8 @@ public partial struct EnemyShootingSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         if (_playerQuery.IsEmpty) return;
-
+        _transformLookup.Update(ref state);
+        
         // Get player position
         var player = SystemAPI.GetSingletonEntity<PlayerData>();
         var playerPos = SystemAPI.GetComponent<LocalTransform>(player).Position;
@@ -84,13 +102,14 @@ public partial struct EnemyShootingSystem : ISystem
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter();
 
         // Shooting job
-        new ProcessShootingJob
+        state.Dependency = new ProcessShootingJob
         {
             PlayerPosition = playerPos,
             DeltaTime = deltaTime,
             ECB = ecb,
             Dim = DimensionManager.burstDim.Data,
-        }.ScheduleParallel();
+            Transform = _transformLookup,
+        }.ScheduleParallel(state.Dependency);
     }
 
     [BurstCompile]
@@ -100,9 +119,11 @@ public partial struct EnemyShootingSystem : ISystem
         public float DeltaTime;
         public EntityCommandBuffer.ParallelWriter ECB;
         public Dimension Dim;
+        [ReadOnly] public ComponentLookup<LocalTransform> Transform;
         
-        void Execute([EntityIndexInQuery] int index, ref DynamicBuffer<EnemyShoot> shoots, in LocalTransform transform)
+        void Execute([ChunkIndexInQuery] int index, Entity entity, ref DynamicBuffer<EnemyShoot> shoots)
         {
+            var transform = Transform[entity];
             for (int i = 0; i < shoots.Length; i++)
             {
                 var shoot = shoots[i];
@@ -159,16 +180,29 @@ public partial struct EnemyShootingSystem : ISystem
                         continue;
                     }
                 }
-
-                // Fire projectile
-                Entity projectile = ECB.Instantiate(index, shoot.Projectile);
-                ECB.SetComponent(index, projectile, new LocalTransform
+                
+                float3 up = transform.TransformDirection(shoot.Up);
+                quaternion baseRot = quaternion.LookRotation(forward, up);
+                float3 pos = transform.TransformPoint(shoot.Position);
+                var t = Transform[shoot.Projectile];
+                
+                float step = shoot.SpreadCount > 1 ? shoot.SpreadAngle / (shoot.SpreadCount - 1) : 0f;
+                float start = shoot.SpreadCount > 1 ? -shoot.SpreadAngle / 2f : 0f;
+                
+                for (int j = 0; j < shoot.SpreadCount; j++)
                 {
-                    Position = transform.TransformPoint(shoot.Position),
-                    Rotation = quaternion.LookRotation(forward, math.up()),
-                    Scale = 1f
-                });
-                ECB.SetComponent(index, projectile, new PhysicsVelocity { Linear = forward * shoot.Speed });
+                    quaternion rot = math.mul(baseRot, quaternion.EulerZXY(0, math.TORADIANS * (start + j * step), 0));
+                    float3 dir = math.mul(rot, math.forward());
+                    // Fire projectile
+                    Entity projectile = ECB.Instantiate(index, shoot.Projectile);
+                    ECB.SetComponent(index, projectile, new LocalTransform
+                    {
+                        Position = pos + dir * shoot.Distance,
+                        Rotation = rot,
+                        Scale = t.Scale
+                    });
+                    ECB.AddComponent(index, projectile, new PhysicsVelocity { Linear = dir * shoot.Speed });
+                }
 
                 // Update burst counters
                 shoot.ShotsFired++;
