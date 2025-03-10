@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public enum ShopItemType
 {
@@ -39,15 +40,46 @@ public class ShopItemData
 }
 
 // MonoBehaviour for UI
-public class ShopItem : MonoBehaviour
+public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler
 {
     [Header("UI Elements")]
     public Image itemIcon;
     public TextMeshProUGUI costText;
     public Button purchaseButton;
-
-    private ShopItemData data;
+    public Augment augment;
+    
+    [Header("Selection Colors")]
+    [SerializeField] private Color normalColor = Color.white;
+    [SerializeField] private Color selectedColor = new Color(0.8f, 0.8f, 1f); // Light blue tint
+    
+    public ShopItemData data;
     private ShopManager shopManager;
+    private PlayerInventory playerInventory;
+
+    private void Start()
+    {
+        purchaseButton.interactable = false;  // Disabled by default
+    }
+
+    public void OnSelect(BaseEventData eventData)
+    {
+        itemIcon.color = selectedColor;
+        purchaseButton.interactable = true;
+    }
+
+    public void OnDeselect(BaseEventData eventData)
+    {
+        itemIcon.color = normalColor;
+        purchaseButton.interactable = false;
+    }
+
+    private void OnSubmit()
+    {
+        if (purchaseButton.interactable)
+        {
+            OnPurchaseClicked();
+        }
+    }
 
     public void Initialize(ShopItemData itemData, ShopManager manager)
     {
@@ -64,6 +96,15 @@ public class ShopItem : MonoBehaviour
     {
         if (shopManager.PurchaseItem(data))
         {
+            // If it's a weapon-related augment, apply it immediately
+            if (data.augment is CoreAugment coreAug)
+            {
+                var weapon = playerInventory.equippedWeapons[coreAug.coreType];
+                if (weapon != null)
+                {
+                    // weapon.AddAugment(coreAug);
+                }
+            }
             purchaseButton.interactable = false;
         }
     }
