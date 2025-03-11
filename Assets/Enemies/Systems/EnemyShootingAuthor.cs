@@ -26,14 +26,21 @@ public class EnemyShootingAuthor : BaseAuthor
     {
         var guns = GetComponentsInChildren<EnemyGunTag>();
         var buffer = baker.AddBuffer<EnemyShoot>(entity);
-        buffer.Capacity = 0;
+        buffer.Capacity = guns.Length;
+        var builder = new BlobBuilder(Allocator.Temp);
+            
+        ref ShootingArrayBlob arrayBlob = ref builder.ConstructRoot<ShootingArrayBlob>();
+        
+        BlobBuilderArray<ShootingBlob> singlesBuilder = builder.Allocate(
+            ref arrayBlob.Guns,
+            guns.Length
+        );
+        
         for (int i = 0; i < guns.Length; i++)
         {
             var data = guns[i];
-            buffer.Add(new EnemyShoot
+            singlesBuilder[i] = new ShootingBlob
             {
-                Projectile = baker.ToEntity(projectile),
-                Active = active,
                 Position = guns[i].transform.localPosition,
                 Forward = guns[i].transform.localRotation * Vector3.forward,
                 Up = guns[i].transform.localRotation * Vector3.up,
@@ -46,16 +53,24 @@ public class EnemyShootingAuthor : BaseAuthor
                 SpreadAngle = data.spreadAngle,
                 SpreadCount = data.spreadCount,
                 Distance = data.distance,
+            };
+            buffer.Add(new EnemyShoot
+            {
+                Projectile = baker.ToEntity(projectile),
+                Active = active,
             });
         }
+        var linearBlob = builder.CreateBlobAssetReference<ShootingArrayBlob>(Allocator.Persistent);
+        builder.Dispose();
+        baker.AddBlobAsset(ref linearBlob, out var hash1);
+        baker.AddComponent(entity, new ShootingData{Data = linearBlob});
+        
         base.Bake(baker, entity);
     }
 }
 
-public struct EnemyShoot : IBufferElementData
+public struct ShootingBlob
 {
-    public Entity Projectile;
-    public bool Active;
     public float3 Position;
     public float3 Forward;
     public float3 Up;
@@ -63,12 +78,28 @@ public struct EnemyShoot : IBufferElementData
     public float Speed;
     public float2 VisionConeMinMax; // x = min angle, y = max angle (degrees)
     public float MaxCooldown;
-    public float CurrentCooldown;
     public int SpreadCount;
     public float SpreadAngle;
     public float Distance;
     public int BurstCount; // Number of shots in a burst
     public float BurstLength; // Time between shots in a burst
+}
+
+public struct ShootingArrayBlob
+{
+    public BlobArray<ShootingBlob> Guns;
+}
+
+public struct ShootingData : IComponentData
+{
+    public BlobAssetReference<ShootingArrayBlob> Data;
+}
+
+public struct EnemyShoot : IBufferElementData
+{
+    public Entity Projectile;
+    public bool Active;
+    public float CurrentCooldown;
     public int ShotsFired; // Number of shots fired in the current burst
     public float CurrentBurstTimer; // Timer between burst shots
 }
@@ -121,13 +152,13 @@ public partial struct EnemyShootingSystem : ISystem
         public Dimension Dim;
         [ReadOnly] public ComponentLookup<LocalTransform> Transform;
         
-        void Execute([ChunkIndexInQuery] int index, Entity entity, ref DynamicBuffer<EnemyShoot> shoots)
+        void Execute([ChunkIndexInQuery] int index, Entity entity, in ShootingData data, ref DynamicBuffer<EnemyShoot> shoots)
         {
             var transform = Transform[entity];
             for (int i = 0; i < shoots.Length; i++)
             {
                 var shoot = shoots[i];
-
+                ref var stats = ref data.Data.Value.Guns;
                 // Update cooldown and burst timer
                 shoot.CurrentCooldown = math.max(shoot.CurrentCooldown - DeltaTime, 0f);
                 shoot.CurrentBurstTimer = math.max(shoot.CurrentBurstTimer - DeltaTime, 0f);
@@ -140,7 +171,7 @@ public partial struct EnemyShootingSystem : ISystem
                 }
 
                 // If in a burst, wait for the burst delay
-                if (shoot.ShotsFired > 0 && shoot.ShotsFired < shoot.BurstCount)
+                if (shoot.ShotsFired > 0 && shoot.ShotsFired < stats[i].BurstCount)
                 {
                     if (shoot.CurrentBurstTimer > 0)
                     {
@@ -159,10 +190,10 @@ public partial struct EnemyShootingSystem : ISystem
                 float3 toPlayer = PlayerPosition - transform.Position;
                 if (Dim == Dimension.Two) toPlayer.y = 0;
                 float distance = math.length(toPlayer);
-                float3 forward = transform.TransformDirection(shoot.Forward);
+                float3 forward = transform.TransformDirection(stats[i].Forward);
                 
                 // Range check
-                if (distance > shoot.Range)
+                if (distance > stats[i].Range)
                 {
                     shoots[i] = shoot;
                     continue;
@@ -174,22 +205,22 @@ public partial struct EnemyShootingSystem : ISystem
                     float3 dirToPlayer = math.normalize(toPlayer);
                     float angle = math.degrees(math.acos(math.dot(forward, dirToPlayer)));
                     
-                    if (angle < shoot.VisionConeMinMax.x || angle > shoot.VisionConeMinMax.y)
+                    if (angle < stats[i].VisionConeMinMax.x || angle > stats[i].VisionConeMinMax.y)
                     {
                         shoots[i] = shoot;
                         continue;
                     }
                 }
                 
-                float3 up = transform.TransformDirection(shoot.Up);
+                float3 up = transform.TransformDirection(stats[i].Up);
                 quaternion baseRot = quaternion.LookRotation(forward, up);
-                float3 pos = transform.TransformPoint(shoot.Position);
+                float3 pos = transform.TransformPoint(stats[i].Position);
                 var t = Transform[shoot.Projectile];
                 
-                float step = shoot.SpreadCount > 1 ? shoot.SpreadAngle / (shoot.SpreadCount - 1) : 0f;
-                float start = shoot.SpreadCount > 1 ? -shoot.SpreadAngle / 2f : 0f;
+                float step = stats[i].SpreadCount > 1 ? stats[i].SpreadAngle / (stats[i].SpreadCount - 1) : 0f;
+                float start = stats[i].SpreadCount > 1 ? -stats[i].SpreadAngle / 2f : 0f;
                 
-                for (int j = 0; j < shoot.SpreadCount; j++)
+                for (int j = 0; j < stats[i].SpreadCount; j++)
                 {
                     quaternion rot = math.mul(baseRot, quaternion.EulerZXY(0, math.TORADIANS * (start + j * step), 0));
                     float3 dir = math.mul(rot, math.forward());
@@ -197,22 +228,22 @@ public partial struct EnemyShootingSystem : ISystem
                     Entity projectile = ECB.Instantiate(index, shoot.Projectile);
                     ECB.SetComponent(index, projectile, new LocalTransform
                     {
-                        Position = pos + dir * shoot.Distance,
+                        Position = pos + dir * stats[i].Distance,
                         Rotation = rot,
                         Scale = t.Scale
                     });
-                    ECB.AddComponent(index, projectile, new PhysicsVelocity { Linear = dir * shoot.Speed });
+                    ECB.AddComponent(index, projectile, new PhysicsVelocity { Linear = dir * stats[i].Speed });
                 }
 
                 // Update burst counters
                 shoot.ShotsFired++;
-                shoot.CurrentBurstTimer = shoot.BurstLength / shoot.BurstCount;
+                shoot.CurrentBurstTimer = stats[i].BurstLength / stats[i].BurstCount;
 
                 // Reset burst if all shots fired
-                if (shoot.ShotsFired >= shoot.BurstCount)
+                if (shoot.ShotsFired >= stats[i].BurstCount)
                 {
                     shoot.ShotsFired = 0;
-                    shoot.CurrentCooldown = shoot.MaxCooldown;
+                    shoot.CurrentCooldown = stats[i].MaxCooldown;
                 }
 
                 shoots[i] = shoot;

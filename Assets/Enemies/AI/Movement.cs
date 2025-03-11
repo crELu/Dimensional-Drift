@@ -1,34 +1,32 @@
 ﻿using System;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine.Serialization;
 
 namespace Enemies.AI
 {
     [Serializable]
     public struct PID {
-   
-        public float Kp;
-        public float Ki;
-        public float Kd;
-   
-        private float3 _outputLimit;
-
+        
+        [Serializable]
+        public struct Params
+        {
+            public float kp;
+            public float ki;
+            public float kd;
+            public float3 outputLimit;
+        }
         private float3 _preError;
    
         public float3 integral;
         
-        public void SetBounds(float3 torque)
-        {
-            _outputLimit = torque;
-        }
-   
-        public float3 Cycle(float3 pv, float3 setPoint, float dt) {
+        public float3 Cycle(Params p, float3 pv, float3 setPoint, float dt) {
             var error = setPoint - pv;
-            integral = math.clamp(integral + (error * dt), -_outputLimit/Ki, _outputLimit/Ki);
+            integral = math.clamp(integral + (error * dt), -p.outputLimit/p.ki, p.outputLimit/p.ki);
        
             var derivative = (error - _preError) / dt;
-            var output = Kp * error + Ki * integral + Kd * derivative;
-            output = math.clamp(output, -_outputLimit, _outputLimit);
+            var output = p.kp * error + p.ki * integral + p.kd * derivative;
+            output = math.clamp(output, -p.outputLimit, p.outputLimit);
        
             _preError = error;
             return output;

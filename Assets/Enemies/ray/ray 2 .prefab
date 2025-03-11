@@ -460,32 +460,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 40
-  size: 10
+  size: 12
   intel: {fileID: 1973288489611225477, guid: f81dc56b200479e40ac7f69e3d7e71f9, type: 3}
-  baseMoveSpeed:
-    x: 90
-    y: 90
-    z: 90
   linearPid:
-    Kp: 20
-    Ki: 0
-    Kd: 0
-    integral:
-      x: 0
-      y: 0
-      z: 0
-  baseRotationSpeed:
-    x: 6
-    y: 2
-    z: 2
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 10
+      y: 10
+      z: 30
   angularPid:
-    Kp: 4
-    Ki: 0.1
-    Kd: 0.5
-    integral:
-      x: 0
-      y: 0
-      z: 0
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 4
+      y: 2
+      z: 2
   spacingRange: 20
   turnSpeed: 120
   moveWeight: 40

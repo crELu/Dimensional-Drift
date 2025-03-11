@@ -195,30 +195,22 @@ MonoBehaviour:
   health: 150
   size: 35
   intel: {fileID: 1231305184969748935, guid: cb4a7fa663eefdd4a82550cec515e921, type: 3}
-  baseMoveSpeed:
-    x: 5
-    y: 5
-    z: 5
   linearPid:
-    Kp: 4
-    Ki: 0.1
-    Kd: 0.5
-    integral:
-      x: 0
-      y: 0
-      z: 0
-  baseRotationSpeed:
-    x: 0.2
-    y: 0.2
-    z: 0.2
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 5
+      y: 5
+      z: 15
   angularPid:
-    Kp: 4
-    Ki: 0.1
-    Kd: 0.5
-    integral:
-      x: 0
-      y: 0
-      z: 0
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 1
+      y: 1
+      z: 3
   spacingRange: 75
   attackRange: 150
   strafeWeight: 5

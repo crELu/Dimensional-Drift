@@ -102,8 +102,8 @@ public class PlayerManager : MonoBehaviour
         health = Mathf.Min(stats.flatHealth, health);
         shield += stats.shieldRegen * Time.deltaTime;
         shield = Mathf.Min(stats.flatShield, shield);
-        sd.sizeDelta = new Vector2(shield / stats.flatShield * 1000, 32);
-        hp.sizeDelta = new Vector2(health / stats.flatHealth * 1000, 64);
+        sd.sizeDelta = new Vector2(shield / stats.flatShield * 894, 32);
+        hp.sizeDelta = new Vector2(health / stats.flatHealth * 1024, 64);
         if (health <= 0)
         {
             GameObject deathMessageObject = GameObject.Find("Death Message");

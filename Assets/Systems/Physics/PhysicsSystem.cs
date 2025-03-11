@@ -95,9 +95,11 @@ partial struct ColliderBodiesJob: IJobParallelFor {
     public float3 projectDirection2D;
     public NativeArray<ColliderBody> colliderBodies;
     public NativeArray<Entity> entities;
+    
     public NativeArray<LocalTransform> entityTransforms;
     public NativeArray<Collider> entityColliders;
     public Dimension Dim;
+    [ReadOnly] public ComponentLookup<PostTransformMatrix> TransformLookup;
 
     [BurstCompile]
     public void Execute(int i) {
@@ -113,9 +115,16 @@ partial struct ColliderBodiesJob: IJobParallelFor {
                 projectDirection2D, entityColliders[i], t.Rotation, out projectedCollider);
         }
 
+        float3 stretch = 1;
+        if (TransformLookup.HasComponent(entities[i]))
+        {
+            var p = TransformLookup[entities[i]];
+            stretch = p.Value.Scale();
+        }
+        
         colliderBodies[i] = new ColliderBody {
             collider = projectedCollider,
-            transform = new TransformQvvs(projectedPosition, t.Rotation, 1, t.Scale),
+            transform = new TransformQvvs(projectedPosition, t.Rotation, t.Scale, stretch),
             entity = entities[i]
         };
 
@@ -292,6 +301,7 @@ public partial struct PhysicsSystem: ISystem {
 
     NativeParallelHashMap<Entity, int> entitiesToBodyIndices;
     CollisionLayer collisionLayer;
+    private ComponentLookup<PostTransformMatrix> _postTransform;
     PairsProcessor pairsProcessor;
 
     EntityQuery physicsObjectQuery;
@@ -314,6 +324,8 @@ public partial struct PhysicsSystem: ISystem {
             TerrainLookup = state.GetComponentLookup<Obstacle>(),
             IntelLookup = state.GetComponentLookup<Intel>()
         };
+        
+        _postTransform = state.GetComponentLookup<PostTransformMatrix>(true);
 
         // Top-down 2D projection
         projectDirection2D = new float3(0f, 1f, 0f);
@@ -337,6 +349,7 @@ public partial struct PhysicsSystem: ISystem {
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state) {
+        _postTransform.Update(ref state);
         // Temporary allocations needed to build the collision layer
         var entities = physicsObjectQuery.ToEntityArray(Allocator.TempJob);
         var colliderBodies = new NativeArray<ColliderBody>(entities.Length, Allocator.TempJob);
@@ -350,7 +363,8 @@ public partial struct PhysicsSystem: ISystem {
             entities = entities,
             entityColliders = entityColliders,
             entityTransforms = entityTransforms,
-            Dim = DimensionManager.burstDim.Data
+            Dim = DimensionManager.burstDim.Data,
+            TransformLookup = _postTransform,
         }.Schedule(entities.Length, 64).Complete();
 
         // Delete the previous collision layer
