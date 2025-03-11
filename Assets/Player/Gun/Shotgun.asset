@@ -17,32 +17,44 @@ MonoBehaviour:
   <Requirements>k__BackingField: []
   coreType: 0
   tier1:
-    damage: 0
     size: 0
     speed: 0
     attackSpeed: 0
     attackDelay: -90
-    duration: -50
     accuracy: -20
+    ammoUse: 0
     count: 5
-    precision: 0
+    bulletStats:
+      damage: 0
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
   tier2:
-    damage: 0
     size: 0
-    speed: 0
-    attackSpeed: 0
-    attackDelay: -100
-    duration: 0
-    accuracy: -40
-    count: 5
-    precision: 0
+    speed: 40
+    attackSpeed: -50
+    attackDelay: -300
+    accuracy: -80
+    ammoUse: 0
+    count: 15
+    bulletStats:
+      damage: 0
+      duration: -50
+      extraction: 0
+      power: 0
+      pierce: 0
   tier3:
-    damage: 0
     size: 0
     speed: 0
     attackSpeed: 0
     attackDelay: 0
-    duration: 0
     accuracy: 0
+    ammoUse: 0
     count: 0
-    precision: 0
+    bulletStats:
+      damage: 0
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
