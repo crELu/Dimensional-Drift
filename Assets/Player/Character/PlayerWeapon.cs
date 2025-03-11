@@ -23,6 +23,12 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] private AudioSource WeaponTrack;
     [SerializeField] private AudioClip WeaponSFX;
 
+
+/// ////////////////////////////
+    [SerializeField] private AugmentType weaponType;
+    public AugmentType WeaponType => weaponType;
+/// ////////////////////////////
+
     private float Cd => 1 / BaseStats.attackSpeed;
     protected float Cooldown;
 
