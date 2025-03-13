@@ -6,6 +6,7 @@ namespace Player.Cannon.Core
     [CreateAssetMenu(fileName = "Railgun", menuName = "Augments/Cannon/Core/Railgun")]
     public class Railgun: CoreAugment
     {
-        //TODO
+        public override string Id => "Railgun";
+        public override AugmentType Target => AugmentType.Cannon;
     }
 }

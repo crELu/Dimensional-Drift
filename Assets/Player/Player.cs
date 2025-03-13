@@ -14,6 +14,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 using UnityEngine.VFX;
 using Collider = UnityEngine.Collider;
 using Matrix4x4 = UnityEngine.Matrix4x4;
@@ -29,23 +30,29 @@ public class PlayerManager : MonoBehaviour
     public static readonly SharedStatic<float3> burstPos = SharedStatic<float3>.GetOrCreate<PlayerManager, IntFieldKey>();
     
     public static float waveTimer, maxWaveTimer;
+    public static int waveCount;
     
     public PlayerMovement movement;
+    public PlayerInventory inventory;
     
     private InputAction _fireAction;
     private InputAction _weaponUpAction;
     private InputAction _weaponDownAction;
+    [Header("Stats Settings")] 
+    public List<CharacterAugment> augments;
+    public CharacterStats stats;
+    protected CharacterStats AddonStats;
+    public float health, shield;
+    [field:SerializeField] public float Ammo { get; private set; }
+    public static bool fire;
     
     [Header("Weapon Settings")] 
     public PlayerWeapon CurrentWeapon => weapons[currentWeapon];
     public int currentWeapon;
-    public TextMeshProUGUI weaponText;
     public List<PlayerWeapon> weapons;
-
-    public CharacterStats stats;
-    public float health, shield;
-    [field:SerializeField] public float Ammo { get; private set; }
-    public static bool fire;
+    public List<Image> weaponSlots;
+    public Sprite weaponSelected, weaponUnselected;
+    
     public static List<Attack> Bullets => main.CurrentWeapon.Bullets;
     public RectTransform hp, sd;
     public TextMeshProUGUI waveCounter;
@@ -54,7 +61,7 @@ public class PlayerManager : MonoBehaviour
     public VisualEffect minimap;
     public RectTransform minimapIcon;
     public GraphicsBuffer Px;
-    public float intel;
+    [HideInInspector] public CursorLockMode targetCursorMode;
     
     void Start()
     {
@@ -65,6 +72,18 @@ public class PlayerManager : MonoBehaviour
         main = this;
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
     }
+    
+    public void AddAugment(Augment augment)
+    {
+        if (augment is CharacterAugment charAug)
+            augments.Add(charAug);
+        else if (augment is StatsCharAugment statsAug)
+            AddonStats += statsAug.GetStats().characterStats;
+        else
+        {
+            Debug.Log($"Wrong augment type {augment.Target} for character.");
+        }
+    }
 
     void Update()
     {
@@ -72,17 +91,22 @@ public class PlayerManager : MonoBehaviour
         DoAttack();
         waveCounter.text = $"Wave in {Mathf.Ceil(waveTimer)}s";
         burstPos.Data = transform.position;
-        if (_weaponUpAction.triggered)
+        if (_weaponDownAction.triggered)
         {
             currentWeapon++;
             currentWeapon %= weapons.Count;
-        } else if (_weaponDownAction.triggered)
+        } else if (_weaponUpAction.triggered)
         {
             currentWeapon--;
             if (currentWeapon < 0) currentWeapon = weapons.Count - 1;
         }
 
-        weaponText.text = $"Weapon: {currentWeapon + 1}";
+        for (int i = 0; i < weaponSlots.Count; i++)
+        {
+            if (currentWeapon == i) weaponSlots[i].sprite = weaponSelected;
+            else weaponSlots[i].sprite = weaponUnselected;
+        }
+
         var v = transform.forward;
         v.y = 0;
         minimapIcon.transform.rotation = Quaternion.Euler(0, 0, -Quaternion.LookRotation(v).eulerAngles.y);

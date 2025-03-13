@@ -6,8 +6,9 @@ namespace Player.Gun.Core
     [CreateAssetMenu(fileName = "Jhin", menuName = "Augments/Gun/Core/Jhin")]
     public class EveryNShot: CoreAugment
     {
+        public override string Id => "Jhin";
         private int _counter;
-
+        public override AugmentType Target => AugmentType.Gun;
         public override void PostProcessing(WeaponStats stats, List<Attack> attacks)
         {
             _counter++;

@@ -86,7 +86,7 @@ public class LaserWeapon : PlayerWeapon
         
         if (maxLaserCount == 0)
         {
-            attack.Bullets.Enqueue(new Bullet { position = position.position, rotation = Quaternion.identity, time = 0 });
+            attack.Bullets.Enqueue(new Bullet { position = position.localPosition, rotation = Quaternion.identity, time = 0 });
             _laserDuration = stats.bulletStats.duration;
             Cooldown += stats.bulletStats.duration;
         }

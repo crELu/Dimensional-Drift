@@ -14,20 +14,17 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] protected WeaponStats baseStats;
     protected WeaponStats Stats;
     protected WeaponStats BaseStats;
+    protected WeaponStats AddonStats;
     
     public Transform position;
-    [SerializeField] protected List<StatsAugment> BasicAugments = new();
     [SerializeField] protected List<SpecializedAugment> SpecializedAugments = new();
     [SerializeField] protected List<CoreAugment> CoreAugments = new();
 
     [SerializeField] private AudioSource WeaponTrack;
     [SerializeField] private AudioClip WeaponSFX;
-
-
-/// ////////////////////////////
+    
     [SerializeField] private AugmentType weaponType;
     public AugmentType WeaponType => weaponType;
-/// ////////////////////////////
 
     private float Cd => 1 / BaseStats.attackSpeed;
     protected float Cooldown;
@@ -39,7 +36,7 @@ public class PlayerWeapon : MonoBehaviour
 
     public void Compile()
     {
-        Stats = CollectStats().weaponStats;
+        Stats = AddonStats + CollectStats().weaponStats;
         foreach (var core in CoreAugments)
         {
             if (core.Verify()) core.Compile(Stats);
@@ -98,16 +95,26 @@ public class PlayerWeapon : MonoBehaviour
         {
             s += augment.GetStats();
         }
-        foreach (var augment in BasicAugments)
-        {
-            s += augment.GetStats();
-        }
         foreach (var augment in SpecializedAugments)
         {
             s += augment.GetStats();
         }
 
         return s;
+    }
+
+    public void AddAugment(Augment augment)
+    {
+        if (augment.Target != weaponType)
+        {
+            Debug.Log($"Wrong augment type {augment.Target} for weaponType {weaponType}.");
+        }
+        if (augment is CoreAugment coreAug)
+            CoreAugments.Add(coreAug);
+        else if (augment is SpecializedAugment specAug)
+            SpecializedAugments.Add(specAug);
+        else if (augment is StatsAugment statsAug)
+            AddonStats += statsAug.GetStats().weaponStats;
     }
 }
 

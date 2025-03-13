@@ -6,6 +6,7 @@ namespace Player.Laser.Core
     [CreateAssetMenu(fileName = "Beam", menuName = "Augments/Laser/Core/Beam")]
     public class Beam: CoreAugment
     {
-        //TODO
+        public override string Id => "Beam";
+        public override AugmentType Target => AugmentType.Laser;
     }
 }

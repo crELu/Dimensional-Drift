@@ -16,6 +16,8 @@ namespace Enemies
 {
     public class WaveManager : BaseAuthor
     {
+        // public static AnimationCurve catFreqG, enemyCountG;
+        // public static AnimationCurve catFreq, enemyCount;
         public List<GameObject> enemies;
         public int difficulty;
         public GameObject yuumi;
@@ -128,7 +130,11 @@ namespace Enemies
                 if (waveEarlyDone || wave.WaveTimer < 0)
                 {
                     wave.Wave++;
-                    var count = wave.Difficulty * 2 * wave.Wave;
+                    
+                    PlayerManager.waveCount = wave.Wave;
+                    PlayerManager.main.inventory.UpdateUI();
+                    
+                    var count = GetEnemyCount(wave.Wave, wave.Difficulty);
                     
                     wave.WaveTimer = GetWaveTimer(wave.Wave);
                     PlayerManager.maxWaveTimer = wave.WaveTimer;
@@ -169,7 +175,10 @@ namespace Enemies
                 SystemAPI.SetComponent(e, wave);
             }
         }
-
+        private int GetEnemyCount(int wave, int difficulty)
+        {
+            return difficulty * wave * wave;
+        }
         private float GetWaveTimer(int wave)
         {
             return 240;

@@ -5411,8 +5411,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1
-  m_Height: 3
+  m_Radius: 2
+  m_Height: 5
   m_Direction: 2
   m_Center: {x: 0, y: 0.02, z: 0.00046624243}
 --- !u!1 &1581098105
@@ -5661,7 +5661,7 @@ MonoBehaviour:
   - {fileID: 5180185838724031331, guid: a388a16d211b71c4499c1719332a17d1, type: 3}
   - {fileID: 4051934337747174715, guid: fe45c491e05ee8a42929203f6140e43e, type: 3}
   - {fileID: 4795614831435197986, guid: 454eec39a93ceba46a1f6d1030ee6d1f, type: 3}
-  difficulty: 100
+  difficulty: 50
   yuumi: {fileID: 5232822899256251882, guid: 064e8294f2cc2d14b90a441e7b01fdfa, type: 3}
 --- !u!114 &1669212151
 MonoBehaviour:

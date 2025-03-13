@@ -108,7 +108,7 @@ public partial struct PlayerSystem : ISystem
 
             var originalTransform = TransformLookup[prefab];
         
-            var position = bullet.position;
+            var position = PlayerTransform.TransformPoint(bullet.position);
             var rotation = math.mul(PlayerLookRotation, bullet.rotation);
 
             Entity newEntity = ECB.Instantiate(index, prefab);
@@ -175,7 +175,7 @@ public partial struct PlayerSystem : ISystem
         PlayerData pData = p.Player;
         PlayerManager.main.DoDamage(pData.LastDamage);
         pData.LastDamage = 0;
-        PlayerManager.main.intel += pData.LastIntel;
+        PlayerManager.main.inventory.AddIntel(pData.LastIntel);
         pData.LastIntel = 0;
         
         if (PlayerManager.fire)
@@ -286,7 +286,6 @@ public partial struct LaserSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
-        //state.RequireForUpdate<PlayerAspect>();
         state.RequireForUpdate<PlayerData>();
     }
 

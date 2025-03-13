@@ -231,9 +231,9 @@ MonoBehaviour:
   range: 100
   speed: 5
   visionCone: {x: 0, y: 360}
-  cd: 5
-  bursts: 1
-  burstLength: 0.5
+  cd: 3
+  bursts: 2
+  burstLength: 1
 --- !u!95 &476956533766852839
 Animator:
   serializedVersion: 7

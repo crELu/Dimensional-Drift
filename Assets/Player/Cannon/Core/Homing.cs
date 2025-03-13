@@ -6,6 +6,7 @@ namespace Player.Cannon.Core
     [CreateAssetMenu(fileName = "Homing", menuName = "Augments/Cannon/Core/Homing")]
     public class Homing: CoreAugment
     {
-        //TODO
+        public override string Id => "Homing";
+        public override AugmentType Target => AugmentType.Cannon;
     }
 }

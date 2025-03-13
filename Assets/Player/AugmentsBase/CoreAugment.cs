@@ -5,8 +5,7 @@ using UnityEngine;
 public class CoreAugment: Augment
 {
     public override int MaxStacks => 3;
-
-    public AugmentType coreType;
+    
     public WeaponStats tier1, tier2, tier3; // extra stats per level (applies to the entire weapon)
     
     protected Attack MainAttack;

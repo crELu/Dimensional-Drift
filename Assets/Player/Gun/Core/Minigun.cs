@@ -6,6 +6,7 @@ namespace Player.Gun.Core
     [CreateAssetMenu(fileName = "Rapidfire", menuName = "Augments/Gun/Core/Rapidfire")]
     public class Rapidfire: CoreAugment
     {
-        //TODO
+        public override string Id => "Rapidfire";
+        public override AugmentType Target => AugmentType.Gun;
     }
 }

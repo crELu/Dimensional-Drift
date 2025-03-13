@@ -419,9 +419,9 @@ MonoBehaviour:
     ki: 0.1
     kd: 0.5
     outputLimit:
-      x: 6
-      y: 3
-      z: 3
+      x: 4
+      y: 2
+      z: 2
   turnSpeed: 270
   moveWeight: 50
 --- !u!114 &3899002820088160831

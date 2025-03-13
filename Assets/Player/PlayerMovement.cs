@@ -157,12 +157,20 @@ public class PlayerMovement : MonoBehaviour
         {
             case Dimension.Three:
                 StartCoroutine(DoCameraTransition());
-                if (!_isUsingController) Cursor.lockState = CursorLockMode.Locked;   
+                if (!_isUsingController)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    PlayerManager.main.targetCursorMode = CursorLockMode.Locked;
+                }   
                 crosshair.SetActive(true);
                 break;
             case Dimension.Two:
                 StartCoroutine(DoCameraTransition());
-                if (!_isUsingController) Cursor.lockState = CursorLockMode.Confined;
+                if (!_isUsingController)
+                {
+                    Cursor.lockState = CursorLockMode.Confined;
+                    PlayerManager.main.targetCursorMode = CursorLockMode.Confined;
+                }
                 crosshair.SetActive(false);
                 break;
             case Dimension.One:
