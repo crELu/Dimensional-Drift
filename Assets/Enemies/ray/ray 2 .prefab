@@ -459,7 +459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe2843d41ed04197a3cb7394fb722740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 30
+  health: 40
   size: 12
   intel: {fileID: 1973288489611225477, guid: f81dc56b200479e40ac7f69e3d7e71f9, type: 3}
   linearPid:
@@ -475,9 +475,9 @@ MonoBehaviour:
     ki: 0.1
     kd: 0.5
     outputLimit:
-      x: 2
-      y: 1
-      z: 1
+      x: 4
+      y: 2
+      z: 2
   spacingRange: 20
   turnSpeed: 120
   moveWeight: 40

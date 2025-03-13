@@ -15,6 +15,7 @@ MonoBehaviour:
   <MaxStacks>k__BackingField: 3
   <Stacks>k__BackingField: 2
   <Requirements>k__BackingField: []
+  coreType: 0
   tier1:
     size: 0
     speed: 0
@@ -34,7 +35,7 @@ MonoBehaviour:
     speed: 40
     attackSpeed: -50
     attackDelay: -300
-    accuracy: -40
+    accuracy: -80
     ammoUse: 0
     count: 15
     bulletStats:
