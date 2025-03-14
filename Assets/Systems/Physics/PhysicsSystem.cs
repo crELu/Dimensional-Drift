@@ -127,35 +127,6 @@ partial struct ColliderBodiesJob: IJobParallelFor {
     }
 }
 
-// Build a mapping from each `Entity` to the index of its `ColliderBody` in the
-// current collision layer
-[BurstCompile]
-partial struct BodyIndicesJob: IJobParallelFor {
-    public NativeArray<ColliderBody>.ReadOnly colliderBodies;
-    public NativeParallelHashMap<Entity, int>.ParallelWriter writer;
-
-    [BurstCompile]
-    public void Execute(int i) {
-        writer.TryAdd(colliderBodies[i].entity, i);
-    }
-}
-
-// Helpers to find objects within a radius
-public interface IRadiusProcessor {
-    // objectResult stores the object that was within the radius
-    // distanceResult stores information about how close the object was, etc.
-    void Execute(in FindObjectsResult objectResult, in PointDistanceResult distanceResult);
-}
-
-// An implementation of IRadiusProcessor that draws the collider (for testing)
-[BurstCompile]
-public struct DebugDrawRadiusProcessor: IRadiusProcessor {
-    [BurstCompile]
-    public void Execute(in FindObjectsResult objectResult, in PointDistanceResult _) {
-        PhysicsDebug.DrawCollider(objectResult.collider, objectResult.transform, UnityEngine.Color.red);
-    }
-}
-
 [BurstCompile]
 public struct PhysicsComponentLookups {
     public PhysicsComponentLookup<Unity.Physics.PhysicsVelocity> velocity;
@@ -186,7 +157,7 @@ public struct PhysicsComponentLookups {
 [BurstCompile]
 public struct PairsProcessor: IFindPairsProcessor {
     public PhysicsComponentLookups componentLookups;
-    public EntityCommandBuffer.ParallelWriter Ecb;
+    public NativeParallelHashSet<Entity>.ParallelWriter destroyedSetWriter;
 
     public void Execute(in FindPairsResult result) {
         ColliderDistanceResult r;
@@ -211,7 +182,7 @@ public struct PairsProcessor: IFindPairsProcessor {
             componentLookups.PlayerLookup.GetRW(entityA).ValueRW = player;
             if (enemyProj.DieOnHit)
             {
-                Ecb.DestroyEntity(0, entityB);
+                destroyedSetWriter.Add(entityB);
             }
         }
         else if (componentLookups.EnemyLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
@@ -227,7 +198,7 @@ public struct PairsProcessor: IFindPairsProcessor {
                 
             if (playerProj.Health == 0)
             {
-                Ecb.DestroyEntity(0, entityB);
+                destroyedSetWriter.Add(entityB);
             }
         }
         else if (componentLookups.EnemyWeaponLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
@@ -236,7 +207,7 @@ public struct PairsProcessor: IFindPairsProcessor {
             PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
             if (enemyProj.Mass == -1)
             {
-                Ecb.DestroyEntity(0, entityB);
+                destroyedSetWriter.Add(entityB);
             }
             else
             {
@@ -251,21 +222,21 @@ public struct PairsProcessor: IFindPairsProcessor {
                 
                 if (enemyProj.Mass == 0)
                 {
-                    Ecb.DestroyEntity(0, entityA);
+                    destroyedSetWriter.Add(entityA);
                 }
                 if (playerProj.Health == 0)
                 {
-                    Ecb.DestroyEntity(0, entityB);
+                    destroyedSetWriter.Add(entityB);
                 }
             }
         }
         else if (componentLookups.TerrainLookup.HasComponent(entityA) && componentLookups.EnemyWeaponLookup.HasComponent(entityB))
         {
-            Ecb.DestroyEntity(0, entityB);
+            destroyedSetWriter.Add(entityB);
         }
         else if (componentLookups.TerrainLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
         {
-            Ecb.DestroyEntity(0, entityB);
+            destroyedSetWriter.Add(entityB);
         }
     }
 }
@@ -479,7 +450,7 @@ public partial struct PhysicsSystem: ISystem {
         // Create world bounds centered on the player
         var playerEntity = SystemAPI.GetSingletonEntity<PlayerData>();
         var playerTransform = SystemAPI.GetComponent<LocalTransform>(playerEntity);
-        var worldBoundHalfSize = new float3(100);
+        var worldBoundHalfSize = new float3(200);
         var playerAabb = new Aabb(
                 playerTransform.Position - worldBoundHalfSize,
                 playerTransform.Position + worldBoundHalfSize);
@@ -522,34 +493,16 @@ public partial struct PhysicsSystem: ISystem {
                 buildLayers, buildTerrainLayer, buildIntelLayer);
 
         componentLookups.Update(ref state);
-        var ecb = new EntityCommandBuffer(Allocator.TempJob);
-        var ecbWriter = ecb.AsParallelWriter();
-
+        var destroyedSet = new NativeParallelHashSet<Entity>(physicsState.ValueRO.collisionLayer.colliderBodies.Length, Allocator.TempJob);
+        var destroyedSetWriter = destroyedSet.AsParallelWriter();
 
         var pairsProcessor = new PairsProcessor {
             componentLookups = componentLookups,
-            Ecb = ecbWriter
+            destroyedSetWriter = destroyedSetWriter
         };
 
-        // Collide enemy weapons with player
-        var Dependency = Physics.FindPairs(
-                physicsState.ValueRO.enemyWeaponLayer,
-                physicsState.ValueRO.playerLayer, pairsProcessor)
-            .ScheduleParallel(buildLayers);
-        // Collide enemies with enemies
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
-        // Collide player weapons with enemies
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerWeaponLayer,
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
-        // Collide player weapons with enemy weapons
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerWeaponLayer,
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
+        var Dependency = buildLayers;
+
         // Collider player with intel
         Dependency = Physics.FindPairs(
                 physicsState.ValueRO.playerLayer,
@@ -561,16 +514,38 @@ public partial struct PhysicsSystem: ISystem {
                 physicsState.ValueRO.terrainLayer, pairsProcessor)
             .ScheduleParallel(Dependency);
         // Collide enemies with terrain
+        //var enemyTerrain = Physics.FindPairs(
         Dependency = Physics.FindPairs(
                 physicsState.ValueRO.enemyLayer,
                 physicsState.ValueRO.terrainLayer, pairsProcessor)
             .ScheduleParallel(Dependency);
+        // Collide enemies with enemies
+        Dependency = Physics.FindPairs(
+                physicsState.ValueRO.enemyLayer, pairsProcessor)
+            .ScheduleParallel(Dependency);
+        // Collide enemy weapons with player
+        Dependency = Physics.FindPairs(
+                physicsState.ValueRO.enemyWeaponLayer,
+                physicsState.ValueRO.playerLayer, pairsProcessor)
+            .ScheduleParallel(Dependency);
+        // Collide player weapons with enemies
+        Dependency = Physics.FindPairs(
+                physicsState.ValueRO.playerWeaponLayer,
+                physicsState.ValueRO.enemyLayer, pairsProcessor)
+            .ScheduleParallel(Dependency);
+        // Collide player weapons with enemy weapons
+        Dependency = Physics.FindPairs(
+                physicsState.ValueRO.playerWeaponLayer,
+                physicsState.ValueRO.enemyLayer, pairsProcessor)
+            .ScheduleParallel(Dependency);
 
         JobHandle.ScheduleBatchedJobs();
         Dependency.Complete();
-       
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
+
+        foreach (Entity entity in destroyedSet) {
+            state.EntityManager.DestroyEntity(entity);
+        }
+        destroyedSet.Dispose();
 
         /*
         // Example of using GetColliderBodiesInRange to draw the colliders on
@@ -584,12 +559,5 @@ public partial struct PhysicsSystem: ISystem {
 
         // Draw bounding box gizmos
         // PhysicsDebug.DrawLayer(physicsState.ValueRO.collisionLayer).Run();
-    }
-    
-    private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
-    {
-        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-        return ecb.AsParallelWriter();
     }
 }
