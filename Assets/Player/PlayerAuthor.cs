@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Latios.Psyshock;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -76,6 +77,7 @@ public partial struct PlayerSystem : ISystem
 {
     private ComponentLookup<LocalTransform> _localTransformLookup;
     private ComponentLookup<LaserTag> _laserTagLookup;
+    private ComponentLookup<ExplosionPoint> _explosionPointLookup;
     private NativeArray<Entity> _projectiles;
 
     public void OnCreate(ref SystemState state)
@@ -83,6 +85,7 @@ public partial struct PlayerSystem : ISystem
         state.RequireForUpdate<PlayerData>();
         _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
         _laserTagLookup = state.GetComponentLookup<LaserTag>(isReadOnly: true);
+        _explosionPointLookup = state.GetComponentLookup<ExplosionPoint>(isReadOnly: true);
     }
 
     public void OnDestroy(ref SystemState state) { }
@@ -99,6 +102,7 @@ public partial struct PlayerSystem : ISystem
     
         [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
         [ReadOnly] public ComponentLookup<LaserTag> LaserTagLookup;
+        [ReadOnly] public ComponentLookup<ExplosionPoint> ExplosionPointLookup;
 
         public void Execute(int index)
         {
@@ -121,10 +125,18 @@ public partial struct PlayerSystem : ISystem
             ECB.AddComponent(index, newEntity, new PostTransformMatrix{Value = float4x4.Scale(be.Stats.Scale)});
             
             
-            if (IsLaser(prefab))
+            if (LaserTagLookup.HasComponent(prefab))
             {
-                ECB.AddComponent(index, newEntity, new LaserTag());
                 ECB.AddComponent(index, newEntity, new Lifetime { Time = float.MaxValue});
+            } 
+            else if (ExplosionPointLookup.HasComponent(prefab))
+            {
+                ECB.SetComponent(index, newEntity, new ExplosionPoint
+                {
+                    Position = position,
+                    Damage = be.Stats.Stats.damage,
+                    Radius = be.Stats.Scale.x * 100
+                });
             }
             else 
             {
@@ -143,10 +155,6 @@ public partial struct PlayerSystem : ISystem
             });
         }
         
-        private bool IsLaser(Entity prefab)
-        {
-            return LaserTagLookup.HasComponent(prefab);
-        }
     }
 
     public struct BulletEntity
@@ -161,6 +169,7 @@ public partial struct PlayerSystem : ISystem
     {
         _localTransformLookup.Update(ref state);
         _laserTagLookup.Update(ref state);
+        _explosionPointLookup.Update(ref state);
         
         var deltaTime = SystemAPI.Time.DeltaTime;
         var bullets = PlayerManager.Bullets;
@@ -222,7 +231,8 @@ public partial struct PlayerSystem : ISystem
             PlayerPosition = playerTransform.Position,
             PlayerVelocity = playerVelocity,
             TransformLookup = _localTransformLookup,
-            LaserTagLookup = _laserTagLookup
+            LaserTagLookup = _laserTagLookup,
+            ExplosionPointLookup = _explosionPointLookup
         };
 
         // Schedule with initial dependency chain
@@ -332,5 +342,65 @@ public partial struct LaserSystem : ISystem
         state.Dependency.Complete();
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
+    }
+}
+
+[BurstCompile]
+public partial struct CannonExplosionSystem : ISystem
+{
+    private ComponentLookup<LocalTransform> _localTransformLookup;
+    public void OnCreate(ref SystemState state)
+    {
+        state.RequireForUpdate<PhysicsSystemState>();
+        state.RequireForUpdate<ExplosionPoint>();
+        _localTransformLookup = state.GetComponentLookup<LocalTransform>(true);
+    }
+
+    public void OnUpdate(ref SystemState state)
+    {
+        _localTransformLookup.Update(ref state);
+        var ecb = new EntityCommandBuffer(Allocator.TempJob);
+        var job = new ProcessExplosionsJob
+        {
+            ECB = ecb.AsParallelWriter(),
+            PhysicsState = SystemAPI.GetSingletonRW<PhysicsSystemState>()
+        };
+
+        state.Dependency = job.ScheduleParallel(state.Dependency);
+        state.Dependency.Complete();
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();        
+    }
+
+    [BurstCompile]
+    [WithNone(typeof(PlayerProjectile))]
+    public partial struct ProcessExplosionsJob : IJobEntity
+    {
+        public EntityCommandBuffer.ParallelWriter ECB;
+        public RefRW<PhysicsSystemState> PhysicsState;
+        [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
+        [ReadOnly] public ComponentLookup<PlayerProjectile> ProjectileLookup;
+        public void Execute(Entity entity, [EntityIndexInQuery] int index, ref ExplosionPoint explosion)
+        {
+            if (LocalTransformLookup.HasComponent(entity) && ProjectileLookup.HasComponent(entity))
+            {
+                // If LocalTransform exists, update ExplosionPoint position
+                explosion.Position = LocalTransformLookup[entity].Position;
+                ECB.SetComponent(index, entity, explosion);
+            }
+            else
+            {
+                // If LocalTransform is missing, trigger explosion immediately
+                BodiesInRadius inRadius;
+                PhysicsState.ValueRW.GetInRadius(explosion.Position, explosion.Radius, out inRadius);
+                foreach ((FindObjectsResult, PointDistanceInput) result in
+                         inRadius)
+                {
+                    PhysicsDebug.DrawCollider(result.Item1.collider, result.Item1.transform, UnityEngine.Color.red);
+                }
+                ECB.RemoveComponent<ExplosionPoint>(index, entity);
+                ECB.DestroyEntity(index, entity);
+            }
+        }
     }
 }
