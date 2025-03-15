@@ -174,7 +174,9 @@ public struct PairsProcessor: IFindPairsProcessor {
     [BurstCompile]
     private void Calculate(SafeEntity entityA, SafeEntity entityB)
     {
-        if (componentLookups.PlayerLookup.HasComponent(entityA) && componentLookups.EnemyWeaponLookup.HasComponent(entityB)) // Enemy Hit Player
+        if (
+                componentLookups.PlayerLookup.HasComponent(entityA)
+                && componentLookups.EnemyWeaponLookup.HasComponent(entityB)) // Enemy Hit Player
         {
             DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW;
             PlayerData player = componentLookups.PlayerLookup.GetRW(entityA).ValueRW;
@@ -185,29 +187,45 @@ public struct PairsProcessor: IFindPairsProcessor {
                 destroyedSetWriter.Add(entityB);
             }
         }
-        else if (componentLookups.EnemyLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
+        else if (
+                componentLookups.EnemyLookup.HasComponent(entityA)
+                && componentLookups.PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
         {
-            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
             EnemyStats enemy = componentLookups.EnemyLookup.GetRW(entityA).ValueRW;
-            enemy.Health -= playerProj.Stats.damage;
+            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
+            if (!enemy.Invulnerable) enemy.Health -= playerProj.Stats.damage;
 
             playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
-                
+
             componentLookups.EnemyLookup.GetRW(entityA).ValueRW = enemy;
             componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
                 
-            if (playerProj.Health == 0)
+            if (playerProj.Health <= 0)
             {
                 destroyedSetWriter.Add(entityB);
             }
         }
-        else if (componentLookups.EnemyWeaponLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
+        else if (
+                componentLookups.EnemyWeaponLookup.HasComponent(entityA)
+                && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
         {
             DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW;
             PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
-            if (enemyProj.Mass == -1)
+            if (enemyProj.Mass < 0 || playerProj.InfPierce)
             {
-                destroyedSetWriter.Add(entityB);
+                if (enemyProj.Mass < 0 && playerProj.InfPierce) return;
+                if (playerProj.InfPierce) destroyedSetWriter.Add(entityA);
+                else
+                {
+                    playerProj.Health -= (int)math.ceil(-(float)enemyProj.Mass / ((1+playerProj.Stats.pierce)*(1+playerProj.Stats.power)));
+                    
+                    componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
+                    
+                    if (playerProj.Health <= 0)
+                    {
+                        destroyedSetWriter.Add(entityB);
+                    }
+                }
             }
             else
             {
@@ -220,22 +238,36 @@ public struct PairsProcessor: IFindPairsProcessor {
                 componentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW = enemyProj;
                 componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
                 
-                if (enemyProj.Mass == 0)
+                if (enemyProj.Mass <= 0)
                 {
                     destroyedSetWriter.Add(entityA);
                 }
-                if (playerProj.Health == 0)
+                if (playerProj.Health <= 0)
                 {
                     destroyedSetWriter.Add(entityB);
                 }
             }
         }
-        else if (componentLookups.TerrainLookup.HasComponent(entityA) && componentLookups.EnemyWeaponLookup.HasComponent(entityB))
+        else if (
+                componentLookups.TerrainLookup.HasComponent(entityA)
+                && componentLookups.EnemyWeaponLookup.HasComponent(entityB))
         {
             destroyedSetWriter.Add(entityB);
         }
-        else if (componentLookups.TerrainLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
+        else if (
+                componentLookups.TerrainLookup.HasComponent(entityA)
+                && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
         {
+            destroyedSetWriter.Add(entityB);
+        }
+        else if (
+                componentLookups.PlayerLookup.HasComponent(entityA)
+                && componentLookups.IntelLookup.HasComponent(entityB))
+        {
+            PlayerData player = componentLookups.PlayerLookup.GetRW(entityA).ValueRW;
+            Intel intel = componentLookups.IntelLookup.GetRW(entityB).ValueRW;
+            player.LastIntel += intel.BaseValue;
+            componentLookups.PlayerLookup.GetRW(entityA).ValueRW = player;
             destroyedSetWriter.Add(entityB);
         }
     }
