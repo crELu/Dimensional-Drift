@@ -24,11 +24,7 @@ public class PlayerProjectileAuthor : BaseAuthor
                 baker.AddComponent<MeleeTag>(entity);
                 break;
             case AttackType.Bomb:
-                baker.AddComponent(entity, new ExplosionPoint
-                {
-                    Position = float3.zero,
-                    Radius = 0
-                });
+                baker.AddComponent<BombTag>(entity);
                 break;
         }
         base.Bake(baker, entity);
@@ -46,10 +42,14 @@ public struct LaserTag : IComponentData {}
 
 public struct MeleeTag : IComponentData {}
 
+public struct BombTag : IComponentData {}
+
+public struct ExplosionTag : IComponentData {}
+
 public struct ExplosionPoint : ICleanupComponentData
 {
+    public BulletStats Stats;
     public float3 Position;
-    public float Damage;
     public float Radius;
 }
 
