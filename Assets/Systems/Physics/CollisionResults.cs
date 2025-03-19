@@ -9,6 +9,8 @@ using Unity.Mathematics;
 [BurstCompile]
 public struct PairsProcessor: IFindPairsProcessor {
     public PhysicsComponentLookups ComponentLookups;
+    public float DeltaTime;
+    public Dimension Dim;
     public EntityCommandBuffer.ParallelWriter Ecb;
     public NativeParallelHashSet<Entity>.ParallelWriter DestroyedSetWriter;
     
@@ -27,34 +29,21 @@ public struct PairsProcessor: IFindPairsProcessor {
     [BurstCompile]
     private void Calculate(SafeEntity entityA, SafeEntity entityB)
     {
-        if (ComponentLookups.EnemyWeaponLookup.HasComponent(entityA) && ComponentLookups.PlayerWeaponLookup.HasComponent(entityB))
-        {
-            DamagePlayer enemyProj = ComponentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW;
-            PlayerProjectile playerProj = ComponentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
-            if (enemyProj.Mass == -1)
-            {
-                DestroyedSetWriter.Add(entityB);
-            }
-            else
-            {
-                while (enemyProj.Mass > 0 && playerProj.Health > 0)
-                {
-                    enemyProj.Mass--;
-                    playerProj.Health -= (int)math.ceil(10000f / ((1+playerProj.Stats.pierce)*(1+playerProj.Stats.power)));
-                }
-                
-                ComponentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW = enemyProj;
-                ComponentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
-                
-                if (enemyProj.Mass == 0)
-                {
-                    Ecb.DestroyEntity(0, entityA);
-                }
-                if (playerProj.Health == 0)
-                {
-                    Ecb.DestroyEntity(0, entityB);
-                }
-            }
-        }
+        var eA = ComponentLookups.EnemyLookup.GetRW(entityA).ValueRW;
+        var eB = ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW;
+        if (eA.Ghosted || eB.Ghosted) return;
+        var tA = ComponentLookups.transform.GetRW(entityA).ValueRW;
+        var tB = ComponentLookups.transform.GetRW(entityB).ValueRW;
+        var vA = ComponentLookups.velocity.GetRW(entityA).ValueRW;
+        var vB = ComponentLookups.velocity.GetRW(entityB).ValueRW;
+        
+        var d = tA.Position - tB.Position;
+        if (Dim == Dimension.Two) d.y = 0;
+        var massRatio = eA.Size * eA.Size / (eA.Size * eA.Size + eB.Size * eB.Size);
+        vA.Linear += DeltaTime * math.normalize(d) * 15 * massRatio;
+        vB.Linear += DeltaTime * -math.normalize(d) * 15 / massRatio;
+
+        ComponentLookups.velocity.GetRW(entityA).ValueRW = vA;
+        ComponentLookups.velocity.GetRW(entityB).ValueRW = vB;
     }
 }

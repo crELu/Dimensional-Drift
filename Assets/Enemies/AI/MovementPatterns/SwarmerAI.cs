@@ -13,25 +13,30 @@ namespace Enemies.AI
         [Header("Swarmer Settings")]
         public float spacingRange;
         public float strafeWeight;
+        public float maxTargetSpeed, maxFarSpeed;
         public override void Bake(UniversalBaker baker, Entity entity)
         {
-            baker.AddComponent(entity, new Swarmer
+            baker.AddSharedComponent(entity, new Swarmer
             {
                 SpacingRange = spacingRange,
                 StrafeWeight = strafeWeight,
+                MaxTargetSpeed = maxTargetSpeed,
+                MaxFarSpeed = maxFarSpeed
             });
             base.Bake(baker, entity);
         }
     }
     
-    public struct Swarmer : IComponentData
+    public struct Swarmer : ISharedComponentData
     {
         public float StrafeWeight;
         public float SpacingRange;
+        public float MaxTargetSpeed;
+        public float MaxFarSpeed;
     }
     
     [BurstCompile]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(BaseEnemyAI))]
     public partial struct SwarmerAISystem : ISystem
     {
@@ -46,7 +51,7 @@ namespace Enemies.AI
             public float DeltaTime;
             public Dimension Dim;
             private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, ref EnemyMovement movement,
-                ref Swarmer fish)
+                in Swarmer fish)
             {
                 var pPos = MathsBurst.DimSwitcher(PlayerPosition, Dim == Dimension.Three);
                 var ePos = MathsBurst.DimSwitcher(transform.Position, Dim == Dimension.Three);
@@ -59,7 +64,8 @@ namespace Enemies.AI
                                math.cross(math.normalize(toPlayer), math.up()) * fish.StrafeWeight;
                 movement.TargetUpDir = math.up();
                 movement.TargetFaceDir = math.normalize(toPlayer);
-                
+                idealVel = MathsBurst.ClampMagnitude(idealVel,
+                    math.lengthsq(toPlayer) > 150 * 150 ? fish.MaxFarSpeed : fish.MaxTargetSpeed);
                 movement.TargetMoveVel = idealVel;
             }
 

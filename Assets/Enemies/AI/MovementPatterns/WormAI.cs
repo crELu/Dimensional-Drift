@@ -81,15 +81,16 @@ namespace Enemies.AI
     }
     
     [BurstCompile]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(BaseEnemyAI))]
     public partial struct WormAISystem : ISystem
     {
-        private ComponentLookup<EnemyDamageReceiver> _damageReceiverLookup;
+        private ComponentLookup<EnemyCollisionReceiver> _damageReceiverLookup;
         private ComponentLookup<LocalTransform> _localTransformLookup;
         public void OnCreate(ref SystemState state)
         {
-            
+            _damageReceiverLookup = state.GetComponentLookup<EnemyCollisionReceiver>();
+            _localTransformLookup = state.GetComponentLookup<LocalTransform>();
         }
 
         public void OnDestroy(ref SystemState state) { }
@@ -114,7 +115,7 @@ namespace Enemies.AI
             public float DeltaTime;
             public Dimension Dim;
             public EntityCommandBuffer.ParallelWriter Ecb;
-            [NativeDisableParallelForRestriction] public ComponentLookup<EnemyDamageReceiver> DamageLookup;
+            [NativeDisableParallelForRestriction] public ComponentLookup<EnemyCollisionReceiver> DamageLookup;
             [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
             private void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref WormBody body, ref DynamicBuffer<EnemyShoot> guns)
             {

@@ -44,7 +44,7 @@ namespace Enemies.AI
     }
     
     [BurstCompile]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(BaseEnemyAI))]
     public partial struct SpikeBallAISystem : ISystem
     {

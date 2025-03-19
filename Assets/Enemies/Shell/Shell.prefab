@@ -182,7 +182,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a3564c47c2e2b8744bc12551e2a00e8a, type: 2}
+  - {fileID: 2100000, guid: 44812a96b73007e4a98f7be2d2a15029, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -327,7 +327,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.25, y: 0.2, z: 1}
+  m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: -0.1449337}
 --- !u!54 &7149123046338045279
 Rigidbody:
@@ -402,7 +402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 056874908c0341c7a7ebed2cfb2a2afa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 15
+  health: 10
   size: 6
   intel: {fileID: 1973288489611225477, guid: f81dc56b200479e40ac7f69e3d7e71f9, type: 3}
   linearPid:
@@ -423,6 +423,8 @@ MonoBehaviour:
       z: 3
   spacingRange: 30
   strafeWeight: 3
+  maxTargetSpeed: 20
+  maxFarSpeed: 40
 --- !u!114 &2928448717791960285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -441,7 +443,7 @@ MonoBehaviour:
   speed: 50
   visionCone: {x: 0, y: 45}
   cd: 4
-  bursts: 3
+  bursts: 1
   burstLength: 0.5
 --- !u!1 &6291649056924822601
 GameObject:

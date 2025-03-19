@@ -16,7 +16,7 @@ namespace Enemies.AI
         public float moveWeight;
         public override void Bake(UniversalBaker baker, Entity entity)
         {
-            baker.AddComponent(entity, new GunRay
+            baker.AddSharedComponent(entity, new GunRay
             {
                 TurnSpeed = turnSpeed,
                 SpacingRange = spacingRange * spacingRange,
@@ -26,7 +26,7 @@ namespace Enemies.AI
         }
     }
     
-    public struct GunRay : IComponentData
+    public struct GunRay : ISharedComponentData
     {
         public float TurnSpeed;
         public float SpacingRange;
@@ -34,7 +34,7 @@ namespace Enemies.AI
     }
     
     [BurstCompile]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(BaseEnemyAI))]
     public partial struct GunRayAISystem : ISystem
     {
@@ -48,7 +48,7 @@ namespace Enemies.AI
             public float3 PlayerPosition;
             public float DeltaTime;
             public Dimension Dim;
-            private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, in PhysicsVelocity velocity, ref EnemyMovement movement, ref GunRay ray)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, in PhysicsVelocity velocity, ref EnemyMovement movement, in GunRay ray)
             {
                 var toPlayer = PlayerPosition - transform.Position;
                 

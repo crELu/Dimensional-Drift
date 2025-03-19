@@ -7,20 +7,29 @@ using UnityEngine;
 public class BombWeapon: PlayerWeapon
 {
     private float _chargeTimer;
-
+    public AudioSource chargeSound;
+    private bool _charged;
+    
     public override bool Fire(PlayerManager player, bool pressed)
     {
         if (pressed)
         {
             _chargeTimer += Time.deltaTime;
+            if (!_charged && _chargeTimer > BaseStats.attackDelay)
+            {
+                chargeSound.Play();
+                _charged = true;
+            }
         }
         else
         {
-            if (_chargeTimer > BaseStats.attackDelay && base.Fire(player, true))
+            if (_charged && base.Fire(player, true))
             {
                 _chargeTimer = 0;
+                _charged = false;
                 return true;
             }
+            _charged = false;
             _chargeTimer = 0;
         }
         return false;

@@ -15,7 +15,7 @@ namespace Enemies.AI
     }
     
     [BurstCompile]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(BaseEnemyAI))]
     public partial struct YuumiAISystem : ISystem
     {
@@ -53,7 +53,7 @@ namespace Enemies.AI
                 var enemy = temp.ValueRO.Attached;
                 if (SystemAPI.Exists(enemy))
                 {
-                    var enemyStats = state.EntityManager.GetComponentData<EnemyDamageReceiver>(enemy);
+                    var enemyStats = state.EntityManager.GetComponentData<EnemyCollisionReceiver>(enemy);
                     enemyStats.Invulnerable = false;
                     ecb.SetComponent(enemy, enemyStats);
                 }

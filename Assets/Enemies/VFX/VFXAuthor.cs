@@ -77,6 +77,7 @@ public struct TrailSystemData : ICleanupComponentData
 }
 
 [BurstCompile]
+[UpdateAfter(typeof(PlayerShootingSystem))]
 public partial struct TrailUpdateSystem : ISystem
 {
     private ComponentLookup<TrailData> _trailLookup;

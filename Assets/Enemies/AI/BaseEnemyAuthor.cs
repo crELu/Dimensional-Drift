@@ -68,7 +68,7 @@ namespace Enemies.AI
             
             var thrusters = builder.CreateBlobAssetReference<ThrusterBlob>(Allocator.Persistent);
             
-            baker.AddComponent(entity, new EnemyDamageReceiver());
+            baker.AddComponent(entity, new EnemyCollisionReceiver {Size = size});
             baker.AddComponent(entity, new EnemyStats
             {
                 Health = health,
@@ -85,10 +85,10 @@ namespace Enemies.AI
             
         }
     }
-    public struct EnemyDamageReceiver : IComponentData
+    public struct EnemyCollisionReceiver : IComponentData
     {
-        public float LastDamage;
-        public bool Invulnerable;
+        public float LastDamage, Size;
+        public bool Invulnerable, Ghosted;
     }
     
     public struct EnemyStats : IComponentData
@@ -125,17 +125,15 @@ namespace Enemies.AI
     [UpdateAfter(typeof(PhysicsSystem))]
     public partial struct BaseEnemyAI : ISystem
     {
-        private BufferLookup<Thruster> _tBuffer;
-        private BufferLookup<ThrusterPair> _tPBbuffer;
         private ComponentLookup<LocalTransform> _localTransform;
         
         [BurstCompile]
         public void OnCreate(ref SystemState state)
-        { 
+        {
+            state.RequireForUpdate<SoundReceiver>();
             state.InitSystemRng("BaseEnemyAI");
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
-            _tBuffer = state.GetBufferLookup<Thruster>();
-            _tPBbuffer = state.GetBufferLookup<ThrusterPair>();
+            
             _localTransform = state.GetComponentLookup<LocalTransform>(true);
         }
 
@@ -147,9 +145,6 @@ namespace Enemies.AI
             public EntityCommandBuffer.ParallelWriter Ecb;
             public float DeltaTime;
             public Dimension Dim;
-                
-            [ReadOnly] public BufferLookup<Thruster> MainThrusters;
-            [ReadOnly] public BufferLookup<ThrusterPair> Stabilizers;
             
             private void DoStuff(Entity e, ref LocalTransform transform, ref EnemyMovement enemy, PhysicsMass mass, ref PhysicsVelocity physicsVelocity)
             { 
@@ -229,6 +224,7 @@ namespace Enemies.AI
             public EntityCommandBuffer.ParallelWriter Ecb;
             [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
             public SystemRng Rng;
+            public NativeQueue<SfxCommand>.ParallelWriter AudioWriter;
             
             public bool OnChunkBegin(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
@@ -241,7 +237,7 @@ namespace Enemies.AI
             {
             }
 
-            private void Execute([ChunkIndexInQuery] int chunkIndex, in Entity enemy, ref EnemyStats enemyStats, ref EnemyDamageReceiver damageInfo)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, in Entity enemy, ref EnemyStats enemyStats, ref EnemyCollisionReceiver damageInfo)
             {
                 enemyStats.Health -= damageInfo.LastDamage;
                 damageInfo.LastDamage = 0;
@@ -249,6 +245,7 @@ namespace Enemies.AI
                 if (enemyStats.Health <= 0)
                 {
                     var transform = TransformLookup[enemy];
+                    AudioWriter.Enqueue(new SfxCommand {Name = "Enemy Die", Position = transform.Position});
                     if (enemyStats.IntelPrefab != Entity.Null)
                     {
                         var intel = Ecb.Instantiate(chunkIndex, enemyStats.IntelPrefab);
@@ -264,14 +261,9 @@ namespace Enemies.AI
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            _tBuffer.Update(ref state);
-            _tPBbuffer.Update(ref state);
-            
             EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
             var d1 = new BaseEnemyMoveJob
             {
-                MainThrusters = _tBuffer,
-                Stabilizers = _tPBbuffer,
                 Ecb = ecb,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
                 Dim = DimensionManager.burstDim.Data,
@@ -281,11 +273,15 @@ namespace Enemies.AI
             
             _localTransform.Update(ref state);
             ecb = GetEntityCommandBuffer(ref state);
+            
+            var soundReceiver = SystemAPI.GetSingleton<SoundReceiver>();
+            var soundWriter = soundReceiver.AudioCommands.AsParallelWriter();
             var d2 = new BaseEnemyHealthJob
             {
                 Ecb = ecb,
                 TransformLookup = _localTransform,
                 Rng = state.GetJobRng(),
+                AudioWriter = soundWriter,
             }.ScheduleParallel(state.Dependency);
             state.Dependency = d2;
         }

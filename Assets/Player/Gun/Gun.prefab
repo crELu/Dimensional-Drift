@@ -131,7 +131,7 @@ MonoBehaviour:
     ammoUse: 0
     count: 0
     bulletStats:
-      damage: 10
+      damage: 12
       duration: 2
       extraction: 0
       power: 0

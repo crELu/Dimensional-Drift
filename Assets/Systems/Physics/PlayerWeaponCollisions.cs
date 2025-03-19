@@ -5,13 +5,14 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 
 [BurstCompile]
 public struct PlayerWeaponPairs: IFindPairsProcessor {
     public PhysicsComponentLookups ComponentLookups;
     public EntityCommandBuffer.ParallelWriter Ecb;
     public NativeParallelHashSet<Entity>.ParallelWriter DestroyedSetWriter;
-    
+    public NativeQueue<SfxCommand>.ParallelWriter AudioWriter;
     public void Execute(in FindPairsResult result) {
         ColliderDistanceResult r;
         if (Physics.DistanceBetween(
@@ -28,16 +29,19 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
     {
         PlayerProjectile playerProj = ComponentLookups.PlayerWeaponLookup.GetRW(pProj).ValueRW;
         
+        LocalTransform projPos = ComponentLookups.transform.GetRW(pProj).ValueRW;
+        
         if (ComponentLookups.EnemyLookup.HasComponent(entityB)) // Hit Enemy
         {
-            EnemyDamageReceiver enemy = ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW;
+            EnemyCollisionReceiver enemy = ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW;
             if (!enemy.Invulnerable) enemy.LastDamage += playerProj.Stats.damage;
 
             playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
-                
+            
             ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW = enemy;
-                
-            if (playerProj.Health == 0)
+            AudioWriter.Enqueue(new SfxCommand {Name = "Hit Enemy", Position = projPos.Position});
+            ComponentLookups.PlayerWeaponLookup.GetRW(pProj).ValueRW = playerProj;
+            if (playerProj.Health <= 0)
             {
                 DestroyedSetWriter.Add(pProj);
             }
@@ -60,11 +64,11 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
                 ComponentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW = enemyProj;
                 ComponentLookups.PlayerWeaponLookup.GetRW(pProj).ValueRW = playerProj;
                 
-                if (enemyProj.Mass == 0)
+                if (enemyProj.Mass <= 0)
                 {
                     DestroyedSetWriter.Add(entityB);
                 }
-                if (playerProj.Health == 0)
+                if (playerProj.Health <= 0)
                 {
                     DestroyedSetWriter.Add(pProj);
                 }

@@ -15,7 +15,7 @@ namespace Enemies.AI
         public float moveWeight;
         public override void Bake(UniversalBaker baker, Entity entity)
         {
-            baker.AddComponent(entity, new MeleeRay
+            baker.AddSharedComponent(entity, new MeleeRay
             {
                 TurnSpeed = turnSpeed,
                 MoveWeight = moveWeight,
@@ -24,14 +24,14 @@ namespace Enemies.AI
         }
     }
     
-    public struct MeleeRay : IComponentData
+    public struct MeleeRay : ISharedComponentData
     {
         public float TurnSpeed;
         public float MoveWeight;
     }
     
     [BurstCompile]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(BaseEnemyAI))]
     public partial struct MeleeRayAISystem : ISystem
     {
@@ -45,7 +45,7 @@ namespace Enemies.AI
             public float3 PlayerPosition;
             public float DeltaTime;
             public Dimension Dim;
-            private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, in PhysicsVelocity velocity, ref EnemyMovement movement, ref MeleeRay ray)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, in PhysicsVelocity velocity, ref EnemyMovement movement, in MeleeRay ray)
             {
                 var toPlayer = PlayerPosition - transform.Position;
                 if (Dim != Dimension.Three) toPlayer.y = 0;

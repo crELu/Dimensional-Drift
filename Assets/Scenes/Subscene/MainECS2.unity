@@ -1832,6 +1832,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Head
       objectReference: {fileID: 0}
+    - target: {fileID: 9046877455752257583, guid: 017569f3dc9c5cd4791f4a8070c520f9, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2061,7 +2065,7 @@ Rigidbody:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 4294967295
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
@@ -2136,7 +2140,7 @@ CapsuleCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 4294967295
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -2185,7 +2189,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1669212150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2204,8 +2208,50 @@ MonoBehaviour:
   - {fileID: 5180185838724031331, guid: a388a16d211b71c4499c1719332a17d1, type: 3}
   - {fileID: 4051934337747174715, guid: fe45c491e05ee8a42929203f6140e43e, type: 3}
   - {fileID: 4795614831435197986, guid: 454eec39a93ceba46a1f6d1030ee6d1f, type: 3}
-  difficulty: 50
+  difficulty: 2
   yuumi: {fileID: 5232822899256251882, guid: 064e8294f2cc2d14b90a441e7b01fdfa, type: 3}
+  starfishFreq:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 3
+      value: 0
+      inSlope: Infinity
+      outSlope: 0.06666667
+      tangentMode: 71
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 6
+      value: 0.2
+      inSlope: 0.06666667
+      outSlope: 0.033333335
+      tangentMode: 69
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 15
+      value: 0.5
+      inSlope: 0.033333335
+      outSlope: 0.033333335
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &1669212151
 MonoBehaviour:
   m_ObjectHideFlags: 0

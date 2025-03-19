@@ -30,7 +30,9 @@ public struct PlayerPairs: IFindPairsProcessor {
         
         if (ComponentLookups.IntelLookup.HasComponent(entityB))
         {
-            
+            player.LastIntel += ComponentLookups.IntelLookup.GetRW(entityB).ValueRW.BaseValue;
+            ComponentLookups.PlayerLookup.GetRW(playerEntity).ValueRW = player;
+            DestroyedSetWriter.Add(entityB);
         }
         else if (ComponentLookups.EnemyWeaponLookup.HasComponent(entityB))
         {
