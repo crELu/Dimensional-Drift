@@ -23,6 +23,9 @@ public class PlayerProjectileAuthor : BaseAuthor
             case AttackType.Melee:
                 baker.AddComponent<MeleeTag>(entity);
                 break;
+            case AttackType.Bomb:
+                baker.AddComponent<BombTag>(entity);
+                break;
         }
         base.Bake(baker, entity);
     }
@@ -39,9 +42,21 @@ public struct LaserTag : IComponentData {}
 
 public struct MeleeTag : IComponentData {}
 
+public struct BombTag : IComponentData {}
+
+public struct ExplosionTag : IComponentData {}
+
+public struct ExplosionPoint : ICleanupComponentData
+{
+    public BulletStats Stats;
+    public float3 Position;
+    public float Radius;
+}
+
 public enum AttackType
 {
     Projectile,
     Laser,
+    Bomb,
     Melee
 }
