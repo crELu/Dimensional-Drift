@@ -62,6 +62,10 @@ public class PlayerManager : MonoBehaviour
     public RectTransform minimapIcon;
     public GraphicsBuffer Px;
     [HideInInspector] public CursorLockMode targetCursorMode;
+
+    [Header("Sound Settings")]
+    [SerializeField] private AudioSource PlayerDamageTrack;
+    [SerializeField] private AudioClip DamageSFX;
     
     void Start()
     {
@@ -119,6 +123,8 @@ public class PlayerManager : MonoBehaviour
         damage -= sDamage;
         
         health -= damage;
+
+        PlayerDamageTrack.PlayOneShot(DamageSFX);
     }
 
     private void CheckHealth()

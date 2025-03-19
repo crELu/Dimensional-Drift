@@ -69,6 +69,11 @@ public class PlayerMovement : MonoBehaviour
     
     private Animator _anim;
     private Camera _camera;
+
+    [Header("Sound")]
+    [SerializeField] private AudioSource DimSwitchTrack;
+    [SerializeField] private AudioClip DimSwitchUp;
+    [SerializeField] private AudioClip DimSwitchDown;
     
     
     public float3 Position
@@ -161,6 +166,8 @@ public class PlayerMovement : MonoBehaviour
                 {
                     Cursor.lockState = CursorLockMode.Locked;
                     PlayerManager.main.targetCursorMode = CursorLockMode.Locked;
+
+                    DimSwitchTrack.PlayOneShot(DimSwitchUp);
                 }   
                 crosshair.SetActive(true);
                 break;
@@ -170,6 +177,8 @@ public class PlayerMovement : MonoBehaviour
                 {
                     Cursor.lockState = CursorLockMode.Confined;
                     PlayerManager.main.targetCursorMode = CursorLockMode.Confined;
+
+                    DimSwitchTrack.PlayOneShot(DimSwitchDown);
                 }
                 crosshair.SetActive(false);
                 break;
