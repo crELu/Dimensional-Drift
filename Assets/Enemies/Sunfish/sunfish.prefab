@@ -54,13 +54,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 824820710825999398}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 029d9e12c13e458b95fb1ffade7552e1, type: 3}
+  m_Script: {fileID: 11500000, guid: cadc6a505c674049a8218ccc42075bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 1
   spreadCount: 2
-  spreadAngle: 250
-  distance: 4
+  spreadAngle: -253.2
+  distance: 1
 --- !u!1 &3751981840652985977
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,13 +223,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4795614831435197986}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 325a83af18d34e12a1d990939726613c, type: 3}
+  m_Script: {fileID: 11500000, guid: db956e81361440ea96939b8d19dd2ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   projectile: {fileID: 4895124560806928564, guid: 18f983911a3cbdb4e901ec2921998092, type: 3}
   range: 100
-  speed: 5
+  speed: 15
   visionCone: {x: 0, y: 360}
   cd: 3
   bursts: 2
@@ -464,13 +464,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 6709749251416770524}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 029d9e12c13e458b95fb1ffade7552e1, type: 3}
+  m_Script: {fileID: 11500000, guid: cadc6a505c674049a8218ccc42075bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 1
   spreadCount: 2
-  spreadAngle: 130
-  distance: 4
+  spreadAngle: -123.45
+  distance: 1
 --- !u!1 &7355888958473229817
 GameObject:
   m_ObjectHideFlags: 0
@@ -670,13 +670,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 7874086900050653441}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 029d9e12c13e458b95fb1ffade7552e1, type: 3}
+  m_Script: {fileID: 11500000, guid: cadc6a505c674049a8218ccc42075bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 1
   spreadCount: 2
-  spreadAngle: 200
-  distance: 4
+  spreadAngle: -204.9
+  distance: 1
 --- !u!1 &8480712518429348016
 GameObject:
   m_ObjectHideFlags: 0

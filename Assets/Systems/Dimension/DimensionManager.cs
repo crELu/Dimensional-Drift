@@ -18,6 +18,8 @@ public class DimensionManager : MonoBehaviour
     public static float Duration => _instance.dimSwitchDuration;
     public float dimSwitchDuration;
     
+    public AnimationCurve timeCurve;
+    
     private InputAction _dimUpAction;
     private InputAction _dimDownAction;
     
@@ -52,10 +54,12 @@ public class DimensionManager : MonoBehaviour
         t = 0;
         while (t < 1f)
         {
-            t += Time.deltaTime / dimSwitchDuration;
+            t += Time.unscaledDeltaTime / dimSwitchDuration;
+            Time.timeScale = timeCurve.Evaluate(t);
             yield return null;
         }
         t = 1f;
+        Time.timeScale = 1f;
     }
 }
 

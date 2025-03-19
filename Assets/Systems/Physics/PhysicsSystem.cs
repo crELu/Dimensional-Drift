@@ -27,6 +27,7 @@ using static Unity.Mathematics.math;
 using CapsuleCollider = Latios.Psyshock.CapsuleCollider;
 using Collider = Latios.Psyshock.Collider;
 using Physics = Latios.Psyshock.Physics;
+using SphereCollider = Latios.Psyshock.SphereCollider;
 
 
 // Static helper methods
@@ -163,7 +164,7 @@ public struct PhysicsComponentLookups {
     public PhysicsComponentLookup<LocalTransform> transform;
 
     public PhysicsComponentLookup<PlayerData> PlayerLookup;
-    public PhysicsComponentLookup<EnemyStats> EnemyLookup;
+    public PhysicsComponentLookup<EnemyDamageReceiver> EnemyLookup;
     public PhysicsComponentLookup<PlayerProjectile> PlayerWeaponLookup;
     public PhysicsComponentLookup<DamagePlayer> EnemyWeaponLookup;
     public PhysicsComponentLookup<Obstacle> TerrainLookup;
@@ -182,93 +183,6 @@ public struct PhysicsComponentLookups {
     }
 }
 
-// Collision handling implementation.
-[BurstCompile]
-public struct PairsProcessor: IFindPairsProcessor {
-    public PhysicsComponentLookups componentLookups;
-    public EntityCommandBuffer.ParallelWriter Ecb;
-
-    public void Execute(in FindPairsResult result) {
-        ColliderDistanceResult r;
-        if (Physics.DistanceBetween(
-                    result.bodyA.collider, result.bodyA.transform,
-                    result.bodyB.collider, result.bodyB.transform,
-                    0, out r))
-        {
-            Calculate(result.entityA, result.entityB);
-            Calculate(result.entityB, result.entityA);
-        }
-    }
-    
-    [BurstCompile]
-    private void Calculate(SafeEntity entityA, SafeEntity entityB)
-    {
-        if (componentLookups.PlayerLookup.HasComponent(entityA) && componentLookups.EnemyWeaponLookup.HasComponent(entityB)) // Enemy Hit Player
-        {
-            DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW;
-            PlayerData player = componentLookups.PlayerLookup.GetRW(entityA).ValueRW;
-            player.LastDamage += enemyProj.Damage;
-            componentLookups.PlayerLookup.GetRW(entityA).ValueRW = player;
-            if (enemyProj.DieOnHit)
-            {
-                Ecb.DestroyEntity(0, entityB);
-            }
-        }
-        else if (componentLookups.EnemyLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
-        {
-            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
-            EnemyStats enemy = componentLookups.EnemyLookup.GetRW(entityA).ValueRW;
-            enemy.Health -= playerProj.Stats.damage;
-
-            playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
-                
-            componentLookups.EnemyLookup.GetRW(entityA).ValueRW = enemy;
-            componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
-                
-            if (playerProj.Health == 0)
-            {
-                Ecb.DestroyEntity(0, entityB);
-            }
-        }
-        else if (componentLookups.EnemyWeaponLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
-        {
-            DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW;
-            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
-            if (enemyProj.Mass == -1)
-            {
-                Ecb.DestroyEntity(0, entityB);
-            }
-            else
-            {
-                while (enemyProj.Mass > 0 && playerProj.Health > 0)
-                {
-                    enemyProj.Mass--;
-                    playerProj.Health -= (int)math.ceil(10000f / ((1+playerProj.Stats.pierce)*(1+playerProj.Stats.power)));
-                }
-                
-                componentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW = enemyProj;
-                componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
-                
-                if (enemyProj.Mass == 0)
-                {
-                    Ecb.DestroyEntity(0, entityA);
-                }
-                if (playerProj.Health == 0)
-                {
-                    Ecb.DestroyEntity(0, entityB);
-                }
-            }
-        }
-        else if (componentLookups.TerrainLookup.HasComponent(entityA) && componentLookups.EnemyWeaponLookup.HasComponent(entityB))
-        {
-            Ecb.DestroyEntity(0, entityB);
-        }
-        else if (componentLookups.TerrainLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
-        {
-            Ecb.DestroyEntity(0, entityB);
-        }
-    }
-}
 
 // Enumerator implementation for iterating over bodies within a radius
 [BurstCompile]
@@ -310,12 +224,13 @@ public struct PhysicsSystemState: IComponentData {
     public CollisionLayer collisionLayer;
 
     // Collision layers with specific types of objects
-    public CollisionLayer playerLayer;
-    public CollisionLayer playerWeaponLayer;
-    public CollisionLayer enemyLayer;
-    public CollisionLayer enemyWeaponLayer;
-    public CollisionLayer terrainLayer;
-    public CollisionLayer intelLayer;
+    public CollisionLayer PlayerLayer;
+    public CollisionLayer PlayerInteractLayer;
+    public CollisionLayer PlayerWeaponLayer;
+    public CollisionLayer EnemyLayer;
+    public CollisionLayer EnemyWeaponLayer;
+    public CollisionLayer TerrainLayer;
+    public CollisionLayer IntelLayer;
 
     public Dimension dimension;
     public float3 projectDirection2D;
@@ -339,12 +254,13 @@ public struct PhysicsSystemState: IComponentData {
     [BurstCompile]
     public void Dispose() {
         collisionLayer.Dispose();
-        playerLayer.Dispose();
-        playerWeaponLayer.Dispose();
-        enemyLayer.Dispose();
-        enemyWeaponLayer.Dispose();
-        terrainLayer.Dispose();
-        intelLayer.Dispose();
+        PlayerLayer.Dispose();
+        PlayerInteractLayer.Dispose();
+        PlayerWeaponLayer.Dispose();
+        EnemyLayer.Dispose();
+        EnemyWeaponLayer.Dispose();
+        TerrainLayer.Dispose();
+        IntelLayer.Dispose();
     }
 }
 
@@ -368,30 +284,62 @@ public partial struct PhysicsSystem: ISystem {
 
     [BurstCompile]
     private JobHandle BuildLayer(
-            in Aabb worldBounds, in Dimension dim,
-            in float3 projectDirection2D, in EntityQuery query,
-            out CollisionLayer collisionLayer)
+        in Aabb worldBounds, in Dimension dim,
+        in float3 projectDirection2D, in EntityQuery query,
+        out CollisionLayer collisionLayer)
     {
-        var entities = query.ToEntityArray(Allocator.TempJob);
-        var colliderBodies = new NativeArray<ColliderBody>(entities.Length, Allocator.TempJob);
-        var entityColliders = query.ToComponentDataArray<Collider>(Allocator.TempJob);
-        var entityTransforms = query.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+        return BuildLayer(worldBounds, dim, projectDirection2D, query, out collisionLayer, new NativeArray<ColliderBody>());
+    }
 
-        var colliderBodiesDependency = new ColliderBodiesJob {
-            projectDirection2D = projectDirection2D,
-            colliderBodies = colliderBodies,
-            entities = entities,
-            entityColliders = entityColliders,
-            entityTransforms = entityTransforms,
-            Dim = dim
-        }.Schedule(entities.Length, 64);
-        colliderBodiesDependency = entities.Dispose(colliderBodiesDependency);
-        colliderBodiesDependency = entityColliders.Dispose(colliderBodiesDependency);
-        colliderBodiesDependency = entityTransforms.Dispose(colliderBodiesDependency);
+    [BurstCompile]
+    private JobHandle BuildLayer(
+            in Aabb worldBounds, in Dimension dim,
+            in float3 projectDirection2D, in EntityQuery? query,
+            out CollisionLayer collisionLayer, NativeArray<ColliderBody>? bodies)
+    {
+        var size = 0;
+        if (bodies.HasValue) size += bodies.Value.Length;
+        NativeArray<Entity> entities;
+        NativeArray<ColliderBody> colliderBodies;
+        JobHandle dependency = new JobHandle();
+        if (query.HasValue)
+        {
+            entities = query.Value.ToEntityArray(Allocator.TempJob);
+            size += entities.Length;
+            colliderBodies = new NativeArray<ColliderBody>(size, Allocator.TempJob);
+            
+            var entityColliders = query.Value.ToComponentDataArray<Collider>(Allocator.TempJob);
+            var entityTransforms = query.Value.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+            
+            dependency = new ColliderBodiesJob {
+                projectDirection2D = projectDirection2D,
+                colliderBodies = colliderBodies,
+                entities = entities,
+                entityColliders = entityColliders,
+                entityTransforms = entityTransforms,
+                Dim = dim
+            }.Schedule(entities.Length, 64);
+            
+            dependency = entities.Dispose(dependency);
+            dependency = entityColliders.Dispose(dependency);
+            dependency = entityTransforms.Dispose(dependency);
 
+            if (bodies.HasValue)
+            {
+                for (var i = 0; i < bodies.Value.Length; i++)
+                {
+                    colliderBodies[entities.Length + i] = bodies.Value[i];
+                }
+            }
+        }
+        else
+        {
+            colliderBodies = bodies.Value;
+        }
+        
         var physicsLayerDependency = Physics.BuildCollisionLayer(colliderBodies)
             .WithSubdivisions(5, 5, 5).WithWorldBounds(worldBounds)
-            .ScheduleParallel(out collisionLayer, Allocator.Persistent, colliderBodiesDependency);
+            .ScheduleParallel(out collisionLayer, Allocator.Persistent, dependency);
         physicsLayerDependency = colliderBodies.Dispose(physicsLayerDependency);
 
         return physicsLayerDependency;
@@ -408,7 +356,7 @@ public partial struct PhysicsSystem: ISystem {
             
             PlayerLookup = state.GetComponentLookup<PlayerData>(),
             EnemyWeaponLookup = state.GetComponentLookup<DamagePlayer>(),
-            EnemyLookup = state.GetComponentLookup<EnemyStats>(),
+            EnemyLookup = state.GetComponentLookup<EnemyDamageReceiver>(),
             PlayerWeaponLookup = state.GetComponentLookup<PlayerProjectile>(),
             TerrainLookup = state.GetComponentLookup<Obstacle>(),
             IntelLookup = state.GetComponentLookup<Intel>()
@@ -435,7 +383,7 @@ public partial struct PhysicsSystem: ISystem {
             .Build(ref state);
 
         enemyQuery = new EntityQueryBuilder(Allocator.Temp)
-            .WithAllRW<EnemyStats>()
+            .WithAllRW<EnemyDamageReceiver>()
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
             .WithAll<Collider, Unity.Physics.PhysicsMass>()
             .Build(ref state);
@@ -492,27 +440,38 @@ public partial struct PhysicsSystem: ISystem {
 
         var buildPlayerLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                playerQuery, out physicsState.ValueRW.playerLayer);
+                playerQuery, out physicsState.ValueRW.PlayerLayer);
+
+        var playerHitbox = new NativeArray<ColliderBody>(1, Allocator.TempJob);
+        playerHitbox[0] = new()
+        {
+            collider = new SphereCollider(playerTransform.Position, 5), transform = TransformQvvs.identity,
+            entity = playerEntity
+        };
+        
+        var buildPlayerInteractLayer = BuildLayer(
+            playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
+            null, out physicsState.ValueRW.PlayerInteractLayer, new NativeArray<ColliderBody>(playerHitbox, Allocator.TempJob));
 
         var buildPlayerWeaponLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                playerWeaponQuery, out physicsState.ValueRW.playerWeaponLayer);
+                playerWeaponQuery, out physicsState.ValueRW.PlayerWeaponLayer);
 
         var buildEnemyLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                enemyQuery, out physicsState.ValueRW.enemyLayer);
+                enemyQuery, out physicsState.ValueRW.EnemyLayer);
 
         var buildEnemyWeaponLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                enemyWeaponQuery, out physicsState.ValueRW.enemyWeaponLayer);
+                enemyWeaponQuery, out physicsState.ValueRW.EnemyWeaponLayer);
 
         var buildTerrainLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                terrainQuery, out physicsState.ValueRW.terrainLayer);
+                terrainQuery, out physicsState.ValueRW.TerrainLayer);
 
         var buildIntelLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                intelQuery, out physicsState.ValueRW.intelLayer);
+                intelQuery, out physicsState.ValueRW.IntelLayer);
 
         var buildLayers = JobHandle.CombineDependencies(
                 buildMainLayer, buildPlayerLayer, buildPlayerWeaponLayer);
@@ -520,58 +479,92 @@ public partial struct PhysicsSystem: ISystem {
                 buildLayers, buildEnemyLayer, buildEnemyWeaponLayer);
         buildLayers = JobHandle.CombineDependencies(
                 buildLayers, buildTerrainLayer, buildIntelLayer);
+        buildLayers = JobHandle.CombineDependencies(
+            buildLayers, buildPlayerInteractLayer);
 
         componentLookups.Update(ref state);
         var ecb = new EntityCommandBuffer(Allocator.TempJob);
         var ecbWriter = ecb.AsParallelWriter();
 
-
+        var destroyedSet = new NativeParallelHashSet<Entity>(physicsState.ValueRO.collisionLayer.colliderBodies.Length, Allocator.TempJob);
+        var destroyedSetWriter = destroyedSet.AsParallelWriter();
+        
         var pairsProcessor = new PairsProcessor {
-            componentLookups = componentLookups,
-            Ecb = ecbWriter
+            ComponentLookups = componentLookups,
+            Ecb = ecbWriter,
+            DestroyedSetWriter = destroyedSetWriter
         };
-
-        // Collide enemy weapons with player
-        var Dependency = Physics.FindPairs(
-                physicsState.ValueRO.enemyWeaponLayer,
-                physicsState.ValueRO.playerLayer, pairsProcessor)
-            .ScheduleParallel(buildLayers);
-        // Collide enemies with enemies
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
-        // Collide player weapons with enemies
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerWeaponLayer,
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
-        // Collide player weapons with enemy weapons
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerWeaponLayer,
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
+        var terrainProcessor = new TerrainPairs {
+            ComponentLookups = componentLookups,
+            Ecb = ecbWriter,
+            DestroyedSetWriter = destroyedSetWriter
+        };
+        var playerWeaponPairsProcessor = new PlayerWeaponPairs {
+            ComponentLookups = componentLookups,
+            Ecb = ecbWriter,
+            DestroyedSetWriter = destroyedSetWriter
+        };
+        
         // Collider player with intel
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerLayer,
-                physicsState.ValueRO.intelLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
+        var dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerInteractLayer,
+                physicsState.ValueRO.IntelLayer, pairsProcessor)
+            .ScheduleParallel(buildLayers);
+        
+        // Collide player enemy weapons
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.EnemyWeaponLayer,
+                physicsState.ValueRO.PlayerLayer, pairsProcessor)
+            .ScheduleParallel(dependency);
+        
+        // Collide enemies with enemies
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.EnemyLayer, pairsProcessor)
+            .ScheduleParallel(dependency);
+        
+        // Collide player weapons with enemies
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerWeaponLayer,
+                physicsState.ValueRO.EnemyLayer, playerWeaponPairsProcessor)
+            .ScheduleParallel(dependency);
+        // Collide player weapons with enemy weapons
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerWeaponLayer,
+                physicsState.ValueRO.EnemyWeaponLayer, playerWeaponPairsProcessor)
+            .ScheduleParallel(dependency);
+        
         // Collide player with terrain
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerLayer,
-                physicsState.ValueRO.terrainLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerLayer,
+                physicsState.ValueRO.TerrainLayer, terrainProcessor)
+            .ScheduleParallel(dependency);
+        // Collide player weapons with terrain
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerWeaponLayer,
+                physicsState.ValueRO.TerrainLayer, terrainProcessor)
+            .ScheduleParallel(dependency);
         // Collide enemies with terrain
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.enemyLayer,
-                physicsState.ValueRO.terrainLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.EnemyLayer,
+                physicsState.ValueRO.TerrainLayer, terrainProcessor)
+            .ScheduleParallel(dependency);
+        // Collide enemy weapons with terrain
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.EnemyWeaponLayer,
+                physicsState.ValueRO.TerrainLayer, terrainProcessor)
+            .ScheduleParallel(dependency);
 
         JobHandle.ScheduleBatchedJobs();
-        Dependency.Complete();
+        dependency.Complete();
        
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
-
+        
+        foreach (Entity entity in destroyedSet) {
+            state.EntityManager.DestroyEntity(entity);
+        }
+        destroyedSet.Dispose();
+        
         /*
         // Example of using GetColliderBodiesInRange to draw the colliders on
         // all the objects within 100 units of the origin

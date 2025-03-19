@@ -26,12 +26,6 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] private AugmentType weaponType;
     public AugmentType WeaponType => weaponType;
 
-
-/// ////////////////////////////
-    [SerializeField] private AugmentType weaponType;
-    public AugmentType WeaponType => weaponType;
-/// ////////////////////////////
-
     private float Cd => 1 / BaseStats.attackSpeed;
     protected float Cooldown;
 

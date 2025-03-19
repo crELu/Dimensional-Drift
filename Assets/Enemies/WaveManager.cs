@@ -103,10 +103,10 @@ namespace Enemies
                     float hp = stats.Health * catStats.Health;
                     Ecb.AddComponent(jobIndex, cat,
                         new EnemyStats { IntelPrefab = catStats.IntelPrefab, MaxHealth = hp, Health = hp });
+                    Ecb.AddComponent(jobIndex, cat, new EnemyDamageReceiver());
+                    
                     Ecb.AddComponent(jobIndex, cat, LocalTransform.FromScale(stats.Size));
-
-                    stats.Invulnerable = true;
-                    Ecb.SetComponent(jobIndex, entity, stats);
+                    Ecb.SetComponent(jobIndex, entity, new EnemyDamageReceiver{Invulnerable = true});
                 }
                 
                 var originalTransform = LocalTransformLookup.GetRefRO(Enemies[i].Prefab).ValueRO;
@@ -144,7 +144,7 @@ namespace Enemies
                     
                     var random = _rng.GetSequence(0);
 
-                    float[] weights = { 20, 4, 2, 1};
+                    float[] weights = {15, 5, 4, 2, 1};
                     float totalWeight = 0;
                     
                     foreach (var t in weights)

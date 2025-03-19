@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &9046877455752257583
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4012870506824383072}
+  - component: {fileID: 1929389468739571984}
+  - component: {fileID: 7978749031990209013}
+  m_Layer: 0
+  m_Name: Head
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4012870506824383072
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9046877455752257583}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -137.3, y: -19.167494, z: -108.75725}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1929389468739571984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9046877455752257583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e56bcd25c7954330a4e55b134c8fbd17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7978749031990209013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9046877455752257583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 416c8eeb473a4a7197b0b5f77bcca924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 10
+  size: 10
+  intel: {fileID: 1231305184969748935, guid: cb4a7fa663eefdd4a82550cec515e921, type: 3}
+  linearPid:
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 1
+      y: 1
+      z: 1
+  angularPid:
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 1
+      y: 1
+      z: 1
+  count: 5
+  bodyPrefab: {fileID: 6849106216674670052, guid: 3be030b34b36c5f4f98c3a7b1210d3a8, type: 3}
+  spacing: 1

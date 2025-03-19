@@ -68,6 +68,7 @@ namespace Enemies.AI
             
             var thrusters = builder.CreateBlobAssetReference<ThrusterBlob>(Allocator.Persistent);
             
+            baker.AddComponent(entity, new EnemyDamageReceiver());
             baker.AddComponent(entity, new EnemyStats
             {
                 Health = health,
@@ -84,11 +85,15 @@ namespace Enemies.AI
             
         }
     }
+    public struct EnemyDamageReceiver : IComponentData
+    {
+        public float LastDamage;
+        public bool Invulnerable;
+    }
     
     public struct EnemyStats : IComponentData
     {
         public float Health, MaxHealth, Size;
-        public bool Invulnerable;
         public Entity IntelPrefab;
     }
 
@@ -116,7 +121,8 @@ namespace Enemies.AI
     }
 
     [BurstCompile]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+    [UpdateAfter(typeof(PhysicsSystem))]
     public partial struct BaseEnemyAI : ISystem
     {
         private BufferLookup<Thruster> _tBuffer;
@@ -235,15 +241,21 @@ namespace Enemies.AI
             {
             }
 
-            private void Execute([ChunkIndexInQuery] int chunkIndex, Entity enemy, EnemyStats enemyStats)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, in Entity enemy, ref EnemyStats enemyStats, ref EnemyDamageReceiver damageInfo)
             {
+                enemyStats.Health -= damageInfo.LastDamage;
+                damageInfo.LastDamage = 0;
+                
                 if (enemyStats.Health <= 0)
                 {
                     var transform = TransformLookup[enemy];
-                    var intel = Ecb.Instantiate(chunkIndex, enemyStats.IntelPrefab);
-                    var s = TransformLookup[enemyStats.IntelPrefab];
-                    Ecb.SetComponent(chunkIndex, intel, LocalTransform.FromPositionRotationScale(transform.Position, transform.Rotation, s.Scale));
-                    Ecb.SetComponent(chunkIndex, intel, new PhysicsVelocity{Linear = Rng.NextFloat3Direction() * 5});
+                    if (enemyStats.IntelPrefab != Entity.Null)
+                    {
+                        var intel = Ecb.Instantiate(chunkIndex, enemyStats.IntelPrefab);
+                        var s = TransformLookup[enemyStats.IntelPrefab];
+                        Ecb.SetComponent(chunkIndex, intel, LocalTransform.FromPositionRotationScale(transform.Position, transform.Rotation, s.Scale));
+                        Ecb.SetComponent(chunkIndex, intel, new PhysicsVelocity{Linear = Rng.NextFloat3Direction() * 5});
+                    }
                     Ecb.DestroyEntity(chunkIndex, enemy);
                 }
             }
