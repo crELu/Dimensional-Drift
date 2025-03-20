@@ -998,7 +998,7 @@ MonoBehaviour:
         clearFlags: 0
         passFoldout: 0
         m_Version: 0
-        fullscreenPassMaterial: {fileID: 2100000, guid: ddcbc0e45bff6e34ebdb480e40ddf646, type: 2}
+        fullscreenPassMaterial: {fileID: 2100000, guid: f424cc490ef1b4a4187d3f93cc575810, type: 2}
         materialPassIndex: 0
         materialPassName: Custom Pass 0
         fetchColorBuffer: 0
