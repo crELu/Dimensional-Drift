@@ -20,7 +20,7 @@ MonoBehaviour:
     x: -3238
     y: -881
     width: 3520
-    height: 3169
+    height: 3187
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -519,7 +519,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"r":2.996077537536621,"g":0.5503788590431213,"b":0.0,"a":0.3686274588108063}'
+      m_SerializableObject: '{"r":383.498046875,"g":70.44851684570313,"b":0.0,"a":0.3686274588108063}'
     m_Space: -1
   m_Property:
     name: _Color
@@ -2834,7 +2834,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.1
+      m_SerializableObject: 0.4
     m_Space: -1
   m_Property:
     name: A
@@ -2868,7 +2868,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.15
+      m_SerializableObject: 0.3
     m_Space: -1
   m_Property:
     name: B
@@ -3846,7 +3846,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"r":10.780163764953614,"g":4.1816301345825199,"b":0.0,"a":0.250980406999588}'
+      m_SerializableObject: '{"r":766.9960327148438,"g":297.51806640625,"b":0.0,"a":0.250980406999588}'
     m_Space: -1
   m_Property:
     name: _Color
@@ -7193,7 +7193,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"r":2.009500741958618,"g":0.07364662736654282,"b":0.0,"a":0.11372549086809159}'
+      m_SerializableObject: '{"r":1.4980391263961793,"g":0.054901961237192157,"b":0.0,"a":0.21568627655506135}'
     m_Space: -1
   m_Property:
     name: _Color
@@ -8115,7 +8115,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEditor.VFX.Position, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"position":{"x":0.0,"y":0.0,"z":2.0}}'
+      m_SerializableObject: '{"position":{"x":0.0,"y":0.0,"z":2.4000000953674318}}'
     m_Space: 0
   m_Property:
     name: _Position
@@ -8677,7 +8677,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
-  m_UIPosition: {x: -909, y: 2113}
+  m_UIPosition: {x: -910, y: 2231}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
