@@ -124,7 +124,8 @@ public class PlayerManager : MonoBehaviour
         
         health -= damage;
 
-        PlayerDamageTrack.PlayOneShot(DamageSFX);
+        // Andrew TODO
+        // PlayerDamageTrack.PlayOneShot(DamageSFX);
     }
 
     private void CheckHealth()
