@@ -100,12 +100,22 @@ partial struct ColliderBodiesJob: IJobParallelFor {
     public NativeArray<ColliderBody> colliderBodies;
     public NativeArray<Entity> entities;
     public NativeArray<LocalTransform> entityTransforms;
+    [ReadOnly]
+    public ComponentLookup<PostTransformMatrix> postTransformLookup;
     public NativeArray<Collider> entityColliders;
     public Dimension Dim;
 
     [BurstCompile]
     public void Execute(int i) {
         var t = entityTransforms[i];
+        float3 scale = new float3(t.Scale);
+        if (postTransformLookup.HasComponent(entities[i])) {
+            float4x4 postTransform = postTransformLookup.GetRefRO(entities[i]).ValueRO.Value;
+            scale = new float3(
+                length(new float3(postTransform.c0.x, postTransform.c1.x, postTransform.c2.x)),
+                length(new float3(postTransform.c0.y, postTransform.c1.y, postTransform.c2.y)),
+                length(new float3(postTransform.c0.z, postTransform.c1.z, postTransform.c2.z)));
+        }
         float3 projectedPosition = t.Position;
         Collider projectedCollider = entityColliders[i];
         
@@ -119,11 +129,14 @@ partial struct ColliderBodiesJob: IJobParallelFor {
 
         colliderBodies[i] = new ColliderBody {
             collider = projectedCollider,
-            transform = new TransformQvvs(projectedPosition, t.Rotation, 1, t.Scale),
+            // XXX: this only works for uniform scale for now...
+            transform = new TransformQvvs(projectedPosition, t.Rotation, scale.x, 1),
             entity = entities[i]
         };
 
-        //PhysicsDebug.DrawCollider(colliderBodies[i].collider, colliderBodies[i].transform, UnityEngine.Color.red);
+        // XXX: debug draw colliders to check if things aren't broken. This adds
+        // lag so it's commented out most of the time.
+        // PhysicsDebug.DrawCollider(colliderBodies[i].collider, colliderBodies[i].transform, UnityEngine.Color.red);
     }
 }
 
@@ -137,7 +150,7 @@ public struct PhysicsComponentLookups {
     public PhysicsComponentLookup<EnemyStats> EnemyLookup;
     public PhysicsComponentLookup<PlayerProjectile> PlayerWeaponLookup;
     public PhysicsComponentLookup<DamagePlayer> EnemyWeaponLookup;
-    public PhysicsComponentLookup<Obstacle> TerrainLookup;
+    public PhysicsComponentLookup<Turnips.TurnipTag> TerrainLookup;
     public PhysicsComponentLookup<Intel> IntelLookup;
 
     public void Update(ref SystemState state) {
@@ -166,64 +179,136 @@ public struct PairsProcessor: IFindPairsProcessor {
                     result.bodyB.collider, result.bodyB.transform,
                     0, out r))
         {
-            Calculate(result.entityA, result.entityB);
-            Calculate(result.entityB, result.entityA);
+            Calculate(result);
+        }
+    }
+
+    /*
+     * Do a collision check for a turnip. Turnip colliders are assumed to be a
+     * bounding sphere on the whole turnip. The turnip is taller than it is wide,
+     * so the diameter of the turnip collider is assumed to be the height of the
+     * turnip.
+     *
+     * Return a vector representing how body has penetrated turnipBody, or the
+     * zero vector if there is no intersection.
+     */
+    [BurstCompile]
+    private void TurnipCollisionCheck(in ColliderBody turnipBody, in ColliderBody body, out float3 penetration) {
+        penetration = new float3(0);
+
+        // Ratio between width of turnip and height of turnip
+        float widthRatio = 0.446428571f;
+        // Ratio between height of "body" of turnip and total height of turnip
+        float heightRatio = 0.241071429f;
+        // Ratio between width of "stalk" of turnip in the middle of the body
+        float stalkRatio = 0.087857143f;
+
+        Aabb bodyAabb = Physics.AabbFrom(body.collider, body.transform);
+        float bodyRadius = max(
+                max(bodyAabb.max.x - bodyAabb.min.x,
+                bodyAabb.max.y - bodyAabb.min.y),
+                bodyAabb.max.z - bodyAabb.min.z) / 2;
+
+        Aabb turnipAabb = Physics.AabbFrom(turnipBody.collider, turnipBody.transform);
+        float turnipRadius = (turnipAabb.max.x - turnipAabb.min.x) / 2;
+
+        float turnipBodyWidth = turnipRadius * widthRatio;
+        float turnipBodyHeight = turnipRadius * heightRatio;
+
+        float3 position = body.transform.position;
+        float3 turnipPosition = turnipBody.transform.position;
+
+        // body position relative to turnip
+        float3 turnipRelativePosition = position - turnipPosition;
+
+        // Check for intersection with turnip "body"
+        // squared height of turnip at player posiiton
+        float turnipHeightSquared =
+            (1
+            - square(turnipRelativePosition.x / turnipBodyWidth)
+            - square(turnipRelativePosition.z / turnipBodyWidth))
+            * square(turnipBodyHeight);
+
+        if (turnipHeightSquared > 0) {
+            float turnipHeight = sqrt(turnipHeightSquared);
+            // Minimum distance the body can be from the turnip
+            // without intersecting
+            float minBodyDistance = bodyRadius + turnipHeight;
+            if (abs(turnipRelativePosition.y) < minBodyDistance) {
+                penetration.y +=
+                    normalize(turnipRelativePosition).y
+                    * (minBodyDistance - abs(turnipRelativePosition.y));
+            }
+        }
+
+        // check for intersection with turnip "stalk"
+        float turnipStalkRadius = lerp(turnipRadius * stalkRatio, 0, abs(turnipRelativePosition.y) / turnipRadius);
+        // Minimum distance the body can be from the turnip
+        // without intersecting
+        float minStalkDistance = bodyRadius + turnipStalkRadius;
+        float3 diff = turnipRelativePosition;
+        diff.y = 0;
+        if (length(diff) < minStalkDistance) {
+            penetration += normalize(diff) * (minStalkDistance - length(diff));
         }
     }
     
     [BurstCompile]
-    private void Calculate(SafeEntity entityA, SafeEntity entityB)
+    private void Calculate(FindPairsResult result)
     {
+        SafeEntity entityA = result.entityA;
+        SafeEntity entityB = result.entityB;
+
         if (
-                componentLookups.PlayerLookup.HasComponent(entityA)
-                && componentLookups.EnemyWeaponLookup.HasComponent(entityB)) // Enemy Hit Player
+                componentLookups.PlayerLookup.HasComponent(entityB)
+                && componentLookups.EnemyWeaponLookup.HasComponent(entityA)) // Enemy Hit Player
         {
-            DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW;
-            PlayerData player = componentLookups.PlayerLookup.GetRW(entityA).ValueRW;
+            DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW;
+            PlayerData player = componentLookups.PlayerLookup.GetRW(entityB).ValueRW;
             player.LastDamage += enemyProj.Damage;
-            componentLookups.PlayerLookup.GetRW(entityA).ValueRW = player;
+            componentLookups.PlayerLookup.GetRW(entityB).ValueRW = player;
             if (enemyProj.DieOnHit)
             {
-                destroyedSetWriter.Add(entityB);
+                destroyedSetWriter.Add(entityA);
             }
         }
         else if (
-                componentLookups.EnemyLookup.HasComponent(entityA)
-                && componentLookups.PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
+                componentLookups.EnemyLookup.HasComponent(entityB)
+                && componentLookups.PlayerWeaponLookup.HasComponent(entityA)) // Player Hit Enemy
         {
-            EnemyStats enemy = componentLookups.EnemyLookup.GetRW(entityA).ValueRW;
-            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
+            EnemyStats enemy = componentLookups.EnemyLookup.GetRW(entityB).ValueRW;
+            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityA).ValueRW;
             if (!enemy.Invulnerable) enemy.Health -= playerProj.Stats.damage;
 
             playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
 
-            componentLookups.EnemyLookup.GetRW(entityA).ValueRW = enemy;
-            componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
+            componentLookups.EnemyLookup.GetRW(entityB).ValueRW = enemy;
+            componentLookups.PlayerWeaponLookup.GetRW(entityA).ValueRW = playerProj;
                 
             if (playerProj.Health <= 0)
             {
-                destroyedSetWriter.Add(entityB);
+                destroyedSetWriter.Add(entityA);
             }
         }
         else if (
-                componentLookups.EnemyWeaponLookup.HasComponent(entityA)
-                && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
+                componentLookups.EnemyWeaponLookup.HasComponent(entityB)
+                && componentLookups.PlayerWeaponLookup.HasComponent(entityA))
         {
-            DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW;
-            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
+            DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW;
+            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityA).ValueRW;
             if (enemyProj.Mass < 0 || playerProj.InfPierce)
             {
                 if (enemyProj.Mass < 0 && playerProj.InfPierce) return;
-                if (playerProj.InfPierce) destroyedSetWriter.Add(entityA);
+                if (playerProj.InfPierce) destroyedSetWriter.Add(entityB);
                 else
                 {
                     playerProj.Health -= (int)math.ceil(-(float)enemyProj.Mass / ((1+playerProj.Stats.pierce)*(1+playerProj.Stats.power)));
                     
-                    componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
+                    componentLookups.PlayerWeaponLookup.GetRW(entityA).ValueRW = playerProj;
                     
                     if (playerProj.Health <= 0)
                     {
-                        destroyedSetWriter.Add(entityB);
+                        destroyedSetWriter.Add(entityA);
                     }
                 }
             }
@@ -235,30 +320,44 @@ public struct PairsProcessor: IFindPairsProcessor {
                     playerProj.Health -= (int)math.ceil(10000f / ((1+playerProj.Stats.pierce)*(1+playerProj.Stats.power)));
                 }
                 
-                componentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW = enemyProj;
-                componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
+                componentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW = enemyProj;
+                componentLookups.PlayerWeaponLookup.GetRW(entityA).ValueRW = playerProj;
                 
                 if (enemyProj.Mass <= 0)
                 {
-                    destroyedSetWriter.Add(entityA);
+                    destroyedSetWriter.Add(entityB);
                 }
                 if (playerProj.Health <= 0)
                 {
-                    destroyedSetWriter.Add(entityB);
+                    destroyedSetWriter.Add(entityA);
                 }
             }
         }
         else if (
-                componentLookups.TerrainLookup.HasComponent(entityA)
-                && componentLookups.EnemyWeaponLookup.HasComponent(entityB))
+                componentLookups.TerrainLookup.HasComponent(entityB)
+                && (componentLookups.PlayerLookup.HasComponent(entityA)
+                    || componentLookups.EnemyLookup.HasComponent(entityA)))
         {
-            destroyedSetWriter.Add(entityB);
+            // Player-terrain and enemy-terrain collisions
+            float3 turnipPenetration;
+            TurnipCollisionCheck(result.bodyB, result.bodyA, out turnipPenetration);
+            var transform = componentLookups.transform.GetRW(entityA);
+            transform.ValueRW.Position += turnipPenetration;
         }
         else if (
-                componentLookups.TerrainLookup.HasComponent(entityA)
-                && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
+                componentLookups.TerrainLookup.HasComponent(entityB)
+                && (
+                    (
+                     !componentLookups.EnemyLookup.HasComponent(entityA)
+                     && componentLookups.EnemyWeaponLookup.HasComponent(entityA))
+                    || componentLookups.PlayerWeaponLookup.HasComponent(entityA)))
         {
-            destroyedSetWriter.Add(entityB);
+            // weapon-terrain collisions
+            float3 turnipPenetration;
+            TurnipCollisionCheck(result.bodyB, result.bodyA, out turnipPenetration);
+            if (any(turnipPenetration)) {
+                destroyedSetWriter.Add(entityA);
+            }
         }
         else if (
                 componentLookups.PlayerLookup.HasComponent(entityA)
@@ -357,6 +456,7 @@ public partial struct PhysicsSystem: ISystem {
     LatiosWorldUnmanaged latiosWorld;
 
     PhysicsComponentLookups componentLookups;
+    ComponentLookup<PostTransformMatrix> postTransformLookup;
 
     EntityQuery physicsObjectQuery;
 
@@ -386,6 +486,7 @@ public partial struct PhysicsSystem: ISystem {
             entities = entities,
             entityColliders = entityColliders,
             entityTransforms = entityTransforms,
+            postTransformLookup = postTransformLookup,
             Dim = dim
         }.Schedule(entities.Length, 64);
         colliderBodiesDependency = entities.Dispose(colliderBodiesDependency);
@@ -413,7 +514,7 @@ public partial struct PhysicsSystem: ISystem {
             EnemyWeaponLookup = state.GetComponentLookup<DamagePlayer>(),
             EnemyLookup = state.GetComponentLookup<EnemyStats>(),
             PlayerWeaponLookup = state.GetComponentLookup<PlayerProjectile>(),
-            TerrainLookup = state.GetComponentLookup<Obstacle>(),
+            TerrainLookup = state.GetComponentLookup<Turnips.TurnipTag>(),
             IntelLookup = state.GetComponentLookup<Intel>()
         };
 
@@ -422,44 +523,45 @@ public partial struct PhysicsSystem: ISystem {
 
         physicsObjectQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
-            .WithAll<Collider, Unity.Physics.PhysicsMass>()
+            .WithAll<Collider, Unity.Physics.PhysicsMass, LocalToWorld>()
             .Build(ref state);
 
         playerQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAllRW<PlayerData>()
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
-            .WithAll<Collider, Unity.Physics.PhysicsMass>()
+            .WithAll<Collider, Unity.Physics.PhysicsMass, LocalToWorld>()
             .Build(ref state);
 
         playerWeaponQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAllRW<PlayerProjectile>()
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
-            .WithAll<Collider, Unity.Physics.PhysicsMass>()
+            .WithAll<Collider, Unity.Physics.PhysicsMass, LocalToWorld>()
             .Build(ref state);
 
         enemyQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAllRW<EnemyStats>()
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
-            .WithAll<Collider, Unity.Physics.PhysicsMass>()
+            .WithAll<Collider, Unity.Physics.PhysicsMass, LocalToWorld>()
             .Build(ref state);
 
         enemyWeaponQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAllRW<DamagePlayer>()
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
-            .WithAll<Collider, Unity.Physics.PhysicsMass>()
+            .WithAll<Collider, Unity.Physics.PhysicsMass, LocalToWorld>()
             .Build(ref state);
 
         terrainQuery = new EntityQueryBuilder(Allocator.Temp)
-            .WithAllRW<Obstacle>()
-            .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
-            .WithAll<Collider, Unity.Physics.PhysicsMass>()
+            .WithAll<Turnips.TurnipTag, Collider, LocalTransform>()
+            .WithAll<PostTransformMatrix, LocalToWorld>()
             .Build(ref state);
 
         intelQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAllRW<Intel>()
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
-            .WithAll<Collider, Unity.Physics.PhysicsMass>()
+            .WithAll<Collider, Unity.Physics.PhysicsMass, LocalToWorld>()
             .Build(ref state);
+
+        postTransformLookup = state.GetComponentLookup<PostTransformMatrix>();
         
 
         state.EntityManager.AddComponent<PhysicsSystemState>(state.SystemHandle);
@@ -480,6 +582,7 @@ public partial struct PhysicsSystem: ISystem {
         physicsState.ValueRW.dimension = DimensionManager.burstDim.Data;
 
         // Create world bounds centered on the player
+        postTransformLookup.Update(ref state);
         var playerEntity = SystemAPI.GetSingletonEntity<PlayerData>();
         var playerTransform = SystemAPI.GetComponent<LocalTransform>(playerEntity);
         var worldBoundHalfSize = new float3(200);
@@ -540,17 +643,6 @@ public partial struct PhysicsSystem: ISystem {
                 physicsState.ValueRO.playerLayer,
                 physicsState.ValueRO.intelLayer, pairsProcessor)
             .ScheduleParallel(Dependency);
-        // Collide player with terrain
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerLayer,
-                physicsState.ValueRO.terrainLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
-        // Collide enemies with terrain
-        //var enemyTerrain = Physics.FindPairs(
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.enemyLayer,
-                physicsState.ValueRO.terrainLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
         // Collide enemies with enemies
         Dependency = Physics.FindPairs(
                 physicsState.ValueRO.enemyLayer, pairsProcessor)
@@ -568,8 +660,30 @@ public partial struct PhysicsSystem: ISystem {
         // Collide player weapons with enemy weapons
         Dependency = Physics.FindPairs(
                 physicsState.ValueRO.playerWeaponLayer,
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
+                physicsState.ValueRO.enemyWeaponLayer, pairsProcessor)
             .ScheduleParallel(Dependency);
+        if (DimensionManager.burstDim.Data == Dimension.Three) {
+            // Collide player with terrain
+            Dependency = Physics.FindPairs(
+                    physicsState.ValueRO.playerLayer,
+                    physicsState.ValueRO.terrainLayer, pairsProcessor)
+                .ScheduleParallel(Dependency);
+            // Collide enemies with terrain
+            Dependency = Physics.FindPairs(
+                    physicsState.ValueRO.enemyLayer,
+                    physicsState.ValueRO.terrainLayer, pairsProcessor)
+                .ScheduleParallel(Dependency);
+            // Collide player weapons with terrain
+            Dependency = Physics.FindPairs(
+                    physicsState.ValueRO.playerWeaponLayer,
+                    physicsState.ValueRO.terrainLayer, pairsProcessor)
+                .ScheduleParallel(Dependency);
+            // Collide enemy weapons with terrain
+            Dependency = Physics.FindPairs(
+                    physicsState.ValueRO.enemyWeaponLayer,
+                    physicsState.ValueRO.terrainLayer, pairsProcessor)
+                .ScheduleParallel(Dependency);
+        }
 
         JobHandle.ScheduleBatchedJobs();
         Dependency.Complete();
