@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Enemies.AI;
 using Latios;
 using Unity.Burst;
@@ -18,7 +19,7 @@ namespace Enemies
     {
         // public static AnimationCurve catFreqG, enemyCountG;
         // public static AnimationCurve catFreq, enemyCount;
-        public List<GameObject> enemies;
+        public List<WaveEnemy> enemies;
         public int difficulty;
         public GameObject yuumi;
         public AnimationCurve starfishFreq;
@@ -30,12 +31,13 @@ namespace Enemies
                 CatPrefab = baker.ToEntity(yuumi),
                 StarfishFreq = starfishFreq,
             });
-            var buffer = baker.AddBuffer<WaveEnemy>(entity);
+            var buffer = baker.AddBuffer<WaveEnemyData>(entity);
             for (int i = 0; i < enemies.Count; i++)
             {
-                buffer.Add(new WaveEnemy
+                buffer.Add(new WaveEnemyData
                 {
-                    Prefab = baker.ToEntity(enemies[i])
+                    Prefab = baker.ToEntity(enemies[i].prefab),
+                    Weight = enemies[i].weight,
                 });
             }
             base.Bake(baker, entity);
@@ -51,9 +53,17 @@ namespace Enemies
         public AnimationCurve StarfishFreq;
     }
     
-    public struct WaveEnemy : IBufferElementData
+    [Serializable]
+    public struct WaveEnemy
+    {
+        public GameObject prefab;
+        public int weight;
+    }
+    
+    public struct WaveEnemyData : IBufferElementData
     {
         public Entity Prefab;
+        public int Weight;
     }
 
     //[BurstCompile]
@@ -85,7 +95,7 @@ namespace Enemies
             public float CatRate;
             [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
             [ReadOnly] public ComponentLookup<EnemyStats> EnemyStats;
-            [ReadOnly] public DynamicBuffer<WaveEnemy> Enemies;
+            [ReadOnly] public DynamicBuffer<WaveEnemyData> Enemies;
             public Rng Rng;
             
             public void Execute(int jobIndex)
@@ -106,7 +116,8 @@ namespace Enemies
                     float hp = stats.Health * catStats.Health;
                     Ecb.AddComponent(jobIndex, cat,
                         new EnemyStats { IntelPrefab = catStats.IntelPrefab, MaxHealth = hp, Health = hp });
-                    Ecb.AddComponent(jobIndex, cat, new EnemyCollisionReceiver {Size = stats.Size, Ghosted = true});
+                    Ecb.AddComponent(jobIndex, cat, new EnemyCollisionReceiver {Size = stats.Size});
+                    Ecb.AddComponent(jobIndex, cat, new EnemyGhostedTag());
                     
                     Ecb.AddComponent(jobIndex, cat, LocalTransform.FromScale(stats.Size));
                     Ecb.SetComponent(jobIndex, entity, new EnemyCollisionReceiver{Invulnerable = true, Size = stats.Size});
@@ -143,11 +154,14 @@ namespace Enemies
                     PlayerManager.maxWaveTimer = wave.WaveTimer;
                     var enemiesToSpawn = new NativeArray<int>(count, Allocator.TempJob);
                     
-                    var enemyPrefabs = SystemAPI.GetBuffer<WaveEnemy>(e);
+                    var enemyPrefabs = SystemAPI.GetBuffer<WaveEnemyData>(e);
                     
                     var random = _rng.GetSequence(0);
-
-                    float[] weights = {15, 5, 4, 2, 1};
+                    float[] weights = new float[12];
+                    for (int i = 0; i < enemyPrefabs.Length; i++)
+                    {
+                        weights[i] = enemyPrefabs[i].Weight;
+                    }
                     float totalWeight = 0;
                     
                     foreach (var t in weights)

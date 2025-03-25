@@ -34,13 +34,28 @@ public partial struct CannonExplosionSystem : ISystem
         {
             RefRW<PhysicsSystemState> physicsState = SystemAPI.GetSingletonRW<PhysicsSystemState>();
             var exp = explosionPoint.ValueRO;
-            physicsState.ValueRO.GetInRadius(exp.Position, exp.Radius, physicsState.ValueRO.EnemyLayer, out BodiesInRadius inRadius);
-            foreach ((FindObjectsResult, PointDistanceResult) result in inRadius) {
+            physicsState.ValueRO.GetInRadius(exp.Position, exp.Radius, physicsState.ValueRO.EnemyLayer, out BodiesInRadius enemyInRadius);
+            foreach ((FindObjectsResult, PointDistanceResult) result in enemyInRadius) {
                 
                 var enemyPos = SystemAPI.GetComponent<EnemyCollisionReceiver>(result.Item1.entity);
                 if (!enemyPos.Invulnerable) enemyPos.LastDamage += exp.Stats.damage;
                 SystemAPI.SetComponent(result.Item1.entity, enemyPos);
-                //PhysicsDebug.DrawCollider(result.Item1.collider, result.Item1.transform, UnityEngine.Color.red);
+            }
+            physicsState.ValueRO.GetInRadius(exp.Position, exp.Radius, physicsState.ValueRO.EnemyGhostLayer, out BodiesInRadius enemyGhostInRadius);
+            foreach ((FindObjectsResult, PointDistanceResult) result in enemyGhostInRadius) {
+                
+                var enemyPos = SystemAPI.GetComponent<EnemyCollisionReceiver>(result.Item1.entity);
+                if (!enemyPos.Invulnerable) enemyPos.LastDamage += exp.Stats.damage;
+                SystemAPI.SetComponent(result.Item1.entity, enemyPos);
+            }
+            physicsState.ValueRO.GetInRadius(exp.Position, exp.Radius, physicsState.ValueRO.EnemyWeaponLayer, out BodiesInRadius projInRadius);
+            foreach ((FindObjectsResult, PointDistanceResult) result in projInRadius) {
+                var enemyProj = SystemAPI.GetComponent<DamagePlayer>(result.Item1.entity);
+                SystemAPI.SetComponent(result.Item1.entity, enemyProj);
+                if (enemyProj.Mass != -1)
+                {
+                    ecb.DestroyEntity(result.Item1.entity);
+                }
             }
             ecb.RemoveComponent<ExplosionPoint>(entity);
         }

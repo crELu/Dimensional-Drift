@@ -125,13 +125,13 @@ MonoBehaviour:
   baseStats:
     size: 1
     speed: 120
-    attackSpeed: 1.5
+    attackSpeed: 3
     attackDelay: 1
     accuracy: 1
     ammoUse: 0
     count: 0
     bulletStats:
-      damage: 12
+      damage: 5
       duration: 2
       extraction: 0
       power: 0

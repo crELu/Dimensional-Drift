@@ -228,6 +228,7 @@ public struct PhysicsSystemState: IComponentData {
     public CollisionLayer PlayerInteractLayer;
     public CollisionLayer PlayerWeaponLayer;
     public CollisionLayer EnemyLayer;
+    public CollisionLayer EnemyGhostLayer;
     public CollisionLayer EnemyWeaponLayer;
     public CollisionLayer TerrainLayer;
     public CollisionLayer IntelLayer;
@@ -258,6 +259,7 @@ public struct PhysicsSystemState: IComponentData {
         PlayerInteractLayer.Dispose();
         PlayerWeaponLayer.Dispose();
         EnemyLayer.Dispose();
+        EnemyGhostLayer.Dispose();
         EnemyWeaponLayer.Dispose();
         TerrainLayer.Dispose();
         IntelLayer.Dispose();
@@ -276,6 +278,7 @@ public partial struct PhysicsSystem: ISystem {
     EntityQuery playerQuery;
     EntityQuery playerWeaponQuery;
     EntityQuery enemyQuery;
+    EntityQuery enemyGhostedQuery;
     EntityQuery enemyWeaponQuery;
     EntityQuery terrainQuery;
     EntityQuery intelQuery;
@@ -386,6 +389,14 @@ public partial struct PhysicsSystem: ISystem {
 
         enemyQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAllRW<EnemyCollisionReceiver>()
+            .WithNone<EnemyGhostedTag>()
+            .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
+            .WithAll<Collider, Unity.Physics.PhysicsMass>()
+            .Build(ref state);
+        
+        enemyGhostedQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAllRW<EnemyCollisionReceiver>()
+            .WithAll<EnemyGhostedTag>()
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
             .WithAll<Collider, Unity.Physics.PhysicsMass>()
             .Build(ref state);
@@ -467,6 +478,10 @@ public partial struct PhysicsSystem: ISystem {
         var buildEnemyLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
                 enemyQuery, out physicsState.ValueRW.EnemyLayer);
+        
+        var buildEnemyGhostLayer = BuildLayer(
+            playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
+            enemyGhostedQuery, out physicsState.ValueRW.EnemyGhostLayer);
 
         var buildEnemyWeaponLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
@@ -487,7 +502,7 @@ public partial struct PhysicsSystem: ISystem {
         buildLayers = JobHandle.CombineDependencies(
                 buildLayers, buildTerrainLayer, buildIntelLayer);
         buildLayers = JobHandle.CombineDependencies(
-            buildLayers, buildPlayerInteractLayer);
+            buildLayers, buildPlayerInteractLayer, buildEnemyGhostLayer);
 
         componentLookups.Update(ref state);
         var ecb = new EntityCommandBuffer(Allocator.TempJob);
@@ -495,8 +510,6 @@ public partial struct PhysicsSystem: ISystem {
 
         var destroyedSet = new NativeParallelHashSet<Entity>(physicsState.ValueRO.collisionLayer.colliderBodies.Length, Allocator.TempJob);
         var destroyedSetWriter = destroyedSet.AsParallelWriter();
-
-        
         
         var pairsProcessor = new PairsProcessor {
             ComponentLookups = componentLookups,
@@ -554,8 +567,10 @@ public partial struct PhysicsSystem: ISystem {
         
         // Collide player weapons with enemies
         dependency = Physics.FindPairs(
-                physicsState.ValueRO.PlayerWeaponLayer,
-                physicsState.ValueRO.EnemyLayer, playerWeaponPairsProcessor)
+                physicsState.ValueRO.PlayerWeaponLayer, physicsState.ValueRO.EnemyLayer, playerWeaponPairsProcessor)
+            .ScheduleParallel(dependency);
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerWeaponLayer, physicsState.ValueRO.EnemyGhostLayer, playerWeaponPairsProcessor)
             .ScheduleParallel(dependency);
         // Collide player weapons with enemy weapons
         dependency = Physics.FindPairs(

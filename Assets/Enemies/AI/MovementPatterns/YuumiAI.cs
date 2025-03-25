@@ -24,6 +24,7 @@ namespace Enemies.AI
         public void OnCreate(ref SystemState state)
         {
             _localTransformLookup = state.GetComponentLookup<LocalTransform>();
+            state.RequireForUpdate<Yuumi>();
         }
 
         public void OnDestroy(ref SystemState state) { }

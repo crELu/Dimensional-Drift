@@ -403,7 +403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43a24b16711d44d799dc4d34aa1bb468, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 15
+  health: 25
   size: 6
   intel: {fileID: 1973288489611225477, guid: f81dc56b200479e40ac7f69e3d7e71f9, type: 3}
   linearPid:

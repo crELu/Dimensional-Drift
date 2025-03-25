@@ -18,7 +18,7 @@ using Random = Unity.Mathematics.Random;
 
 namespace Enemies.AI
 {
-    class BaseEnemyAuthor : BaseAuthor
+    public class BaseEnemyAuthor : BaseAuthor
     {
         [Header("Enemy Settings")]
         public float health = 10;
@@ -76,6 +76,7 @@ namespace Enemies.AI
                 IntelPrefab = baker.ToEntity(intel),
                 Size = size,
             });
+            baker.AddComponent(entity, new ScannableEnemy());
             baker.AddComponent(entity, new EnemyMovement
             {
                 LinearPidBlob = linearBlob,
@@ -88,13 +89,20 @@ namespace Enemies.AI
     public struct EnemyCollisionReceiver : IComponentData
     {
         public float LastDamage, Size;
-        public bool Invulnerable, Ghosted;
+        public bool Invulnerable;
     }
+    public struct EnemyGhostedTag : IComponentData { }
+    
     
     public struct EnemyStats : IComponentData
     {
         public float Health, MaxHealth, Size;
         public Entity IntelPrefab;
+    }
+    
+    public struct ScannableEnemy : IComponentData
+    {
+        public float ScanSize;
     }
 
     public struct ThrusterBlob

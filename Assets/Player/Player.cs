@@ -38,6 +38,7 @@ public class PlayerManager : MonoBehaviour
     private InputAction _fireAction;
     private InputAction _weaponUpAction;
     private InputAction _weaponDownAction;
+    private InputAction _scanAction;
     [Header("Stats Settings")] 
     public List<CharacterAugment> augments;
     public CharacterStats stats;
@@ -45,7 +46,8 @@ public class PlayerManager : MonoBehaviour
     public float health, shield;
     [field:SerializeField] public float Ammo { get; private set; }
     public static bool fire;
-    
+    public RawImage ammoText;
+    public TextMeshProUGUI velocity;
     [Header("Weapon Settings")] 
     public PlayerWeapon CurrentWeapon => weapons[currentWeapon];
     public int currentWeapon;
@@ -56,25 +58,28 @@ public class PlayerManager : MonoBehaviour
     public static List<Attack> Bullets => main.CurrentWeapon.Bullets;
     public RectTransform hp, sd;
     public TextMeshProUGUI waveCounter;
-    private Animator _anim;
     
-    public VisualEffect minimap;
+    public VisualEffect minimap, overlay;
     public RectTransform minimapIcon;
-    public GraphicsBuffer Px;
+    public GraphicsBuffer MinimapPos, OverlayPos;
     [HideInInspector] public CursorLockMode targetCursorMode;
 
     [Header("Sound Settings")]
     [SerializeField] private AudioSource PlayerDamageTrack;
     [SerializeField] private AudioClip DamageSFX;
-    
+    private bool _isScanning;
+    public float ScanRadius { get; private set; }
+    public int ScanState { get; private set; }
+
     void Start()
     {
         _fireAction = InputSystem.actions.FindAction("Fire 1");
         _weaponUpAction  = InputSystem.actions.FindAction("Weapon Up");
         _weaponDownAction  = InputSystem.actions.FindAction("Weapon Down");
-        _anim = GetComponent<Animator>();
+        _scanAction  = InputSystem.actions.FindAction("Scan");
         main = this;
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+        Application.targetFrameRate = 60;
     }
     
     public void AddAugment(Augment augment)
@@ -93,8 +98,13 @@ public class PlayerManager : MonoBehaviour
     {
         CheckHealth();
         DoAttack();
-        waveCounter.text = $"Wave in {Mathf.Ceil(waveTimer)}s";
-        burstPos.Data = transform.position;
+        waveCounter.text = $"{waveCount}";
+        ammoText.material.SetFloat("_t", Ammo/100);
+        AddAmmo(5 * Time.deltaTime);
+        if (_scanAction.triggered && !_isScanning)
+        {
+            StartCoroutine(Scan());
+        }
         if (_weaponDownAction.triggered)
         {
             currentWeapon++;
@@ -114,6 +124,31 @@ public class PlayerManager : MonoBehaviour
         var v = transform.forward;
         v.y = 0;
         minimapIcon.transform.rotation = Quaternion.Euler(0, 0, -Quaternion.LookRotation(v).eulerAngles.y);
+        transform.position = Vector3.Lerp(transform.position, burstPos.Data, 20f * Time.deltaTime);
+    }
+
+    private IEnumerator Scan()
+    {
+        _isScanning = true;
+        float t = 0;
+        while (t < 12)
+        {
+            t += Time.deltaTime;
+            if (t < 10)
+            {
+                ScanState = 1;
+                ScanRadius = t * 400;
+            }
+            else 
+            {
+                ScanState = -1;
+            }
+            
+            yield return null;
+        }
+
+        ScanState = 0;
+        _isScanning = false;
     }
 
     public void DoDamage(float damage)
@@ -133,7 +168,7 @@ public class PlayerManager : MonoBehaviour
         health = Mathf.Min(stats.flatHealth, health);
         shield += stats.shieldRegen * Time.deltaTime;
         shield = Mathf.Min(stats.flatShield, shield);
-        sd.sizeDelta = new Vector2(shield / stats.flatShield * 894, 32);
+        sd.sizeDelta = new Vector2(shield / stats.flatShield * 1024, 32);
         hp.sizeDelta = new Vector2(health / stats.flatHealth * 1024, 64);
         if (health <= 0)
         {
@@ -155,6 +190,7 @@ public class PlayerManager : MonoBehaviour
 
     public void UseAmmo(float a)
     {
+        if (a == 0) return;
         if (a<0) {Debug.Log("don t do that (use negative ammo)");}
         if (a>Ammo) {Debug.Log("dont do that (use more ammo than exists)");}
         Ammo -= a;

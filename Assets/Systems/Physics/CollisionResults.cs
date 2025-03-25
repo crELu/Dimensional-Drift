@@ -31,7 +31,7 @@ public struct PairsProcessor: IFindPairsProcessor {
     {
         var eA = ComponentLookups.EnemyLookup.GetRW(entityA).ValueRW;
         var eB = ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW;
-        if (eA.Ghosted || eB.Ghosted) return;
+        
         var tA = ComponentLookups.transform.GetRW(entityA).ValueRW;
         var tB = ComponentLookups.transform.GetRW(entityB).ValueRW;
         var vA = ComponentLookups.velocity.GetRW(entityA).ValueRW;

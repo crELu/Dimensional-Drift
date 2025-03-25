@@ -51,13 +51,14 @@ namespace Enemies.AI
             private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, in PhysicsVelocity velocity, ref EnemyMovement movement, in GunRay ray)
             {
                 var toPlayer = PlayerPosition - transform.Position;
+                var forw = MathsBurst.DimSwitcher(transform.Forward(), Dim == Dimension.Three);
                 
                 if (Dim != Dimension.Three) toPlayer.y = 0;
                 if (math.lengthsq(toPlayer) < ray.SpacingRange) toPlayer *= -1;
                 toPlayer = math.normalize(toPlayer);
                 
-                toPlayer = MathsBurst.RotateVectorTowards(transform.Forward(), toPlayer, ray.TurnSpeed * DeltaTime);
-                movement.TargetUpDir = ComputeCurveNormal(velocity.Linear, toPlayer, transform.Forward());
+                toPlayer = MathsBurst.RotateVectorTowards(forw, toPlayer, ray.TurnSpeed * DeltaTime);
+                movement.TargetUpDir = ComputeCurveNormal(velocity.Linear, toPlayer, forw);
                 movement.TargetFaceDir = toPlayer;
                 movement.TargetMoveVel = toPlayer * ray.MoveWeight;
             }

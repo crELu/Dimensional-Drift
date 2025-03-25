@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.VFX;
 
@@ -20,6 +21,17 @@ namespace ECS.Enemy
             {
                 _registeredPersistentVFX[vfx.name] = vfx;
             }
+        }
+        
+        public void PlayOneShot(NativeArray<OneShotData> data)
+        {
+            
+            // if (!_registeredOneShotVFX.ContainsKey(vfxName))
+            // {
+            //     Debug.Log($"One Shot {vfxName} Failed");
+            //     return;
+            // }
+            
         }
         
         public (VFXData, int)? RegisterParticle(FixedString64Bytes vfxName)
@@ -42,5 +54,17 @@ namespace ECS.Enemy
             }
             _registeredPersistentVFX[vfxName].UnregisterParticle(graphId, count);
         }
+    }
+
+    public struct OneShotData
+    {
+        public FixedString64Bytes Name;
+        public float3 Position;
+        public float3 Color;
+        public float3 Scale;
+        public float Duration;
+        public float Buffer1;
+        public float Buffer2;
+        public float Buffer3;
     }
 }

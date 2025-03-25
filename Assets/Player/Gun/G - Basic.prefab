@@ -84,7 +84,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93dba67b558f492f99d0443b8d32afec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 16, g: 15.823498, b: 0, a: 1}
+  color: {r: 15.999998, g: 9.215147, b: 0, a: 1}
   lifetime: 0.4
   scale: {x: 0.5, y: 0.5, z: 0.5, w: 0}
   vfxType: PlayerGun

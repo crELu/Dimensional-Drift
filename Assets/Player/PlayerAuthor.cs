@@ -103,12 +103,13 @@ public partial struct PlayerPhysicsSystem : ISystem
             playerData.movement.Position = player.Transform.Position;
             transform.Rotation = playerData.transform.rotation;
             
-            player.Transform = transform;
+            PlayerManager.burstPos.Data = transform.Position;
             player.PhysicsVelocity = playerPhysics;
-            
+            playerData.velocity.text = $"{math.length(player.PhysicsVelocity.Linear):F0}";
             RefRW<PhysicsSystemState> physicsState = SystemAPI.GetSingletonRW<PhysicsSystemState>();
             physicsState.ValueRO.GetInRadius(player.Transform.Position, 30f, physicsState.ValueRO.IntelLayer, out BodiesInRadius inRadius);
             foreach ((FindObjectsResult, PointDistanceResult) result in inRadius) {
+                if (!state.EntityManager.Exists(result.Item1.entity)) continue;
                 var intelPos = SystemAPI.GetComponent<LocalTransform>(result.Item1.entity);
                 
                 var intelVel = SystemAPI.GetComponent<PhysicsVelocity>(result.Item1.entity);

@@ -128,10 +128,10 @@ MonoBehaviour:
     attackSpeed: 0.5
     attackDelay: 0.2
     accuracy: 0.75
-    ammoUse: 0
+    ammoUse: 10
     count: 1
     bulletStats:
-      damage: 20
+      damage: 1
       duration: 2
       extraction: 0
       power: 10000
@@ -149,6 +149,7 @@ MonoBehaviour:
     z: 0
   _chargeTimer: 0
   _laserDuration: 0
+  _maxDuration: 0
 --- !u!82 &4166113802663282910
 AudioSource:
   m_ObjectHideFlags: 0
