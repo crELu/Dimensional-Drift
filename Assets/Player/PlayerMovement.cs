@@ -25,7 +25,6 @@ using Vector3 = UnityEngine.Vector3;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Camera Settings")]
-    public Transform cameraFixture;
     public Quaternion normalCameraRot, orthoCameraRot;
     public Vector3 normalCameraPos, orthoCameraPos;
     public float orthographicSize;
@@ -147,14 +146,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (device != null && (change == InputUserChange.DevicePaired || change == InputUserChange.DeviceLost))
         {
-                if (device is Keyboard || device is Mouse)
-                {
-                    _isUsingController = false;
-                }
-                else if (device is Gamepad)
-                {
-                    _isUsingController = true;
-                }
+            if (device is Keyboard || device is Mouse)
+            {
+                _isUsingController = false;
+            }
+            else if (device is Gamepad)
+            {
+                _isUsingController = true;
+            }
         }
     }    
     
@@ -178,6 +177,7 @@ public class PlayerMovement : MonoBehaviour
                 StartCoroutine(DoCameraTransition());
                 if (!_isUsingController)
                 {
+                    CameraManager.main.Angle = Mathf.Atan2(transform.forward.x, transform.forward.z) * Mathf.Rad2Deg;
                     Cursor.lockState = CursorLockMode.Confined;
                     PlayerManager.main.targetCursorMode = CursorLockMode.Confined;
 
@@ -202,28 +202,12 @@ public class PlayerMovement : MonoBehaviour
             _camera.orthographic = false;
         }        
         
-        Vector3 startPosition = Dim3 ? orthoCameraPos : normalCameraPos;
-        Quaternion startRotation = Dim3 ? orthoCameraRot : normalCameraRot;
-
-        Quaternion targetCameraRotation = Dim3 ? normalCameraRot : orthoCameraRot;
-
-        Vector3 targetPosition = !Dim3 ? orthoCameraPos : normalCameraPos;
-        
         blender.BlendToMatrix(Dim3 ? _perspective : _ortho, DimensionManager.Duration);
-        var movementCurve = Dim3 ? movementCurve3D : movementCurve2D;
-        var rotationCurve = Dim3 ? rotationCurve3D : rotationCurve2D;
         
         while (DimensionManager.t < 1f)
-        {
-            var t = !Dim3 ? DimensionManager.t : DimensionManager.t;
-            //_camera.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, movementCurve.Evaluate(t));
-            //_camera.transform.localRotation = Quaternion.Slerp(startRotation, targetCameraRotation, rotationCurve.Evaluate(t));
-            
+        { 
             yield return null;
         }
-        
-        //_camera.transform.localPosition = targetPosition;
-        //_camera.transform.localRotation = targetCameraRotation;
         
         if (!Dim3)
         {
@@ -242,7 +226,6 @@ public class PlayerMovement : MonoBehaviour
        
     private void DoRotation()
     {
-        
         if (Dim3)
         {
             Vector2 inputRotation;
@@ -276,10 +259,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 angle = Mathf.Atan2(mouseDirection.y, mouseDirection.x);
             }
-            float angleDegrees = -angle * Mathf.Rad2Deg + 90f + cameraFixture.eulerAngles.y;
+
+            float angleDegrees = -angle * Mathf.Rad2Deg + 90 + CameraManager.main.Angle;
             Quaternion targetRotation = Quaternion.Euler(0f, angleDegrees, 0f);
             transform.rotation = targetRotation;
-            cameraFixture.rotation = Quaternion.identity;
         }
     }
     

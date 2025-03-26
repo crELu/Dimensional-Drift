@@ -85,8 +85,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 15.999998, g: 9.215147, b: 0, a: 1}
-  lifetime: 0.4
-  scale: {x: 0.5, y: 0.5, z: 0.5, w: 0}
+  lifetime: 0.08
+  scale: {x: 0.7, y: 0.7, z: 0.7, w: 0}
   vfxType: PlayerGun
 --- !u!114 &7918589941069970403
 MonoBehaviour:
