@@ -22,6 +22,7 @@ namespace Enemies.AI
     }
     
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+    [BurstCompile]
     public partial struct IntelSystem : ISystem
     {
         public void OnCreate(ref SystemState state)
@@ -29,10 +30,11 @@ namespace Enemies.AI
             state.RequireForUpdate<PlayerData>();
         }
     
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
-            var job = new IntelJob { ECB = ecb.AsParallelWriter(), DeltaTime = SystemAPI.Time.DeltaTime};
+            var job = new IntelJob { ECB = ecb.AsParallelWriter(), DeltaTime = SystemAPI.Time.DeltaTime, Dim3 = DimensionManager.burstDim.Data == Dimension.Three};
         
             state.Dependency = job.ScheduleParallel(state.Dependency);
         
@@ -46,15 +48,20 @@ namespace Enemies.AI
         {
             public float DeltaTime;
             public EntityCommandBuffer.ParallelWriter ECB;
-            public void Execute(Entity entity, [ChunkIndexInQuery] int index, ref Intel intel)
+            public bool Dim3;
+            public void Execute(Entity entity, [ChunkIndexInQuery] int index, ref Intel intel, ref LocalTransform transform)
             {
                 intel.Life -= DeltaTime;
+                if (Dim3)
+                {
+                    var r = math.Euler(transform.Rotation);
+                    transform.Rotation = quaternion.Euler(0, r.y, 0);
+                }
                 if (intel.Life <= 0)
                 {
                     ECB.DestroyEntity(index, entity);
                 }
             }
         }
-
     }
 }

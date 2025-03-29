@@ -129,21 +129,21 @@ MonoBehaviour:
     attackSpeed: 1
     attackDelay: 0.5
     accuracy: 0.5
-    ammoUse: 0
+    ammoUse: 20
     count: 1
     bulletStats:
-      damage: 50
-      duration: 15
+      damage: 30
+      duration: 3
       extraction: 0
       power: 5
       pierce: 0
-  position: {fileID: 0}
   SpecializedAugments: []
   CoreAugments: []
   WeaponTrack: {fileID: 1090031110446889526}
   WeaponSFX: {fileID: 8300000, guid: 2c42a7ffdce6dcc43a37a38dbd30c95d, type: 3}
   weaponType: 1
   chargeSound: {fileID: 3525388067949057881}
+  target: {fileID: 0}
 --- !u!82 &1090031110446889526
 AudioSource:
   m_ObjectHideFlags: 0

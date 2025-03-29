@@ -28,15 +28,15 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
     private void Calculate(SafeEntity pProj, SafeEntity entityB)
     {
         PlayerProjectile playerProj = ComponentLookups.PlayerWeaponLookup.GetRW(pProj).ValueRW;
-        
+        PlayerProjectileDeath playerProjStats = ComponentLookups.PlayerWeaponStatsLookup.GetRW(pProj).ValueRW;
         LocalTransform projPos = ComponentLookups.transform.GetRW(pProj).ValueRW;
         
         if (ComponentLookups.EnemyLookup.HasComponent(entityB)) // Hit Enemy
         {
             EnemyCollisionReceiver enemy = ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW;
-            if (!enemy.Invulnerable) enemy.LastDamage += playerProj.Stats.damage;
+            if (!enemy.Invulnerable) enemy.LastDamage += playerProjStats.Stats.damage;
 
-            playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
+            playerProj.Health -= (int)math.ceil(10000f / (1+playerProjStats.Stats.pierce));
             
             ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW = enemy;
             AudioWriter.Enqueue(new SfxCommand {Name = "Hit Enemy", Position = projPos.Position});
@@ -58,7 +58,7 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
                 while (enemyProj.Mass > 0 && playerProj.Health > 0)
                 {
                     enemyProj.Mass--;
-                    playerProj.Health -= (int)math.ceil(10000f / ((1+playerProj.Stats.pierce)*(1+playerProj.Stats.power)));
+                    playerProj.Health -= (int)math.ceil(10000f / ((1+playerProjStats.Stats.pierce)*(1+playerProjStats.Stats.power)));
                 }
                 
                 ComponentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW = enemyProj;

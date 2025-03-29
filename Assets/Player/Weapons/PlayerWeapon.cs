@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-
-
 public class PlayerWeapon : MonoBehaviour
 {
-    [HideInInspector] public List<Attack> Bullets = new List<Attack>();
+    public List<Attack> Bullets = new ();
 
     [SerializeField] protected WeaponStats baseStats;
     protected WeaponStats Stats;
     protected WeaponStats BaseStats;
     protected WeaponStats AddonStats;
     
-    public Transform position;
     [SerializeField] protected List<SpecializedAugment> SpecializedAugments = new();
     [SerializeField] protected List<CoreAugment> CoreAugments = new();
 
@@ -54,10 +52,10 @@ public class PlayerWeapon : MonoBehaviour
     {
         Compile();
         
-        if (pressed && Cooldown < 0 && Stats.ammoUse >= player.Ammo)
+        if (pressed && Cooldown < 0 && BaseStats.ammoUse <= player.Ammo)
         {
             Cooldown = Cd;
-            player.UseAmmo(Stats.ammoUse);
+            player.UseAmmo(BaseStats.ammoUse);
             RecalcBullets();
 
             WeaponTrack.PlayOneShot(WeaponSFX);
@@ -69,18 +67,18 @@ public class PlayerWeapon : MonoBehaviour
     public void RecalcBullets()
     {
         Compile(); // TODO remove this at some point when we can guarantee this runs after anything is changed
-        Bullets.Clear();
-        Bullets.Add(BaseWeaponAttack(BaseStats));
+        List<Attack> current = new ();
+        current.Add(BaseWeaponAttack(BaseStats));
         foreach (var core in CoreAugments)
         {
             var attack = core.Fire(Stats);
-            if (attack.HasValue) Bullets.Add(attack.Value);
+            if (attack.HasValue) current.Add(attack.Value);
         }
-        foreach (var core in CoreAugments)
+        foreach (var core in CoreAugments.OrderBy(c => -c.postPriority))
         {
-            core.PostProcessing(Stats, Bullets);
+            core.PostProcessing(Stats, current);
         }
-        
+        Bullets.AddRange(current);
     }
 
     protected virtual Attack BaseWeaponAttack(WeaponStats stats)
@@ -123,6 +121,7 @@ public struct AttackInfo
     public float3 Scale;
     public float Speed;
     public BulletStats Stats;
+    public BaseEffects Effects;
 }
 
 public struct Attack
@@ -134,14 +133,14 @@ public struct Attack
     {
         GunBasic,
         GunCrit,
-        GunPlaceholder1,
-        GunPlaceholder2,
+        GunPortal,
+        GunPortalCrit,
         
         ChargeBasic,
         ChargeNuke,
         ChargeRockets,
         ChargeShrapnel,
-        ChargePlaceholder1,
+        ChargeRecursive,
         ChargePlaceholder2,
         
         LaserBasic,

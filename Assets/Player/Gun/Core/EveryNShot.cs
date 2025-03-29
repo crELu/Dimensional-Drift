@@ -20,7 +20,8 @@ namespace Player.Gun.Core
                     var a = attacks[i];
                     a.Info.Speed *= 2;
                     a.Info.Stats.damage *= 2;
-                    a.Projectile = Attack.ProjectileType.GunCrit;
+                    if (a.Projectile == Attack.ProjectileType.GunBasic) a.Projectile = Attack.ProjectileType.GunCrit;
+                    if (a.Projectile == Attack.ProjectileType.GunPortal) a.Projectile = Attack.ProjectileType.GunPortalCrit;
                     attacks[i] = a;
                 }
             }

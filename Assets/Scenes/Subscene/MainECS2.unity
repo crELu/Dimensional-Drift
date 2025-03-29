@@ -1770,13 +1770,13 @@ MonoBehaviour:
   projectiles:
   - {fileID: 2006387325404477191, guid: 861ad819379a70449bfc7b9ba1843bfb, type: 3}
   - {fileID: 2006387325404477191, guid: 521f671b5bc321e4f8dc3dced80cbc6a, type: 3}
-  - {fileID: 2006387325404477191, guid: 521f671b5bc321e4f8dc3dced80cbc6a, type: 3}
-  - {fileID: 2006387325404477191, guid: 521f671b5bc321e4f8dc3dced80cbc6a, type: 3}
+  - {fileID: 2006387325404477191, guid: 0e3e2aaecc4f81b4996e49755d596a8e, type: 3}
+  - {fileID: 2006387325404477191, guid: 6a515a8dcb976bf4c94a179985ebcb50, type: 3}
   - {fileID: 2006387325404477191, guid: 1068277087a350c4491202883bd7124a, type: 3}
   - {fileID: 2006387325404477191, guid: 1068277087a350c4491202883bd7124a, type: 3}
-  - {fileID: 2006387325404477191, guid: 1068277087a350c4491202883bd7124a, type: 3}
-  - {fileID: 2006387325404477191, guid: 1068277087a350c4491202883bd7124a, type: 3}
-  - {fileID: 2006387325404477191, guid: 1068277087a350c4491202883bd7124a, type: 3}
+  - {fileID: 2006387325404477191, guid: 53b1662cc5fcf1445b8c3bff6bfb3395, type: 3}
+  - {fileID: 2006387325404477191, guid: 179315a845aef2a44bc5d95bb094fd1a, type: 3}
+  - {fileID: 2006387325404477191, guid: 0278c28d81b3b6843ac145d71a479018, type: 3}
   - {fileID: 2006387325404477191, guid: 1068277087a350c4491202883bd7124a, type: 3}
   - {fileID: 2006387325404477191, guid: 34141ec792e4c7d4fb2a6552111c0fda, type: 3}
   - {fileID: 2006387325404477191, guid: 34141ec792e4c7d4fb2a6552111c0fda, type: 3}
@@ -1871,7 +1871,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1669212150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1894,8 +1894,8 @@ MonoBehaviour:
   - prefab: {fileID: 6255169815085439490, guid: 7428338cbd5dfae4fae7b95cb7b97def, type: 3}
     weight: 1
   - prefab: {fileID: 6370843074377808497, guid: bee2bbdbe15456e408f129ad40a989ad, type: 3}
-    weight: 10
-  difficulty: 200
+    weight: 5
+  difficulty: 20
   yuumi: {fileID: 5232822899256251882, guid: 064e8294f2cc2d14b90a441e7b01fdfa, type: 3}
   starfishFreq:
     serializedVersion: 2

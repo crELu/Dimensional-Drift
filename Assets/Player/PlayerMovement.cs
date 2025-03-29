@@ -69,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
     
     private Animator _anim;
     private Camera _camera;
-    public Vector2 RelativeMovement { get; private set; }
+    public Vector3 RelativeMovement { get; private set; }
 
     [Header("Sound")]
     [SerializeField] private AudioSource DimSwitchTrack;
@@ -273,7 +273,7 @@ public class PlayerMovement : MonoBehaviour
         var f = Vector3.ProjectOnPlane(moveDir, transform.up).normalized;
         var r = Vector3.Cross(velocity + transform.forward * 5, transform.up).normalized;
         var u = Vector3.Cross(velocity + transform.forward * 5, transform.right).normalized;
-        RelativeMovement = new Vector2(Vector3.Dot(f, r), Vector3.Dot(f, u));
+        RelativeMovement = new Vector3(Vector3.Dot(f, r), Vector3.Dot(f, u), moveDir.normalized.z);
         if (Dim3)
         {
             moveDir += FlyInput * MoveUp;
@@ -330,6 +330,7 @@ public class PlayerMovement : MonoBehaviour
     {
         _isDashing = true;
         _dashCd = dashCooldown;
+        CameraManager.main.isDashing = true;
         float timer = 0;
         while (timer < dashDur)
         {
@@ -353,7 +354,7 @@ public class PlayerMovement : MonoBehaviour
             _dashSpeed = dashSpeed * dashCurve.Evaluate(timer / dashDur);
             yield return null;
         }
-
+        CameraManager.main.isDashing = false;
         CameraManager.main.extraRoll = 0;
         _isDashing = false;
     }

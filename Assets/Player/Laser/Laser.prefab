@@ -128,7 +128,7 @@ MonoBehaviour:
     attackSpeed: 0.5
     attackDelay: 0.2
     accuracy: 0.75
-    ammoUse: 10
+    ammoUse: 5
     count: 1
     bulletStats:
       damage: 1
@@ -136,7 +136,6 @@ MonoBehaviour:
       extraction: 0
       power: 10000
       pierce: 10000
-  position: {fileID: 0}
   SpecializedAugments: []
   CoreAugments: []
   WeaponTrack: {fileID: 4166113802663282910}
@@ -147,6 +146,7 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
+  target: {fileID: 0}
   _chargeTimer: 0
   _laserDuration: 0
   _maxDuration: 0

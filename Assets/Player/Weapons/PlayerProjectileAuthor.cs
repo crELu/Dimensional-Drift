@@ -33,7 +33,6 @@ public class PlayerProjectileAuthor : BaseAuthor
 
 public struct PlayerProjectile : IComponentData
 {
-    public BulletStats Stats;
     public int Health;
     public bool InfPierce;
 }
@@ -43,15 +42,6 @@ public struct LaserTag : IComponentData {}
 public struct MeleeTag : IComponentData {}
 
 public struct BombTag : IComponentData {}
-
-public struct ExplosionTag : IComponentData {}
-
-public struct ExplosionPoint : ICleanupComponentData
-{
-    public BulletStats Stats;
-    public float3 Position;
-    public float Radius;
-}
 
 public enum AttackType
 {

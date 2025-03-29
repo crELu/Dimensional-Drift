@@ -7,7 +7,6 @@ public class PlayerInventory : MonoBehaviour
 {
     [SerializeField] private int maxWeaponSlots = 4;
     [SerializeField] private TextMeshProUGUI intelText;
-    [SerializeField] private TextMeshProUGUI waveText;
     public float Intel { get; private set; }
 
     private void Start()
@@ -37,6 +36,5 @@ public class PlayerInventory : MonoBehaviour
     public void UpdateUI()
     {
         intelText.text = $"{Intel:F0}";
-        waveText.text = $"{PlayerManager.waveCount:F0}";
     }
 }

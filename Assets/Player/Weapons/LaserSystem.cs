@@ -4,7 +4,24 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+public struct LaserEffects
+{
+    public float GrowthRate;
+    public int RefractCount;
+}
+
+public struct LaserGrowth : IComponentData
+{
+    public float GrowthRate;
+}
+
+public struct LaserRefract : IComponentData
+{
+    public int RefractCount;
+}
+
 [UpdateInGroup(typeof(PresentationSystemGroup))]
+[UpdateBefore(typeof(GunSystem))]
 public partial struct LaserSystem : ISystem
 {
     public void OnCreate(ref SystemState state)

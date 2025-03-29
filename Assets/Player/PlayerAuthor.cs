@@ -43,7 +43,6 @@ public struct PlayerProjectilePrefab: IBufferElementData
 
 public struct PlayerData : IComponentData
 {
-    public float AttackTime;
     public float LastDamage;
     public float LastIntel;
 }

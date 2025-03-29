@@ -164,6 +164,7 @@ public struct PhysicsComponentLookups {
     public PhysicsComponentLookup<LocalTransform> transform;
 
     public PhysicsComponentLookup<PlayerData> PlayerLookup;
+    public PhysicsComponentLookup<PlayerProjectileDeath> PlayerWeaponStatsLookup;
     public PhysicsComponentLookup<EnemyCollisionReceiver> EnemyLookup;
     public PhysicsComponentLookup<PlayerProjectile> PlayerWeaponLookup;
     public PhysicsComponentLookup<DamagePlayer> EnemyWeaponLookup;
@@ -177,6 +178,7 @@ public struct PhysicsComponentLookups {
         PlayerLookup.Update(ref state);
         EnemyLookup.Update(ref state);
         PlayerWeaponLookup.Update(ref state);
+        PlayerWeaponStatsLookup.Update(ref state);
         EnemyWeaponLookup.Update(ref state);
         TerrainLookup.Update(ref state);
         IntelLookup.Update(ref state);
@@ -194,9 +196,7 @@ public struct BodiesInRadius {
 
     public object Current {
         [BurstCompile]
-        get {
-            return current;
-        } 
+        get => current;
     }
 
     [BurstCompile]
@@ -358,7 +358,7 @@ public partial struct PhysicsSystem: ISystem {
             velocity = state.GetComponentLookup<Unity.Physics.PhysicsVelocity>(),
             mass = state.GetComponentLookup<Unity.Physics.PhysicsMass>(),
             transform = state.GetComponentLookup<LocalTransform>(),
-            
+            PlayerWeaponStatsLookup = state.GetComponentLookup<PlayerProjectileDeath>(),
             PlayerLookup = state.GetComponentLookup<PlayerData>(),
             EnemyWeaponLookup = state.GetComponentLookup<DamagePlayer>(),
             EnemyLookup = state.GetComponentLookup<EnemyCollisionReceiver>(),

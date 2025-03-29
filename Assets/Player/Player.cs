@@ -46,7 +46,7 @@ public class PlayerManager : MonoBehaviour
     public float health, shield;
     [field:SerializeField] public float Ammo { get; private set; }
     public static bool fire;
-    public RawImage ammoText;
+    public RawImage ammoText, waveImage;
     public TextMeshProUGUI velocity;
     [Header("Weapon Settings")] 
     public PlayerWeapon CurrentWeapon => weapons[currentWeapon];
@@ -100,7 +100,8 @@ public class PlayerManager : MonoBehaviour
         DoAttack();
         waveCounter.text = $"{waveCount}";
         ammoText.material.SetFloat("_t", Ammo/100);
-        AddAmmo(5 * Time.deltaTime);
+        waveImage.material.SetFloat("_t", waveTimer/maxWaveTimer);
+        AddAmmo(2.5f * Time.deltaTime);
         if (_scanAction.triggered && !_isScanning)
         {
             StartCoroutine(Scan());
