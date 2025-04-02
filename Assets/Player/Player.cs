@@ -67,6 +67,10 @@ public class PlayerManager : MonoBehaviour
     [Header("Sound Settings")]
     [SerializeField] private AudioSource PlayerDamageTrack;
     [SerializeField] private AudioClip DamageSFX;
+    [SerializeField] private AudioSource PlayerDeathTrack;
+    [SerializeField] private AudioClip DeathSFX;
+    private bool alreadyPlayed = false;
+
     private bool _isScanning;
     public float ScanRadius { get; private set; }
     public int ScanState { get; private set; }
@@ -160,8 +164,9 @@ public class PlayerManager : MonoBehaviour
         
         health -= damage;
 
-        // Andrew TODO
-        // PlayerDamageTrack.PlayOneShot(DamageSFX);
+        //Andrew TODO
+        //PlayerDamageTrack.PlayOneShot(DamageSFX)
+
     }
 
     private void CheckHealth()
@@ -180,6 +185,11 @@ public class PlayerManager : MonoBehaviour
                     deathMessageObject.GetComponent<TextMeshProUGUI>();
 
                 deathMessage.SetText("You Died!");
+                if (!alreadyPlayed)
+                {
+                    PlayerDeathTrack.PlayOneShot(DeathSFX);
+                    alreadyPlayed = true;
+                }
             }
         }
     }

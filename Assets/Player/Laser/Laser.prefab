@@ -139,8 +139,8 @@ MonoBehaviour:
   SpecializedAugments: []
   CoreAugments: []
   WeaponTrack: {fileID: 4166113802663282910}
-  WeaponSFX: {fileID: 8300000, guid: 991dcafe0f6113147af65d95ef63664e, type: 3}
-  weaponType: 0
+  WeaponSFX: {fileID: 8300000, guid: c74fbe37796739346b221a816621ebfe, type: 3}
+  weaponType: 2
   maxLaserCount: 1
   laserRotationOffset:
     x: 0

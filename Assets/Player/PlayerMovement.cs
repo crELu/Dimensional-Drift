@@ -75,6 +75,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private AudioSource DimSwitchTrack;
     [SerializeField] private AudioClip DimSwitchUp;
     [SerializeField] private AudioClip DimSwitchDown;
+    [SerializeField] private AudioSource DashTrack;
+    [SerializeField] private AudioClip DashSFX;
+    [SerializeField] private AudioSource BoostTrack;
+    [SerializeField] private AudioClip BoostSFX;
     
     
     public float3 Position
@@ -293,7 +297,6 @@ public class PlayerMovement : MonoBehaviour
         {
             impulse -= Vector3.ClampMagnitude(transform.position, transform.position.magnitude - 900 + 100) * wallForce;
         }
-        
         return impulse;
     }
     
@@ -320,6 +323,8 @@ public class PlayerMovement : MonoBehaviour
             _dashDir.Normalize();
         }
         StartCoroutine(Dash(CameraManager.main.RollDir));
+
+        DashTrack.PlayOneShot(DashSFX);
 
         
         
