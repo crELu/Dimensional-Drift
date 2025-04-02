@@ -109,6 +109,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
     
+    public bool invertX = false;
+    public bool invertY = false;
+    
     void Start()
     {
         _moveAction = InputSystem.actions.FindAction("Move");
@@ -237,6 +240,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 inputRotation = LookInput * (rotateSpeed * Time.deltaTime);
             }
+
+            // Apply invert settings
+            if (invertX) inputRotation.x = -inputRotation.x;
+            if (invertY) inputRotation.y = -inputRotation.y;
 
             _pitch -= inputRotation.y;
             _yaw += inputRotation.x;
