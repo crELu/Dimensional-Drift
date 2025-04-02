@@ -5,7 +5,6 @@ using TMPro;
 
 public class PlayerInventory : MonoBehaviour
 {
-    [SerializeField] private int maxWeaponSlots = 4;
     [SerializeField] private TextMeshProUGUI intelText;
     public float Intel { get; private set; }
 

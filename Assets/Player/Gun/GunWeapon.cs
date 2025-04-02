@@ -24,8 +24,8 @@ public class GunWeapon: PlayerWeapon
         var p2 = PositionR;
         for (int i = 0; i < count; i++)
         {
-            attack.Bullets.Enqueue(new Bullet {position = p1, rotation = Maths.GetRandomRotationWithinCone(stats.accuracy, stats.accuracy), time = i * attackCd + Time.time});
-            attack.Bullets.Enqueue(new Bullet {position = p2, rotation = Maths.GetRandomRotationWithinCone(stats.accuracy, stats.accuracy), time = i * attackCd + Time.time});
+            attack.Bullets.Enqueue(new Bullet {position = p1, rotation = Maths.GetRandomRotationWithinCone(stats.accuracy, stats.accuracy), time = Time.time});
+            attack.Bullets.Enqueue(new Bullet {position = p2, rotation = Maths.GetRandomRotationWithinCone(stats.accuracy, stats.accuracy), time = Time.time});
 
         }
 

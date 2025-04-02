@@ -35,8 +35,18 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
         {
             EnemyCollisionReceiver enemy = ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW;
             if (!enemy.Invulnerable) enemy.LastDamage += playerProjStats.Stats.damage;
-
             playerProj.Health -= (int)math.ceil(10000f / (1+playerProjStats.Stats.pierce));
+
+            if (ComponentLookups.PlayerProjectileEffects.InterferenceLookup.HasComponent(pProj))
+            {
+                var strength = ComponentLookups.PlayerProjectileEffects.InterferenceLookup.GetRW(pProj).ValueRW.Strength;
+                var enemyVel = ComponentLookups.velocity.GetRW(entityB).ValueRW;
+                var projVel = ComponentLookups.velocity.GetRW(pProj).ValueRW;
+                var force = math.sqrt(strength / enemy.Size / enemy.Size * 10);
+                enemyVel.Angular += math.normalize(math.cross(projVel.Linear, math.up())) * force / 5;
+                enemyVel.Linear += math.normalize(projVel.Linear) * force;
+                ComponentLookups.velocity.GetRW(entityB).ValueRW = enemyVel;
+            }
             
             ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW = enemy;
             AudioWriter.Enqueue(new SfxCommand {Name = "Hit Enemy", Position = projPos.Position});

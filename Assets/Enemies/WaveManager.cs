@@ -102,7 +102,7 @@ namespace Enemies
             {
                 var random = Rng.GetSequence(jobIndex);
                 var position = random.NextFloat3Direction() * Radius;
-                var xz = math.normalize(position.xz) * Radius;
+                var xz = math.normalizesafe(position.xz) * Radius;
                 position.xz = xz;
                 var i = EntitiesToSpawn[jobIndex];
                 
@@ -147,7 +147,7 @@ namespace Enemies
                     
                     PlayerManager.waveCount = wave.Wave;
                     PlayerManager.main.inventory.UpdateUI();
-                    
+                    PlayerManager.main.StartNewWave(wave.Wave);
                     var count = GetEnemyCount(wave.Wave, wave.Difficulty);
                     
                     wave.WaveTimer = GetWaveTimer(wave.Wave);

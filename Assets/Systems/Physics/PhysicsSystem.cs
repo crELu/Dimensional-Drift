@@ -16,12 +16,14 @@ using Unity.Collections;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics.Extensions;
 using Unity.Transforms;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Unity.Mathematics.math;
 using CapsuleCollider = Latios.Psyshock.CapsuleCollider;
@@ -170,6 +172,7 @@ public struct PhysicsComponentLookups {
     public PhysicsComponentLookup<DamagePlayer> EnemyWeaponLookup;
     public PhysicsComponentLookup<Obstacle> TerrainLookup;
     public PhysicsComponentLookup<Intel> IntelLookup;
+    public PlayerProjectileEffectLookups PlayerProjectileEffects;
 
     public void Update(ref SystemState state) {
         velocity.Update(ref state);
@@ -182,6 +185,7 @@ public struct PhysicsComponentLookups {
         EnemyWeaponLookup.Update(ref state);
         TerrainLookup.Update(ref state);
         IntelLookup.Update(ref state);
+        PlayerProjectileEffects.Update(ref state);
     }
 }
 
@@ -351,7 +355,7 @@ public partial struct PhysicsSystem: ISystem {
     [BurstCompile]
     public void OnCreate(ref SystemState state) {
         state.RequireForUpdate<PlayerData>();
-        state.RequireForUpdate<SoundReceiver>();
+        state.RequireForUpdate<VfxReceiver>();
 
         latiosWorld = state.GetLatiosWorldUnmanaged();
         componentLookups = new PhysicsComponentLookups {
@@ -366,6 +370,7 @@ public partial struct PhysicsSystem: ISystem {
             TerrainLookup = state.GetComponentLookup<Obstacle>(),
             IntelLookup = state.GetComponentLookup<Intel>()
         };
+        componentLookups.PlayerProjectileEffects.Init(ref state);
 
         // Top-down 2D projection
         projectDirection2D = new float3(0f, 1f, 0f);
@@ -441,8 +446,8 @@ public partial struct PhysicsSystem: ISystem {
         var playerEntity = SystemAPI.GetSingletonEntity<PlayerData>();
         var playerTransform = SystemAPI.GetComponent<LocalTransform>(playerEntity);
         
-        if (!SystemAPI.TryGetSingleton(out SoundReceiver soundReceiver)) return;
-        var soundWriter = soundReceiver.AudioCommands.AsParallelWriter();
+        if (!SystemAPI.TryGetSingleton(out VfxReceiver soundReceiver)) return;
+        var soundWriter = soundReceiver.VfxCommands.AsParallelWriter();
         GeometryHelper.ProjectPoint2D(projectDirection2D, playerTransform.Position, out float3 playerCenter);
         var worldBoundHalfSize = new float3(100);
         var playerAabb = new Aabb(

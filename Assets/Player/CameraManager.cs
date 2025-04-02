@@ -51,9 +51,9 @@ public class CameraManager : MonoBehaviour
         }
 
         var a = isDashing ? rollModifier : 1;
-        smoothTarget = Vector3.Lerp(smoothTarget, targetPosition, smoothAccel * a * Time.deltaTime);
-        transform.position = Vector3.Lerp(transform.position, smoothTarget, smoothVel * a * Time.deltaTime);
-        var lookTarg = Vector3.Lerp(lookTarget.position, PlayerManager.Position, DimensionManager.normT);
+        smoothTarget = Vector3.Slerp(smoothTarget, targetPosition, smoothAccel * a * Time.deltaTime);
+        transform.position = Vector3.Slerp(transform.position, smoothTarget, smoothVel * a * Time.deltaTime);
+        var lookTarg = Vector3.Slerp(lookTarget.position, PlayerManager.Position, DimensionManager.normT);
         
         transform.LookAt(lookTarg, DimensionManager.Dim3 ? Vector3.up : Up2d);
         

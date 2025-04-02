@@ -192,7 +192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6a0f263a2f043d8a4c59f8fe7afff3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 150
+  health: 200
   size: 35
   intel: {fileID: 1231305184969748935, guid: cb4a7fa663eefdd4a82550cec515e921, type: 3}
   linearPid:

@@ -59,3 +59,4 @@ MonoBehaviour:
       pierce: 0
   postPriority: 0
   RocketCount: {x: 0, y: 15, z: 65}
+  HomingCount: {x: 45, y: 90, z: 90}

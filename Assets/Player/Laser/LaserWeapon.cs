@@ -43,7 +43,7 @@ public class LaserWeapon : PlayerWeapon
             }
 
             _chargeTimer += Time.deltaTime;
-            if (_chargeTimer > BaseStats.attackDelay && base.Fire(player, true))
+            if (_chargeTimer > MainStats.attackDelay && base.Fire(player, true))
             {
                 _chargeTimer = 0;
                 
@@ -77,13 +77,12 @@ public class LaserWeapon : PlayerWeapon
         
         if (LaserIsActive)
         {
-            var cost = BaseStats.ammoUse * 3 / _maxDuration * Time.deltaTime;
+            var cost = MainStats.ammoUse * 3 / _maxDuration * Time.deltaTime;
             if (_laserDuration >= 0 && cost <= player.Ammo)
             {
                 player.UseAmmo(cost);
             } else
             {
-                Debug.Log($"died{cost} {player.Ammo} {_laserDuration}");
                 maxLaserCount = 0;
                 _chargeTimer = 0;
                 LaserIsActive = false;

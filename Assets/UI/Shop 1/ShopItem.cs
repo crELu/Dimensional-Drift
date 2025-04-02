@@ -19,7 +19,6 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler
     [Header("UI Elements")]
     public Image itemIcon;
     public Image rarity;
-    public TextMeshProUGUI costText;
     
     public Item data;
     private ShopManager shopManager;
@@ -31,7 +30,8 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler
 
     public void OnSelect(BaseEventData eventData)
     {
-        shopManager.DisplayText(data.itemTitle, data.description);
+        string rarityText = data.rarity == 0 ? "I" : data.rarity == 1 ? "II" : "III";
+        shopManager.DisplayText($"{data.itemTitle} {rarityText}", data.Description);
     }
 
     public void OnDeselect(BaseEventData eventData)
@@ -45,9 +45,8 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler
         shopManager = manager;
         playerInventory = PlayerManager.main.inventory;
         
-        itemIcon.sprite = data.icon;
-        rarity.sprite = data.rarity;
-        costText.text = $"{data.baseCost} Intel";
+        itemIcon.sprite = data.Icon;
+        rarity.sprite = manager.rarities[data.rarity];
     }
 
     private void OnPurchaseClicked()

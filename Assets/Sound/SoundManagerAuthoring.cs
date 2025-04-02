@@ -9,9 +9,9 @@ public struct SfxCommand
     public float3 Position;
 }
 
-public struct SoundReceiver : IComponentData
+public struct VfxReceiver : IComponentData
 {
-    public NativeQueue<SfxCommand> AudioCommands;
+    public NativeQueue<SfxCommand> VfxCommands;
 }
 
 [UpdateBefore(typeof(PhysicsSystem))]
@@ -19,15 +19,16 @@ public partial struct SoundProcessSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
-        state.EntityManager.CreateSingleton(new SoundReceiver{AudioCommands = new NativeQueue<SfxCommand>(Allocator.Persistent)});
+        state.RequireForUpdate<VfxReceiver>();
+        state.EntityManager.CreateSingleton(new VfxReceiver{VfxCommands = new NativeQueue<SfxCommand>(Allocator.Persistent)});
     }
 
     public void OnDestroy(ref SystemState state) { }
     
     public void OnUpdate(ref SystemState state)
     {
-        var soundReceiver = SystemAPI.GetSingleton<SoundReceiver>();
-        var soundWriter = soundReceiver.AudioCommands;
+        var soundReceiver = SystemAPI.GetSingleton<VfxReceiver>();
+        var soundWriter = soundReceiver.VfxCommands;
         if (!soundWriter.IsEmpty())
         {
             var a = soundWriter.ToArray(Allocator.Temp);

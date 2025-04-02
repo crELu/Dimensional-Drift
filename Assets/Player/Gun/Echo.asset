@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Echo
   m_EditorClassIdentifier: 
   <MaxStacks>k__BackingField: 3
-  <Stacks>k__BackingField: 2
+  <Stacks>k__BackingField: 3
   <Requirements>k__BackingField: []
   tier1:
     size: 0
@@ -52,7 +52,7 @@ MonoBehaviour:
     ammoUse: 0
     count: 1
     bulletStats:
-      damage: 0
+      damage: -30
       duration: 0
       extraction: 0
       power: 0
@@ -60,3 +60,4 @@ MonoBehaviour:
   postPriority: 1
   echoSize: {x: 5, y: 7}
   echoChance: {x: 0.25, y: 0.5, z: 1}
+  interference: 200

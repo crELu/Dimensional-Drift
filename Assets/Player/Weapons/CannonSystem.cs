@@ -40,14 +40,14 @@ public struct CannonAcceleration : IComponentData
 [BurstCompile]
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateBefore(typeof(GunSystem))]
-public partial struct CannonExplosionSystem : ISystem
+public partial struct CannonSystem : ISystem
 {
     private Rng _rng;
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerData>();
         state.RequireForUpdate<PhysicsSystemState>();
-        _rng = new Rng("CannonExplosionSystem");
+        _rng = new Rng("CannonSystem");
     }
 
     [BurstCompile]

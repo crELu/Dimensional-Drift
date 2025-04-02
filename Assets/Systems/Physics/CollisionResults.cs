@@ -40,8 +40,8 @@ public struct PairsProcessor: IFindPairsProcessor {
         var d = tA.Position - tB.Position;
         if (Dim == Dimension.Two) d.y = 0;
         var massRatio = eA.Size * eA.Size / (eA.Size * eA.Size + eB.Size * eB.Size);
-        vA.Linear += DeltaTime * math.normalize(d) * 15 * massRatio;
-        vB.Linear += DeltaTime * -math.normalize(d) * 15 / massRatio;
+        vA.Linear += DeltaTime * math.normalize(d) * 15 / massRatio;
+        vB.Linear += DeltaTime * -math.normalize(d) * 15 * massRatio;
 
         ComponentLookups.velocity.GetRW(entityA).ValueRW = vA;
         ComponentLookups.velocity.GetRW(entityB).ValueRW = vB;

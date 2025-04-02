@@ -14,6 +14,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Users;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 using UnityEngine.VFX;
 using Collider = UnityEngine.Collider;
 using Math = Unity.Physics.Math;
@@ -24,6 +25,10 @@ using Vector3 = UnityEngine.Vector3;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private static readonly int T = Shader.PropertyToID("_t");
+    private static readonly int T2 = Shader.PropertyToID("_t2");
+    private static readonly int PlayerPos = Shader.PropertyToID("_PlayerPos");
+
     [Header("Camera Settings")]
     public Quaternion normalCameraRot, orthoCameraRot;
     public Vector3 normalCameraPos, orthoCameraPos;
@@ -47,10 +52,10 @@ public class PlayerMovement : MonoBehaviour
     public AnimationCurve dragSpeedScaling;
     public float wallForce;
     public MeshRenderer wall;
+    public RawImage boostImage;
     
     [Header("Dash Settings")]
     public float dashDur;
-    public float dashCooldown;
     public float dashSpeed;
     public AnimationCurve dashCurve;
     public AnimationCurve dashRollCurve;
@@ -91,6 +96,9 @@ public class PlayerMovement : MonoBehaviour
     public Quaternion LookRotation => Dim3 ? Camera.main.transform.rotation : transform.rotation;
     public GameObject crosshair;
     private bool _isUsingController;
+    private float _boost;
+    private float _boostUse;
+    private float _boostTime;
     private Vector3 LookInput
     {
         get
@@ -138,8 +146,16 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         DoRotation();
-        wall.material.SetVector("_PlayerPos", transform.position);
-        //Debug.Log(_isUsingController);
+        boostImage.material.SetFloat(T, _boost/100);
+        boostImage.material.SetFloat(T2, _boostUse/100);
+        _boostUse -= Time.deltaTime * 40;
+        _boostUse = Mathf.Max(0, _boostUse);
+        wall.material.SetVector(PlayerPos, transform.position);
+        if (Time.time > _boostTime + .7f)
+        {
+            _boost += Time.deltaTime * PlayerManager.main.BoostRegen;
+            _boost = Mathf.Min(100, _boost);
+        }
     }    
     
     private void HandleInputChange(InputUser user, InputUserChange change, InputDevice device)
@@ -281,11 +297,17 @@ public class PlayerMovement : MonoBehaviour
         Vector3 impulse = Vector3.zero;
         if (moveDir != Vector3.zero)
         {
+            bool sprint = _sprintAction.ReadValue<float>() != 0 && _boost > 1;
             float speedMultipliers = accelDotScaling.Evaluate(Vector3.Dot(moveDir, velocity)) *
                                      accelSpeedScaling.Evaluate(velocity.magnitude) *
-                                     (_sprintAction.ReadValue<float>() != 0 ? boostMultiplier : 1) *
+                                     (sprint ? boostMultiplier : 1) *
                                      (Dim3 ? forwardAlignmentScaling.Evaluate(moveVector.normalized.z) : 1);
-            Debug.Log(_sprintAction.ReadValue<float>() != 0);
+            if (sprint)
+            {
+                _boost -= Time.fixedDeltaTime * 10;
+                _boostTime = Time.time;
+                _boostUse += Time.fixedDeltaTime * 10;
+            }
             impulse = baseAccel * speedMultipliers * moveDir;
         }
         impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude)); 
@@ -302,8 +324,10 @@ public class PlayerMovement : MonoBehaviour
         if (_isDashing) return _dashDir * _dashSpeed;
         
         _dashCd -= Time.deltaTime;
-        if (_dashAction.ReadValue<float>() <= 0 || _dashCd > 0) return Vector3.zero;
-        
+        if (_dashAction.ReadValue<float>() <= 0 || _dashCd > 0 || _boost < 30) return Vector3.zero;
+        _boost -= 30;
+        _boostTime = Time.time;
+        _boostUse += 30;
         var input = MoveInput;
         _dashDir = MoveForward * input.y + Right * input.x;
         if (Dim3)
@@ -320,8 +344,6 @@ public class PlayerMovement : MonoBehaviour
             _dashDir.Normalize();
         }
         StartCoroutine(Dash(CameraManager.main.RollDir));
-
-        
         
         return _dashDir * _dashSpeed;
     }
@@ -329,7 +351,7 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator Dash(float dir)
     {
         _isDashing = true;
-        _dashCd = dashCooldown;
+        _dashCd = PlayerManager.main.DashCd;
         CameraManager.main.isDashing = true;
         float timer = 0;
         while (timer < dashDur)

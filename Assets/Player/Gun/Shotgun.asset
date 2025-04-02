@@ -12,17 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d310475027345aa941d4fdb79500562, type: 3}
   m_Name: Shotgun
   m_EditorClassIdentifier: 
-  <MaxStacks>k__BackingField: 3
-  <Stacks>k__BackingField: 2
+  <Stacks>k__BackingField: 3
   <Requirements>k__BackingField: []
   tier1:
     size: 0
     speed: 0
-    attackSpeed: 0
-    attackDelay: -90
-    accuracy: -20
+    attackSpeed: -20
+    attackDelay: 0
+    accuracy: -50
     ammoUse: 0
-    count: 5
+    count: 1
     bulletStats:
       damage: 0
       duration: 0
@@ -31,12 +30,12 @@ MonoBehaviour:
       pierce: 0
   tier2:
     size: 0
-    speed: 40
-    attackSpeed: -50
-    attackDelay: -300
-    accuracy: -40
+    speed: 0
+    attackSpeed: -30
+    attackDelay: 0
+    accuracy: -90
     ammoUse: 0
-    count: 15
+    count: 5
     bulletStats:
       damage: 0
       duration: -50
@@ -45,15 +44,16 @@ MonoBehaviour:
       pierce: 0
   tier3:
     size: 0
-    speed: 0
+    speed: 50
     attackSpeed: 0
     attackDelay: 0
     accuracy: 0
     ammoUse: 0
-    count: 0
+    count: 15
     bulletStats:
       damage: 0
-      duration: 0
+      duration: -50
       extraction: 0
       power: 0
       pierce: 0
+  postPriority: 0

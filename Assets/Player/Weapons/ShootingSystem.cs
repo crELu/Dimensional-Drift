@@ -71,6 +71,7 @@ public partial struct PlayerShootingSystem : ISystem
                     if (cannon.RocketCount != 0) ECB.AddComponent(index, newEntity, new CannonRockets{RocketCount = cannon.RocketCount});
                     if (cannon.ShrapnelCount != 0) { ECB.AddComponent(index, newEntity, new CannonShrapnel{ShrapnelCount = cannon.ShrapnelCount}); }
                 }
+                if (stats.Effects.HomingSpeed != 0) ECB.AddComponent(index, newEntity, new PlayerProjectileHoming{TurnSpeed = stats.Effects.HomingSpeed, Radius = stats.Effects.HomingRadius});
                 // Add PhysicsVelocity for regular bullets
                 ECB.AddComponent(index, newEntity, new PhysicsVelocity
                 {
@@ -78,12 +79,13 @@ public partial struct PlayerShootingSystem : ISystem
                 });
                 ECB.AddComponent(index, newEntity, new Lifetime { Time = stats.Stats.duration });
             }
+            if (stats.Effects.Interference != 0) ECB.AddComponent(index, newEntity, new GunInterference{Strength = stats.Effects.Interference});
             ECB.AddComponent(index, newEntity, new PlayerProjectileDeath
             {
                 Stats = stats.Stats,
                 Position = position,
             });
-            ECB.AddComponent(index, newEntity, new PlayerProjectile()
+            ECB.AddComponent(index, newEntity, new PlayerProjectile
             {
                 Health = 10000,
             });
@@ -160,7 +162,6 @@ public partial struct PlayerShootingSystem : ISystem
         // Schedule with initial dependency chain
         JobHandle handle = job.Schedule(bulletsToFire.Count, 64, state.Dependency);
         
-        
         // Combine disposals with main handle
         //handle = job.PlayerTransform.Dispose(handle);
 
@@ -169,7 +170,6 @@ public partial struct PlayerShootingSystem : ISystem
         p.Player = pData;
         
     }
-    
     
     private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
     {

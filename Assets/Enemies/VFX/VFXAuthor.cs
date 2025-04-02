@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using ECS.Enemy;
 using Unity.Burst;
 using Unity.Collections;
 using UnityEngine;

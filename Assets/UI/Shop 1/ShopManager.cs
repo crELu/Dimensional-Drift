@@ -22,7 +22,8 @@ public class ShopManager : MonoBehaviour
     [Header("Shop Items")]
     [SerializeField] private List<Item> availableItems = new();
     [SerializeField] private List<Transform> shopSlots = new();
-
+    [SerializeField] public List<Sprite> rarities = new();
+    
     [Header("UI Navigation")]
     [SerializeField] private PlayerInput playerInput;
     [SerializeField] private Selectable firstShopSelectable;

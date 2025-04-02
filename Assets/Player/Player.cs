@@ -25,13 +25,20 @@ using Vector3 = UnityEngine.Vector3;
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager main;
-    public static float3 Position => burstPos.Data;
+    public static float3 Position => burstPos.Data.Position;
     private class IntFieldKey {}
-    public static readonly SharedStatic<float3> burstPos = SharedStatic<float3>.GetOrCreate<PlayerManager, IntFieldKey>();
+    public static readonly SharedStatic<PlayerDataBurst> burstPos = SharedStatic<PlayerDataBurst>.GetOrCreate<PlayerManager, IntFieldKey>();
+
+    public struct PlayerDataBurst
+    {
+        public float3 Position;
+        public float Damage;
+    }
     
     public static float waveTimer, maxWaveTimer;
     public static int waveCount;
-    
+    private static int T;
+
     public PlayerMovement movement;
     public PlayerInventory inventory;
     
@@ -41,24 +48,36 @@ public class PlayerManager : MonoBehaviour
     private InputAction _scanAction;
     [Header("Stats Settings")] 
     public List<CharacterAugment> augments;
-    public CharacterStats stats;
-    protected CharacterStats AddonStats;
+    [SerializeField] private CharacterStats stats;
+    private AllStats _extraStats;
+    [SerializeField] private CharacterStats baseStats;
+    public float MaxHealth => baseStats.flatHealth;
+    public float MaxShield => baseStats.flatShield;
+    private float ShieldRegen => baseStats.shieldRegen;
+    private float MaxAmmo => baseStats.flatAmmo;
+    private float AmmoRegen => baseStats.ammoRegen;
+    public float DashCd => baseStats.dashCd;
+    public float PickupRadius => baseStats.pickupRadius;
+    public float BoostRegen => baseStats.boostRegen;
+    public bool FullHealth => Mathf.Approximately(health, MaxHealth);
+    public bool FullShield => Mathf.Approximately(shield, MaxShield);
     public float health, shield;
     [field:SerializeField] public float Ammo { get; private set; }
-    public static bool fire;
     public RawImage ammoText, waveImage;
-    public TextMeshProUGUI velocity;
+    [SerializeField] private TextMeshProUGUI velocityText;
+    public float velocity;
     [Header("Weapon Settings")] 
     public PlayerWeapon CurrentWeapon => weapons[currentWeapon];
     public int currentWeapon;
     public List<PlayerWeapon> weapons;
     public List<Image> weaponSlots;
     public Sprite weaponSelected, weaponUnselected;
+    public GameObject infiniteAmmo;
     
     public static List<Attack> Bullets => main.CurrentWeapon.Bullets;
     public RectTransform hp, sd;
-    public TextMeshProUGUI waveCounter;
-    
+    public TextMeshProUGUI waveCounter, newWaveText;
+    public RawImage newWaveImage;
     public VisualEffect minimap, overlay;
     public RectTransform minimapIcon;
     public GraphicsBuffer MinimapPos, OverlayPos;
@@ -80,6 +99,8 @@ public class PlayerManager : MonoBehaviour
         main = this;
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
         Application.targetFrameRate = 60;
+        CalcStats();
+        T = Shader.PropertyToID("_t");
     }
     
     public void AddAugment(Augment augment)
@@ -87,21 +108,30 @@ public class PlayerManager : MonoBehaviour
         if (augment is CharacterAugment charAug)
             augments.Add(charAug);
         else if (augment is StatsCharAugment statsAug)
-            AddonStats += statsAug.GetStats().characterStats;
+            _extraStats += statsAug.GetStats(new AllStats{characterStats = baseStats}).characterStats;
         else
         {
             Debug.Log($"Wrong augment type {augment.Target} for character.");
         }
+
+        CalcStats();
+    }
+    
+    public void AddStats(AllStats s)
+    {
+        _extraStats += s;
     }
 
     void Update()
     {
         CheckHealth();
         DoAttack();
+        CalcStats();
+        velocityText.text = $"{velocity:F0}";
         waveCounter.text = $"{waveCount}";
-        ammoText.material.SetFloat("_t", Ammo/100);
-        waveImage.material.SetFloat("_t", waveTimer/maxWaveTimer);
-        AddAmmo(2.5f * Time.deltaTime);
+        ammoText.material.SetFloat(T, Ammo/MaxAmmo);
+        waveImage.material.SetFloat(T, waveTimer/maxWaveTimer);
+        AddAmmo(AmmoRegen * Time.deltaTime);
         if (_scanAction.triggered && !_isScanning)
         {
             StartCoroutine(Scan());
@@ -121,11 +151,39 @@ public class PlayerManager : MonoBehaviour
             if (currentWeapon == i) weaponSlots[i].sprite = weaponSelected;
             else weaponSlots[i].sprite = weaponUnselected;
         }
+        infiniteAmmo.SetActive(currentWeapon == 0);
 
         var v = transform.forward;
         v.y = 0;
         minimapIcon.transform.rotation = Quaternion.Euler(0, 0, -Quaternion.LookRotation(v).eulerAngles.y);
-        transform.position = Vector3.Lerp(transform.position, burstPos.Data, 20f * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, burstPos.Data.Position, 20f * Time.deltaTime);
+    }
+
+    public void StartNewWave(int num)
+    {
+        newWaveText.text = $"- Wave {num} -";
+        StartCoroutine(Wave());
+    }
+    
+    private IEnumerator Wave()
+    {
+        float t = 0;
+        var a = newWaveImage.color;
+        var b = newWaveText.color;
+        newWaveImage.gameObject.SetActive(true);
+        while (t < 3)
+        {
+            t += Time.deltaTime;
+            if (t > 2)
+            {
+                newWaveImage.color = new Color(a.r, a.g, a.b, a.a*(3-t));
+                newWaveText.color = new Color(b.r, b.g, b.b, b.a*(3-t));
+            }
+            yield return new WaitForSecondsRealtime(0);
+        }
+        newWaveImage.color = a;
+        newWaveText.color = b;
+        newWaveImage.gameObject.SetActive(false);
     }
 
     private IEnumerator Scan()
@@ -152,6 +210,17 @@ public class PlayerManager : MonoBehaviour
         _isScanning = false;
     }
 
+    private void CalcStats()
+    {
+        CharacterStats s = _extraStats.characterStats;
+        foreach (var augment in augments)
+        {
+            s += augment.GetStats(new AllStats{characterStats = baseStats}).characterStats;
+        }
+        baseStats = stats * s;
+        burstPos.Data.Damage = baseStats.damageMultiplier;
+    }
+
     public void DoDamage(float damage)
     {
         var sDamage = Mathf.Min(damage, shield);
@@ -166,11 +235,11 @@ public class PlayerManager : MonoBehaviour
 
     private void CheckHealth()
     {
-        health = Mathf.Min(stats.flatHealth, health);
-        shield += stats.shieldRegen * Time.deltaTime;
-        shield = Mathf.Min(stats.flatShield, shield);
-        sd.sizeDelta = new Vector2(shield / stats.flatShield * 1024, 32);
-        hp.sizeDelta = new Vector2(health / stats.flatHealth * 1024, 64);
+        health = Mathf.Min(MaxHealth, health);
+        shield += ShieldRegen * Time.deltaTime;
+        shield = Mathf.Min(MaxShield, shield);
+        sd.sizeDelta = new Vector2(shield / MaxShield * 1024, 32);
+        hp.sizeDelta = new Vector2(health / MaxHealth * 1024, 64);
         if (health <= 0)
         {
             GameObject deathMessageObject = GameObject.Find("Death Message");
@@ -186,7 +255,7 @@ public class PlayerManager : MonoBehaviour
 
     private void DoAttack()
     {
-        fire = CurrentWeapon.Fire(this, _fireAction.IsPressed());
+        CurrentWeapon.Fire(this, _fireAction.IsPressed());
     }
 
     public void UseAmmo(float a)
@@ -202,7 +271,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (a<0) Debug.Log("don t do that (add negative ammo)");
         Ammo += a;
-        Ammo = Mathf.Min(100, Ammo);
+        Ammo = Mathf.Min(MaxAmmo, Ammo);
     }
     
 }

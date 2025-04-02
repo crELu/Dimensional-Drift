@@ -115,7 +115,7 @@ namespace Enemies.AI
             public EntityCommandBuffer.ParallelWriter Ecb;
             [NativeDisableParallelForRestriction] public ComponentLookup<EnemyCollisionReceiver> DamageLookup;
             [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
-            private void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref WormBody body)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref WormBody body, ref PhysicsVelocity velocity)
             {
                 var bodyDamage = DamageLookup[entity];
                 if (!DamageLookup.EntityExists(body.Head))
@@ -124,10 +124,13 @@ namespace Enemies.AI
                     return;
                 }
                 var headDamage = DamageLookup[body.Head];
-                headDamage.LastDamage += bodyDamage.LastDamage * body.DamageMultiplier;
+                if (!headDamage.Invulnerable) headDamage.LastDamage += bodyDamage.LastDamage * body.DamageMultiplier;
                 DamageLookup.GetRefRW(body.Head).ValueRW = headDamage;
                 bodyDamage.LastDamage = 0;
                 DamageLookup.GetRefRW(entity).ValueRW = bodyDamage;
+                
+                velocity.Linear = float3.zero;
+                velocity.Angular = float3.zero;
                 
                 var bodyTransform = TransformLookup[entity];
                 var prevTransform = TransformLookup[body.Prev];
@@ -159,7 +162,7 @@ namespace Enemies.AI
             
             state.Dependency = new WormHeadAIJob
             {
-                PlayerPosition = PlayerManager.burstPos.Data,
+                PlayerPosition = PlayerManager.burstPos.Data.Position,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
                 Dim = DimensionManager.burstDim.Data,
             }.ScheduleParallel(state.Dependency);
@@ -171,7 +174,7 @@ namespace Enemies.AI
             
             state.Dependency = new WormBodyAIJob
             {
-                PlayerPosition = PlayerManager.burstPos.Data,
+                PlayerPosition = PlayerManager.burstPos.Data.Position,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
                 Dim = DimensionManager.burstDim.Data,
                 Ecb = ecbWriter,
