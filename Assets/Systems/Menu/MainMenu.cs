@@ -23,6 +23,11 @@ namespace Systems.Menu
             SceneManager.LoadScene("Main Scene");
         }
 
+        public void ReturnToMainMenu()
+        {
+            SceneManager.LoadScene("Main Menu");
+        }
+
         // This method is called by the Quit button
         public void QuitGame()
         {

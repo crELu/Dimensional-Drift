@@ -1259,6 +1259,14 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2858606329747854855, guid: cc9dfa90dcc9f423cba1c520a6a55c4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1976179921}
+    - target: {fileID: 2858606329747854855, guid: cc9dfa90dcc9f423cba1c520a6a55c4d, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ReturnToMainMenu
+      objectReference: {fileID: 0}
     - target: {fileID: 3040181251225931620, guid: cc9dfa90dcc9f423cba1c520a6a55c4d, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -10734,7 +10742,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3c6a892d352469eb964d1c92b6c7bee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInput: {fileID: 1976179922}
 --- !u!114 &1976179922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10806,6 +10813,7 @@ MonoBehaviour:
   applyButton: {fileID: 127120516}
   masterVolume: 1
   sensitivityMultiplier: 1
+  playerInput: {fileID: 1976179922}
 --- !u!1 &1982195905
 GameObject:
   m_ObjectHideFlags: 0
