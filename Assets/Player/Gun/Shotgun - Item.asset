@@ -18,7 +18,7 @@ MonoBehaviour:
   augment: {fileID: 11400000, guid: 67d32e2d73954d5429a40e4582b8c623, type: 2}
   type: 0
   target: 0
-  icon: {fileID: 21300000, guid: 1ff0777c98197a643a2e3f8e115ddf46, type: 3}
+  icon: {fileID: 21300000, guid: 732da1c353ab8a34da9f14d2c6e5964d, type: 3}
   textT1: +1 Bullet, -50% ACC, -20% AS
   textT2: +5 Bullets, -90% ACC, -30% AS, -50% DUR
   textT3: +15 Bullets, +100% SPD, -50% DUR

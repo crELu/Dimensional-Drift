@@ -7,7 +7,7 @@ namespace Player.Character.Core
     public class Engine: CharacterAugment
     {
         public override AugmentType Target => AugmentType.Character;
-        
+        public override string Id => "Engine";
         public override AllStats GetStats(AllStats prevStats)
         {
             CharacterStats stats = new CharacterStats

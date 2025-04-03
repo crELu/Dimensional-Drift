@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e7ee96a48964ac9bbb3b3692a114ea6, type: 3}
   m_Name: Echo
   m_EditorClassIdentifier: 
-  <MaxStacks>k__BackingField: 3
   <Stacks>k__BackingField: 3
   <Requirements>k__BackingField: []
   tier1:
@@ -46,13 +45,13 @@ MonoBehaviour:
   tier3:
     size: 0
     speed: 0
-    attackSpeed: 500
+    attackSpeed: 50
     attackDelay: 0
     accuracy: 0
     ammoUse: 0
     count: 1
     bulletStats:
-      damage: -30
+      damage: 0
       duration: 0
       extraction: 0
       power: 0

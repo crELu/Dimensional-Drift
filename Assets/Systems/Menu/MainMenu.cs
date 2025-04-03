@@ -12,7 +12,6 @@ namespace Systems.Menu
         {
             // playerInput.SwitchCurrentActionMap("UI");
             // Cursor.lockState = CursorLockMode.Confined;
-            
         }
         
         // This method is called by the Play button

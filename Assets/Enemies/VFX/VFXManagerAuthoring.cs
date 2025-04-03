@@ -21,6 +21,7 @@ public partial struct VfxProcessSystem : ISystem
     
     public void OnUpdate(ref SystemState state)
     {
+        if (!VFXManager.main) return;
         var graphicsReceiver = SystemAPI.GetSingleton<GraphicsReceiver>();
         var graphicsWriters = graphicsReceiver.AudioCommands;
         

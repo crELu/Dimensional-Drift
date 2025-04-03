@@ -421,8 +421,8 @@ MonoBehaviour:
       x: 3
       y: 3
       z: 3
-  spacingRange: 30
-  strafeWeight: 3
+  spacingRange: 50
+  strafeWeight: 15
   maxTargetSpeed: 20
   maxFarSpeed: 40
 --- !u!114 &2928448717791960285

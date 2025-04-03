@@ -7,7 +7,7 @@ namespace Player.Character.Core
     public class Shield: CharacterAugment
     {
         public override AugmentType Target => AugmentType.Character;
-        
+        public override string Id => "Shield";
         public override AllStats GetStats(AllStats prevStats)
         {
             bool cool = Stacks == 3 && PlayerManager.main.FullShield && PlayerManager.main.FullHealth;

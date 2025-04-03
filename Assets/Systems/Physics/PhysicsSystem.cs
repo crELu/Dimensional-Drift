@@ -474,8 +474,8 @@ public partial struct PhysicsSystem: ISystem {
         
         var buildPlayerInteractLayer = BuildLayer(
             playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-            null, out physicsState.ValueRW.PlayerInteractLayer, new NativeArray<ColliderBody>(playerHitbox, Allocator.TempJob));
-
+            null, out physicsState.ValueRW.PlayerInteractLayer, playerHitbox);
+        
         var buildPlayerWeaponLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
                 playerWeaponQuery, out physicsState.ValueRW.PlayerWeaponLayer);
@@ -508,7 +508,9 @@ public partial struct PhysicsSystem: ISystem {
                 buildLayers, buildTerrainLayer, buildIntelLayer);
         buildLayers = JobHandle.CombineDependencies(
             buildLayers, buildPlayerInteractLayer, buildEnemyGhostLayer);
-
+        
+        
+        
         componentLookups.Update(ref state);
         var ecb = new EntityCommandBuffer(Allocator.TempJob);
         var ecbWriter = ecb.AsParallelWriter();
@@ -578,10 +580,10 @@ public partial struct PhysicsSystem: ISystem {
                 physicsState.ValueRO.PlayerWeaponLayer, physicsState.ValueRO.EnemyGhostLayer, playerWeaponPairsProcessor)
             .ScheduleParallel(dependency);
         // Collide player weapons with enemy weapons
-        dependency = Physics.FindPairs(
-                physicsState.ValueRO.PlayerWeaponLayer,
-                physicsState.ValueRO.EnemyWeaponLayer, playerWeaponPairsProcessor)
-            .ScheduleParallel(dependency);
+        // dependency = Physics.FindPairs(
+        //         physicsState.ValueRO.PlayerWeaponLayer,
+        //         physicsState.ValueRO.EnemyWeaponLayer, playerWeaponPairsProcessor)
+        //     .ScheduleParallel(dependency);
         
         // Collide player with terrain
         dependency = Physics.FindPairs(
@@ -618,7 +620,6 @@ public partial struct PhysicsSystem: ISystem {
             state.EntityManager.DestroyEntity(entity);
         }
         destroyedSet.Dispose();
-        
 
         // Draw bounding box gizmos
         

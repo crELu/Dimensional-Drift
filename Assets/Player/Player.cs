@@ -42,10 +42,6 @@ public class PlayerManager : MonoBehaviour
     public PlayerMovement movement;
     public PlayerInventory inventory;
     
-    private InputAction _fireAction;
-    private InputAction _weaponUpAction;
-    private InputAction _weaponDownAction;
-    private InputAction _scanAction;
     [Header("Stats Settings")] 
     public List<CharacterAugment> augments;
     [SerializeField] private CharacterStats stats;
@@ -92,10 +88,6 @@ public class PlayerManager : MonoBehaviour
 
     void Start()
     {
-        _fireAction = InputSystem.actions.FindAction("Fire 1");
-        _weaponUpAction  = InputSystem.actions.FindAction("Weapon Up");
-        _weaponDownAction  = InputSystem.actions.FindAction("Weapon Down");
-        _scanAction  = InputSystem.actions.FindAction("Scan");
         main = this;
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
         Application.targetFrameRate = 60;
@@ -103,18 +95,37 @@ public class PlayerManager : MonoBehaviour
         T = Shader.PropertyToID("_t");
     }
     
-    public void AddAugment(Augment augment)
+    public void AddAugment(Augment augment, int tier)
     {
-        if (augment is CharacterAugment charAug)
-            augments.Add(charAug);
-        else if (augment is StatsCharAugment statsAug)
-            _extraStats += statsAug.GetStats(new AllStats{characterStats = baseStats}).characterStats;
-        else
-        {
-            Debug.Log($"Wrong augment type {augment.Target} for character.");
-        }
+        if (augment.Target != AugmentType.Character) Debug.LogError($"Wrong augment type {augment.Target} for player.");
+        if (tier < 0 || tier > 2) Debug.LogError($"Invalid augment tier {tier}.");
 
-        CalcStats();
+        if (augment is CharacterAugment coreAug)
+        {
+            Predicate<CharacterAugment> nameChecker = e => e.Id == coreAug.Id;
+            if (tier == 0)
+            {
+                if (augments.Exists(nameChecker))
+                    Debug.LogError($"Tried to add T1 augment {augment.Id} for player, but it already exists.");
+                else if (augments.Count >= 3)
+                    Debug.LogError($"Tried to add T1 augment {augment.Id} for player, but there are already 3.");
+                var clone = Instantiate(coreAug);
+                clone.Stacks = 1;
+                augments.Add(clone);
+            }
+            else if (tier == 1)
+            {
+                if (!augments.Exists(e => nameChecker(e) && e.Stacks == 1))
+                    Debug.LogError($"Tried to add T2 augment {augment.Id} for player, but no T1 exists.");
+                augments.Find(nameChecker).Stacks++;
+            }
+            else if (tier == 2)
+            {
+                if (!augments.Exists(e => nameChecker(e) && e.Stacks == 2))
+                    Debug.LogError($"Tried to add T3 augment {augment.Id} for player, but no T2 exists.");
+                augments.Find(nameChecker).Stacks++;
+            }
+        }
     }
     
     public void AddStats(AllStats s)
@@ -132,15 +143,15 @@ public class PlayerManager : MonoBehaviour
         ammoText.material.SetFloat(T, Ammo/MaxAmmo);
         waveImage.material.SetFloat(T, waveTimer/maxWaveTimer);
         AddAmmo(AmmoRegen * Time.deltaTime);
-        if (_scanAction.triggered && !_isScanning)
+        if (PlayerInputs.main.Scan && !_isScanning)
         {
             StartCoroutine(Scan());
         }
-        if (_weaponDownAction.triggered)
+        if (PlayerInputs.main.WeaponDown)
         {
             currentWeapon++;
             currentWeapon %= weapons.Count;
-        } else if (_weaponUpAction.triggered)
+        } else if (PlayerInputs.main.WeaponUp)
         {
             currentWeapon--;
             if (currentWeapon < 0) currentWeapon = weapons.Count - 1;
@@ -163,6 +174,19 @@ public class PlayerManager : MonoBehaviour
     {
         newWaveText.text = $"- Wave {num} -";
         StartCoroutine(Wave());
+    }
+    
+    public (bool, int) ValidAugment(Augment augment)
+    {
+        if (augment.Target != AugmentType.Character) return (false, 0);
+        if (!augments.Exists(e => e.name == augment.name))
+        {
+            if (augments.Count >= 3) return (false, 0);
+            return (true, 0);
+        }
+        var aug = augments.Find(e => e.name == augment.name);
+        if (aug.Stacks >= 3) return (false, 0);
+        return (true, aug.Stacks);
     }
     
     private IEnumerator Wave()
@@ -255,7 +279,7 @@ public class PlayerManager : MonoBehaviour
 
     private void DoAttack()
     {
-        CurrentWeapon.Fire(this, _fireAction.IsPressed());
+        CurrentWeapon.Fire(this, PlayerInputs.main.Fire);
     }
 
     public void UseAmmo(float a)

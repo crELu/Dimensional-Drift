@@ -80,6 +80,7 @@ namespace Player
 
         public void OnUpdate(ref SystemState state)
         {
+            if (!PlayerManager.main) return;
             // Clear the queue for this frame.
             enemyQueue.Clear();
             enemyOverlayQueue.Clear();

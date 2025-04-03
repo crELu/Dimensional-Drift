@@ -5,8 +5,8 @@ using TMPro;
 
 public class PlayerInventory : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI intelText;
-    public float Intel { get; private set; }
+    [SerializeField] private TextMeshProUGUI intelText, intelText2;
+    [field:SerializeField] public float Intel { get; private set; }
 
     private void Start()
     {
@@ -35,5 +35,6 @@ public class PlayerInventory : MonoBehaviour
     public void UpdateUI()
     {
         intelText.text = $"{Intel:F0}";
+        intelText2.text = $"{Intel:F0}";
     }
 }

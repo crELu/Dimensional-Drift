@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca4b0e6decf448b955566d310d8c593, type: 3}
   m_Name: T2 Damage
   m_EditorClassIdentifier: 
-  itemTitle: Damage
+  itemTitle: Damage (Shard)
   baseCost: 150
   rarity: 1
   stats:
@@ -42,5 +42,7 @@ MonoBehaviour:
       dashCd: 0
       pickupRadius: 0
       damageMultiplier: 0
-  icon: {fileID: 0}
-  textT1: +8% DMG
+  icon: {fileID: 21300000, guid: dd4cfb6d6f0e5364d92cfb504521fe95, type: 3}
+  textT1: '+8% DMG.
+
+    Shard: Can be bought unlimited times.'

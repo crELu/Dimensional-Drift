@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca4b0e6decf448b955566d310d8c593, type: 3}
   m_Name: T1 Dur
   m_EditorClassIdentifier: 
-  itemTitle: Duration
+  itemTitle: Duration (Shard)
   baseCost: 75
   rarity: 0
   stats:
@@ -42,5 +42,7 @@ MonoBehaviour:
       dashCd: 0
       pickupRadius: 0
       damageMultiplier: 0
-  icon: {fileID: 0}
-  textT1: +3% DUR
+  icon: {fileID: 21300000, guid: 54d5cc3067a575143bd0ea20e4cf4989, type: 3}
+  textT1: '+3% Duration.
+
+    Shard: Can be bought unlimited times.'

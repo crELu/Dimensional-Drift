@@ -135,13 +135,12 @@ namespace Enemies
             _enemyStatsLookup.Update(ref state);
             if (SystemAPI.ManagedAPI.TryGetSingletonEntity<WaveSingleton>(out Entity e))
             {
-                bool waveEarlyDone = _enemies.IsEmpty;
                 var wave = SystemAPI.ManagedAPI.GetComponent<WaveSingleton>(e);
                 wave.WaveTimer -= SystemAPI.Time.DeltaTime * GetWaveSpeed(wave.Wave, _enemies.CalculateEntityCount());
                 
                 PlayerManager.waveTimer = wave.WaveTimer;
                 
-                if (waveEarlyDone || wave.WaveTimer < 0)
+                if (wave.WaveTimer < 0)
                 {
                     wave.Wave++;
                     
@@ -186,7 +185,8 @@ namespace Enemies
                         Rng = _rng,
                     };
 
-                    job.Schedule(enemiesToSpawn.Length, 16, state.Dependency).Complete();
+                    state.Dependency = job.Schedule(enemiesToSpawn.Length, 16, state.Dependency);
+                    state.Dependency = enemiesToSpawn.Dispose(state.Dependency);
                 }
                 
                 state.EntityManager.AddComponentData(e, wave);

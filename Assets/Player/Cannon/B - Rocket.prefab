@@ -85,7 +85,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 16, g: 3.8052807, b: 0, a: 1}
   lifetime: 1
-  scale: {x: 8, y: 8, z: 8, w: 0}
+  scale: {x: 24, y: 24, z: 24, w: 0}
   vfxType: PlayerGun
 --- !u!114 &7918589941069970403
 MonoBehaviour:
@@ -156,3 +156,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 50
   turnSpeed: 90
+  offset: 0

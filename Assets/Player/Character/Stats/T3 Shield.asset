@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca4b0e6decf448b955566d310d8c593, type: 3}
   m_Name: T3 Shield
   m_EditorClassIdentifier: 
-  itemTitle: Shield
+  itemTitle: Shield (Shard)
   baseCost: 400
   rarity: 2
   stats:
@@ -42,5 +42,8 @@ MonoBehaviour:
       dashCd: 0
       pickupRadius: 0
       damageMultiplier: 0
-  icon: {fileID: 0}
-  textT1: +10 Shield, +3% Shield, +3% Shield Regen
+  icon: {fileID: 21300000, guid: a09dd60b45bae6e45804c35af63d2024, type: 3}
+  textT1: '+10 Shield, +3% Shield, +3% Shield Regen.
+
+    Shard: Can be bought unlimited
+    times.'

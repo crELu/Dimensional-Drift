@@ -19,6 +19,9 @@ MonoBehaviour:
   type: 1
   target: 2
   icon: {fileID: 21300000, guid: 28ed648a6677da64597f0563af749931, type: 3}
-  textT1: 
-  textT2: 
-  textT3: 
+  textT1: 'Homing: The rocket steers towards the nearest target.'
+  textT2: 'Homing+: The rocket turns twice as fast.
+
+    Cluster Missle: On Death,
+    fires 15 homing missles that do 50% damage each.'
+  textT3: 'Cluster Missle+: Fires 40+(3 per Count) missles.'

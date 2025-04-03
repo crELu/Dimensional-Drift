@@ -149,11 +149,11 @@ public partial struct PlayerShootingSystem : ISystem
         }
 
         bullets.RemoveAll(a => a.Bullets.Count == 0);
-        
+        var nativeBulletArr = new NativeArray<BulletEntity>(bulletsToFire.ToArray(), Allocator.TempJob);
         var job = new BulletFiringJob
         {
             ECB = ecb,
-            BulletsToFire = new NativeArray<BulletEntity>(bulletsToFire.ToArray(), Allocator.TempJob),
+            BulletsToFire = nativeBulletArr,
             PlayerTransform = LocalTransform.FromMatrix(PlayerManager.main.transform.localToWorldMatrix),
             PlayerLookRotation = PlayerManager.main.movement.LookRotation,
             TransformLookup = _localTransformLookup,
@@ -161,14 +161,12 @@ public partial struct PlayerShootingSystem : ISystem
 
         // Schedule with initial dependency chain
         JobHandle handle = job.Schedule(bulletsToFire.Count, 64, state.Dependency);
-        
-        // Combine disposals with main handle
-        //handle = job.PlayerTransform.Dispose(handle);
 
         state.Dependency = handle;
     
         p.Player = pData;
         
+        state.Dependency = nativeBulletArr.Dispose(state.Dependency);
     }
     
     private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)

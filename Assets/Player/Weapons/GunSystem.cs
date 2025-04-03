@@ -97,17 +97,18 @@ public partial struct GunSystem : ISystem
             {
                 ExplodeEnemy(result, ref state, exp, proj);
             }
-            physicsState.ValueRO.GetInRadius(proj.Position, exp.Radius, physicsState.ValueRO.EnemyWeaponLayer, out BodiesInRadius projInRadius);
-            foreach (var result in projInRadius.enumerator)
-            {
-                if (!state.EntityManager.Exists(result.entity)) continue;
-                var enemyProj = SystemAPI.GetComponent<DamagePlayer>(result.entity);
-                SystemAPI.SetComponent(result.entity, enemyProj);
-                if (enemyProj.Mass != -1)
-                {
-                    ecb.DestroyEntity(result.entity);
-                }
-            }
+            // physicsState.ValueRO.GetInRadius(proj.Position, exp.Radius, physicsState.ValueRO.EnemyWeaponLayer, out BodiesInRadius projInRadius);
+            // foreach (var result in projInRadius.enumerator)
+            // {
+            //     if (!state.EntityManager.Exists(result.entity)) continue;
+            //     if (!SystemAPI.HasComponent<DamagePlayer>(result.entity)) continue;
+            //     var enemyProj = SystemAPI.GetComponent<DamagePlayer>(result.entity);
+            //     
+            //     if (enemyProj.Mass != -1)
+            //     {
+            //         ecb.DestroyEntity(result.entity);
+            //     }
+            // }
             ecb.RemoveComponent<GunExplosion>(entity);
         }
         

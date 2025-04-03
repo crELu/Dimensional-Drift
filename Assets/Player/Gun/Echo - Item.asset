@@ -18,11 +18,13 @@ MonoBehaviour:
   augment: {fileID: 11400000, guid: 42f806717235a814fbe00af541089d4f, type: 2}
   type: 0
   target: 0
-  icon: {fileID: 21300000, guid: 1ff0777c98197a643a2e3f8e115ddf46, type: 3}
+  icon: {fileID: 21300000, guid: 15ec1fcead772b1468f893826bae59ba, type: 3}
   textT1: 'Echo: Each bullet fired has a 25% chance of spawning a mirrored bullet.
     Mirrored bullet inherit all traits of the base bullet.'
-  textT2: 'Echo has a 50% chance of triggering.
+  textT2: 'Echo+: Echo has a 50% chance of triggering.
 
-    EMP: Mirrored bullets gain 20
-    Interference.'
-  textT3: Echo has a 100% chance of triggering.
+    EMP: Mirrored bullets
+    gain 20 Interference.'
+  textT3: '+50% AS.
+
+    Echo++: Echo has a 100% chance of triggering.'

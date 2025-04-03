@@ -25,7 +25,7 @@ MonoBehaviour:
     damage and have double speed.'
   textT2: '+20% DMG.
 
-    Critical Strike triggers every 4 shots.'
+    Critical Strike+: Critical Strike triggers every 4 shots.'
   textT3: '+30% DMG.
 
-    Critical Strike triggers every 2 shots.'
+    Critical Strike++: Critical Strike triggers every 2 shots.'

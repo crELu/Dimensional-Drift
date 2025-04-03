@@ -17,10 +17,10 @@ public class AugmentItem : Item
         switch (target)
         {
             case ShopAugmentTarget.Character:
-                PlayerManager.main.weapons[0].AddAugment(augment);
+                PlayerManager.main.AddAugment(augment, rarity);
                 break;
             default:
-                PlayerManager.main.weapons[(int)target].AddAugment(augment);
+                PlayerManager.main.weapons[(int)target].AddAugment(augment, rarity);
                 break;
         }
     }

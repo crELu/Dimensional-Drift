@@ -7,7 +7,7 @@ namespace Player.Character.Core
     public class Battery: CharacterAugment
     {
         public override AugmentType Target => AugmentType.Character;
-        
+        public override string Id => "Battery";
         public override AllStats GetStats(AllStats prevStats)
         {
             CharacterStats stats = new CharacterStats

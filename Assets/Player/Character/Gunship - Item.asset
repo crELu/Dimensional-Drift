@@ -21,5 +21,5 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: f8f3fde586be7be46ab3c79cffbd43f9, type: 3}
   textT1: +15% DMG Boost, -10% HP.
   textT2: +25% DMG Boost.
-  textT3: 'System Overload: You can no longer gain shield. All shielding is converted
-    to DMG% at 50% efficiency.'
+  textT3: 'System Overload: You have 10 shield, which cannot be increased. All shield
+    regen is converted to DMG% at 200% efficiency.'

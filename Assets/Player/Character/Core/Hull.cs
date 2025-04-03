@@ -7,7 +7,7 @@ namespace Player.Character.Core
     public class Hull: CharacterAugment
     {
         public override AugmentType Target => AugmentType.Character;
-        
+        public override string Id => "Hull";
         public override AllStats GetStats(AllStats prevStats)
         {
             if (Stacks == 3 && PlayerManager.main.health < PlayerManager.main.MaxHealth / 2)

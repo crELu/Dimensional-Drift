@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca4b0e6decf448b955566d310d8c593, type: 3}
   m_Name: T2 AS
   m_EditorClassIdentifier: 
-  itemTitle: Attack Speed
+  itemTitle: Attack Speed (Shard)
   baseCost: 150
-  rarity: 1
+  rarity: 0
   stats:
     weaponStats:
       size: 0
@@ -42,5 +42,7 @@ MonoBehaviour:
       dashCd: 0
       pickupRadius: 0
       damageMultiplier: 0
-  icon: {fileID: 0}
-  textT1: +3% AS
+  icon: {fileID: 21300000, guid: 9e59fdb6ec210de4ab2203e83cccdd49, type: 3}
+  textT1: '+3% AS.
+
+    Shard: Can be bought unlimited times.'

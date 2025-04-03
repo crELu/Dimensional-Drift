@@ -101,18 +101,50 @@ public class PlayerWeapon : MonoBehaviour
         return s;
     }
 
-    public void AddAugment(Augment augment)
+    public (bool, int) ValidAugment(Augment augment)
     {
-        if (augment.Target != weaponType)
+        if (augment.Target != weaponType) return (false, 0);
+        if (!CoreAugments.Exists(e => e.Id == augment.Id))
         {
-            Debug.Log($"Wrong augment type {augment.Target} for weaponType {weaponType}.");
+            if (CoreAugments.Count >= 3) return (false, 0);
+            return (true, 0);
         }
+        var aug = CoreAugments.Find(e => e.Id == augment.Id);
+        if (aug.Stacks >= 3) return (false, 0);
+        return (true, aug.Stacks);
+    }
+
+    public void AddAugment(Augment augment, int tier)
+    {
+        if (augment.Target != weaponType) Debug.LogError($"Wrong augment type {augment.Target} for weaponType {weaponType}.");
+        if (tier < 0 || tier > 2) Debug.LogError($"Invalid augment tier {tier}.");
+
         if (augment is CoreAugment coreAug)
-            CoreAugments.Add(coreAug);
-        else if (augment is SpecializedAugment specAug)
-            SpecializedAugments.Add(specAug);
-        else if (augment is StatsAugment statsAug)
-            AddonStats += statsAug.GetStats(new AllStats{weaponStats = MainStats}).weaponStats;
+        {
+            Predicate<CoreAugment> nameChecker = e => e.Id == coreAug.Id;
+            if (tier == 0)
+            {
+                if (CoreAugments.Exists(nameChecker))
+                    Debug.LogError($"Tried to add T1 augment {augment.Id} for weaponType {weaponType}, but it already exists.");
+                else if (CoreAugments.Count >= 3)
+                    Debug.LogError($"Tried to add T1 augment {augment.Id} for weaponType {weaponType}, but there are already 3.");
+                var clone = Instantiate(coreAug);
+                clone.Stacks = 1;
+                CoreAugments.Add(clone);
+            }
+            else if (tier == 1)
+            {
+                if (!CoreAugments.Exists(e => nameChecker(e) && e.Stacks == 1))
+                    Debug.LogError($"Tried to add T2 augment {augment.Id} for weaponType {weaponType}, but no T1 exists.");
+                CoreAugments.Find(nameChecker).Stacks++;
+            }
+            else if (tier == 2)
+            {
+                if (!CoreAugments.Exists(e => nameChecker(e) && e.Stacks == 2))
+                    Debug.LogError($"Tried to add T3 augment {augment.Id} for weaponType {weaponType}, but no T2 exists.");
+                CoreAugments.Find(nameChecker).Stacks++;
+            }
+        }
     }
 }
 

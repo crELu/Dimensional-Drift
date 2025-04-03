@@ -7,5 +7,6 @@ namespace Player.Character.Core
     public class Research: CharacterAugment
     {
         public override AugmentType Target => AugmentType.Character;
+        public override string Id => "Research";
     }
 }

@@ -19,6 +19,13 @@ MonoBehaviour:
   type: 1
   target: 2
   icon: {fileID: 21300000, guid: bc28b519ec562f542acb978166eca018, type: 3}
-  textT1: 
-  textT2: 
-  textT3: 
+  textT1: '+20% Ammo Comsumption.
+
+    Recursion: On Death, spawn 5 mini bombs that
+    do 33% damage each.'
+  textT2: '+30% Ammo Comsumption.
+
+    Recursion+: Spawn 15 mini bombs.'
+  textT3: '+40% Ammo Comsumption.
+
+    Recursion+: Spawn 30 mini bombs.'

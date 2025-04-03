@@ -37,7 +37,7 @@ MonoBehaviour:
     flatAmmo: 0
     dashCd: 0
     pickupRadius: 0
-    damageMultiplier: 0
+    damageMultiplier: 25
   tier3:
     flatHealth: 0
     flatShield: 0

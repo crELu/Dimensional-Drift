@@ -64,14 +64,6 @@ public class PlayerMovement : MonoBehaviour
     private bool _isDashing;
     private Vector3 _dashDir;
     
-    private InputAction _moveAction;
-    private InputAction _lookAction;
-    private InputAction _controllerLookAction;
-    private InputAction _dashAction;
-    private InputAction _sprintAction;
-    private InputAction _flyUpAction;
-    private InputAction _flyDownAction;
-    
     private Animator _anim;
     private Camera _camera;
     public Vector3 RelativeMovement { get; private set; }
@@ -91,44 +83,19 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 Right => Dim3 ? transform.right : _camera.transform.right;
     public Vector3 MoveForward => Dim3 ? transform.forward : _camera.transform.up;
     public Vector3 MoveUp => Dim3 ? transform.up : Vector3.zero;
-    private Vector2 MoveInput => _moveAction.ReadValue<Vector2>();
-    private float FlyInput => _flyUpAction.ReadValue<float>() - _flyDownAction.ReadValue<float>();
     public Quaternion LookRotation => Dim3 ? Camera.main.transform.rotation : transform.rotation;
     public GameObject crosshair;
+    
     private bool _isUsingController;
     private float _boost;
     private float _boostUse;
     private float _boostTime;
-    private Vector3 LookInput
-    {
-        get
-        {
-            var lookVector = _lookAction.ReadValue<Vector2>();
-            return lookVector;
-        }
-    }
-
-    private Vector3 ControllerLookInput
-    {
-        get
-        {
-            var lookVector = _controllerLookAction.ReadValue<Vector2>();
-            return lookVector;
-        }
-    }
     
     public bool invertX = false;
     public bool invertY = false;
     
     void Start()
     {
-        _moveAction = InputSystem.actions.FindAction("Move");
-        _lookAction = InputSystem.actions.FindAction("Look");
-        _controllerLookAction = InputSystem.actions.FindAction("Controller Look");
-        _dashAction = InputSystem.actions.FindAction("Dash");
-        _sprintAction = InputSystem.actions.FindAction("Sprint");
-        _flyUpAction = InputSystem.actions.FindAction("Fly Up");
-        _flyDownAction = InputSystem.actions.FindAction("Fly Down");
         _anim = GetComponent<Animator>();
         _camera = Camera.main;
         DimensionManager.DimSwitch.AddListener(SwitchDims);
@@ -137,7 +104,6 @@ public class PlayerMovement : MonoBehaviour
         _camera.orthographicSize = orthographicSize;
         _camera.fieldOfView = fov;
         InputUser.onChange += HandleInputChange;
-        
         _isUsingController = Gamepad.all.Count > 0;
         
         _aspect = (float) Screen.width / Screen.height;
@@ -146,9 +112,11 @@ public class PlayerMovement : MonoBehaviour
         Camera.main.projectionMatrix = _perspective;
         SwitchDims();
     }
+    
     void Update()
     {
         DoRotation();
+        
         boostImage.material.SetFloat(T, _boost/100);
         boostImage.material.SetFloat(T2, _boostUse/100);
         _boostUse -= Time.deltaTime * 40;
@@ -174,6 +142,7 @@ public class PlayerMovement : MonoBehaviour
                 _isUsingController = true;
             }
         }
+        PlayerInputs.main.RebindActions();
     }    
     
     private void SwitchDims()
@@ -187,9 +156,8 @@ public class PlayerMovement : MonoBehaviour
                 {
                     Cursor.lockState = CursorLockMode.Locked;
                     PlayerManager.main.targetCursorMode = CursorLockMode.Locked;
-
-                    DimSwitchTrack.PlayOneShot(DimSwitchUp);
-                }   
+                }
+                DimSwitchTrack.PlayOneShot(DimSwitchUp);
                 crosshair.SetActive(true);
                 break;
             case Dimension.Two:
@@ -199,9 +167,8 @@ public class PlayerMovement : MonoBehaviour
                     CameraManager.main.Angle = Mathf.Atan2(transform.forward.x, transform.forward.z) * Mathf.Rad2Deg;
                     Cursor.lockState = CursorLockMode.Confined;
                     PlayerManager.main.targetCursorMode = CursorLockMode.Confined;
-
-                    DimSwitchTrack.PlayOneShot(DimSwitchDown);
                 }
+                DimSwitchTrack.PlayOneShot(DimSwitchDown);
                 crosshair.SetActive(false);
                 break;
             case Dimension.One:
@@ -250,11 +217,11 @@ public class PlayerMovement : MonoBehaviour
             Vector2 inputRotation;
             if (_isUsingController)
             {
-                inputRotation = ControllerLookInput * (controllerRotateSpeed * Time.deltaTime);
+                inputRotation = PlayerInputs.main.ControllerLookInput * (controllerRotateSpeed * Time.deltaTime);
             }
             else
             {
-                inputRotation = LookInput * (rotateSpeed * Time.deltaTime);
+                inputRotation = PlayerInputs.main.LookInput * (rotateSpeed * Time.deltaTime);
             }
 
             // Apply invert settings
@@ -275,8 +242,9 @@ public class PlayerMovement : MonoBehaviour
             float angle;
             if (_isUsingController)
             {
-                if (ControllerLookInput == Vector3.zero) return;
-                angle = Mathf.Atan2(ControllerLookInput.y, ControllerLookInput.x);
+                var inp = PlayerInputs.main.ControllerLookInput;
+                if (inp == Vector3.zero) return;
+                angle = Mathf.Atan2(inp.y, inp.x);
             }
             else
             {
@@ -291,20 +259,17 @@ public class PlayerMovement : MonoBehaviour
     
     public Vector3 GetMovement(Vector3 velocity)
     {
-        var moveVector = new Vector3(MoveInput.x, FlyInput, MoveInput.y);
+        var minp = PlayerInputs.main.MoveInput;
+        var moveVector = new Vector3(minp.x, 0, minp.y);
         var moveDir = moveVector.z * MoveForward + moveVector.x * Right + moveVector.y * MoveUp;
-        var f = Vector3.ProjectOnPlane(moveDir, transform.up).normalized;
+        var f = Vector3.ProjectOnPlane(moveDir, transform.up);
         var r = Vector3.Cross(velocity + transform.forward * 5, transform.up).normalized;
         var u = Vector3.Cross(velocity + transform.forward * 5, transform.right).normalized;
-        RelativeMovement = new Vector3(Vector3.Dot(f, r), Vector3.Dot(f, u), moveDir.normalized.z);
-        if (Dim3)
-        {
-            moveDir += FlyInput * MoveUp;
-        }
+        RelativeMovement = new Vector3(Vector3.Dot(f, r), Vector3.Dot(f, u), moveDir.z);
         Vector3 impulse = Vector3.zero;
         if (moveDir != Vector3.zero)
         {
-            bool sprint = _sprintAction.ReadValue<float>() != 0 && _boost > 1;
+            bool sprint = PlayerInputs.main.Sprint && _boost > 1;
             float speedMultipliers = accelDotScaling.Evaluate(Vector3.Dot(moveDir, velocity)) *
                                      accelSpeedScaling.Evaluate(velocity.magnitude) *
                                      (sprint ? boostMultiplier : 1) *
@@ -331,17 +296,13 @@ public class PlayerMovement : MonoBehaviour
         if (_isDashing) return _dashDir * _dashSpeed;
         
         _dashCd -= Time.deltaTime;
-        if (_dashAction.ReadValue<float>() <= 0 || _dashCd > 0 || _boost < 30) return Vector3.zero;
+        if (!PlayerInputs.main.Dash || _dashCd > 0 || _boost < 30) return Vector3.zero;
         _boost -= 30;
         _boostTime = Time.time;
         _boostUse += 30;
-        var input = MoveInput;
+        var input = PlayerInputs.main.MoveInput;
         _dashDir = MoveForward * input.y + Right * input.x;
-        if (Dim3)
-        {
-            _dashDir += FlyInput * MoveUp;
-        }
-
+        
         if (_dashDir.Equals(float3.zero))
         {
             _dashDir = transform.forward;
