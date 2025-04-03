@@ -17044,6 +17044,7 @@ MonoBehaviour:
   infoDescription: {fileID: 767704353}
   infoCost: {fileID: 1480532776}
   shopItemPrefab: {fileID: 7010377093311145032, guid: 7cf5921549cde4ae6a1da1ae1e37f4be, type: 3}
+  refreshButton: {fileID: 570631667}
   augmentPool:
   - {fileID: 11400000, guid: 1ba7bfd05a6003a43ba5fd5bcc277471, type: 2}
   - {fileID: 11400000, guid: 6884bff8cab354848adeef8bd872c1f5, type: 2}

@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +35,13 @@ public class PlayerStats: MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         PopulateStats(wave, time);
         PopulateAugments();
+        
+        // Find and call the death screen selection method
+        var settingsController = FindObjectOfType<GameSceneSettingsController>();
+        if (settingsController != null)
+        {
+            settingsController.OnDeathScreenShown();
+        }
     }
 
     public void PopulateStats(int wave, float time)

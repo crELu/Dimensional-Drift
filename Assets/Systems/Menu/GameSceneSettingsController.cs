@@ -71,4 +71,15 @@ public class GameSceneSettingsController : MonoBehaviour
     {
         SceneManager.LoadScene("Main Menu");
     }
+
+    public void OnDeathScreenShown()
+    {
+        PlayerInputs.main.playerInput.SwitchCurrentActionMap("UI");
+        Cursor.lockState = CursorLockMode.Confined;
+        
+        // Select the replay button
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(deathScreenReplayButton);
+        Debug.Log("Death screen - selected replay button");
+    }
 }
