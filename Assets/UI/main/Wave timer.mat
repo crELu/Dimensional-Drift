@@ -250,7 +250,7 @@ Material:
     - _ZTestGBuffer: 4
     - _ZTestTransparent: 4
     - _ZWrite: 1
-    - _t: 0.99722236
+    - _t: 0.92187965
     - _t2: 0
     m_Colors:
     - _BaseCol: {r: 1, g: 1, b: 1, a: 1}
