@@ -1,0 +1,1084 @@
+fileFormatVersion: 2
+guid: b4784e00a45c1ed48ab613304c0dcced
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: XBox_B
+      rect:
+        serializedVersion: 2
+        x: 184
+        y: 1696
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b163d3c35819d243a76f18fc4131655
+      internalID: -1750494140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_A
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 1696
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d848305dcf4ba97438ac942184de7623
+      internalID: -1209376926
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_X
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 1696
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 69fbca482f7846746a580dd8c131d8e0
+      internalID: -594844914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_4
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 1528
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63c384b5a2c09204abf541dca98a63b9
+      internalID: -1837797444
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_5
+      rect:
+        serializedVersion: 2
+        x: 184
+        y: 1528
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f77ba3ac81b2a9428a5fb7238818a66
+      internalID: -1349216447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_6
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 1528
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1fe82125d54103048aa7a2d53f17cce7
+      internalID: 1506667483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_7
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 1528
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7fc790999724fab4dbe93730a54cda38
+      internalID: -1780845615
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_LB
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1364
+        width: 128
+        height: 84
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d67a7a594f6cf84409895c5bf6dab6e3
+      internalID: -1580522278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_RB
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 1364
+        width: 128
+        height: 84
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7feaccfa60fa70469614f6d3382723a
+      internalID: 1313854724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_LT
+      rect:
+        serializedVersion: 2
+        x: 351
+        y: 1352
+        width: 101
+        height: 120
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cbfab65e6372c1a44b1ae3fb53362980
+      internalID: 466209851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_RT
+      rect:
+        serializedVersion: 2
+        x: 516
+        y: 1352
+        width: 101
+        height: 120
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7f8dd39cf26b37428fa6fd149b36102
+      internalID: -162107943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_DP_Up
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 1177
+        width: 120
+        height: 121
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a30a6f765cf12f7488b4b4b42d246e18
+      internalID: -1105587019
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_DP_Down
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 1178
+        width: 120
+        height: 121
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1904bc33b861d12478c39ed1bfdb4bf7
+      internalID: -1793458562
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_DP_Left
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 1182
+        width: 118
+        height: 118
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 790c7143ae712884bb14249601762a20
+      internalID: -278767250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_DP_Right
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 1184
+        width: 118
+        height: 118
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aaec1cad7b84d6a40b043c4e22ffcd82
+      internalID: 1720413967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_16
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 1032
+        width: 80
+        height: 80
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7dc8c955c710dc4b8066e3f39e8d7bb
+      internalID: 405624181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_LStick_All
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 1008
+        width: 128
+        height: 128
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 22c86575deea9504f97910f1bd789c0b
+      internalID: -1032096449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_18
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 1032
+        width: 128
+        height: 80
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 445b13dbde0971e4fbe093a03d06c1ae
+      internalID: 1726746721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_19
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 1008
+        width: 80
+        height: 128
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f482967bf5851844097df00b9b89b22d
+      internalID: 339184437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_20
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 864
+        width: 80
+        height: 104
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 93db9285aadea2041afbefe6b63a431b
+      internalID: -221723055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_21
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 840
+        width: 80
+        height: 104
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6ea993cda7ce67441a8d6ceb69d7bfca
+      internalID: 764234551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_22
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 864
+        width: 104
+        height: 80
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9d6cb6c26188bb4c87abc9af05e1704
+      internalID: -833518408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_23
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 864
+        width: 104
+        height: 80
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4c26df89431bec45aa985b0ca26f4da
+      internalID: 744797293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_24
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 696
+        width: 80
+        height: 80
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57fa4ebaec1f75f48a890fd871ed9b29
+      internalID: -296169656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_RStick_All
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 672
+        width: 128
+        height: 128
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a37da78d414b7241b380d8001e9c831
+      internalID: 1741214816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_26
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 696
+        width: 128
+        height: 80
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7350c2cfbd9344348b91cc4c0e683743
+      internalID: 317030440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_27
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 672
+        width: 80
+        height: 128
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c064e6665e9dd3d46a888ac62fdbf35c
+      internalID: -46304939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_28
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 528
+        width: 80
+        height: 104
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bb7948be87b86b34cb497459dc0f1200
+      internalID: 1242238710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_29
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 504
+        width: 80
+        height: 104
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3d96909ec1c3a346bbbe8439123317e
+      internalID: 1871986902
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_30
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 528
+        width: 104
+        height: 80
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ea5c8d7e5446d6544a8770281e4184b7
+      internalID: -8745642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_31
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 528
+        width: 104
+        height: 80
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d6bdeec024bec264eb9e28acab71a959
+      internalID: 2007369735
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_DP
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 337
+        width: 120
+        height: 121
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae909fe5eb0ae2d4d89819302b580087
+      internalID: -1470718305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_DP_UpDown
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 339
+        width: 120
+        height: 121
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7e86b171819d99440a8662ce2fab4e28
+      internalID: -536755767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_DP_LeftRight
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 340
+        width: 121
+        height: 120
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 085fdd1ea3847034598aa9fd633e6dcd
+      internalID: -273807859
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_35
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 364
+        width: 112
+        height: 68
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d47be996b8c6f3c4b9536dc5f2848988
+      internalID: 644620738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_36
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 168
+        width: 128
+        height: 113
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00492fdc73755b943a8513ceb3c195c4
+      internalID: 252393459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_37
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 168
+        width: 128
+        height: 113
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3aef88f63941b7a4eaff4878dc08b966
+      internalID: -2062787281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_LStick_Press
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 168
+        width: 128
+        height: 113
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de2ac742da572874786c44ee07ff3df5
+      internalID: -1780179257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_RStick_Press
+      rect:
+        serializedVersion: 2
+        x: 504
+        y: 168
+        width: 128
+        height: 113
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15bda2d7724fc6244a5002c62c5583fa
+      internalID: -444956388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_40
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 16
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a3c47bff97ba924c972404e7f170ee9
+      internalID: -1578842903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_X_Sprite_41
+      rect:
+        serializedVersion: 2
+        x: 184
+        y: 16
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e0c88370df8ee0046a65a8c1e58baf7e
+      internalID: 1442804747
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: XBox_Y
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 1696
+        width: 96
+        height: 96
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 479542bf9aebd8943a55944c0585e6f9
+      internalID: -1128541934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 89be88864f2667241b5b68f60cf10d28
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      T_X_Sprite_16: 405624181
+      T_X_Sprite_18: 1726746721
+      T_X_Sprite_19: 339184437
+      T_X_Sprite_20: -221723055
+      T_X_Sprite_21: 764234551
+      T_X_Sprite_22: -833518408
+      T_X_Sprite_23: 744797293
+      T_X_Sprite_24: -296169656
+      T_X_Sprite_26: 317030440
+      T_X_Sprite_27: -46304939
+      T_X_Sprite_28: 1242238710
+      T_X_Sprite_29: 1871986902
+      T_X_Sprite_30: -8745642
+      T_X_Sprite_31: 2007369735
+      T_X_Sprite_35: 644620738
+      T_X_Sprite_36: 252393459
+      T_X_Sprite_37: -2062787281
+      T_X_Sprite_4: -1837797444
+      T_X_Sprite_40: -1578842903
+      T_X_Sprite_41: 1442804747
+      T_X_Sprite_5: -1349216447
+      T_X_Sprite_6: 1506667483
+      T_X_Sprite_7: -1780845615
+      XBox_A: -1209376926
+      XBox_B: -1750494140
+      XBox_DP: -1470718305
+      XBox_DP_Down: -1793458562
+      XBox_DP_Left: -278767250
+      XBox_DP_LeftRight: -273807859
+      XBox_DP_Right: 1720413967
+      XBox_DP_Up: -1105587019
+      XBox_DP_UpDown: -536755767
+      XBox_LB: -1580522278
+      XBox_LStick_Al: 1741214816
+      XBox_LStick_All: -1032096449
+      XBox_LStick_Press: -1780179257
+      XBox_LT: 466209851
+      XBox_RB: 1313854724
+      XBox_RStick_All: 1741214816
+      XBox_RStick_Press: -444956388
+      XBox_RT: -162107943
+      XBox_X: -594844914
+      XBox_Y: -1128541934
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

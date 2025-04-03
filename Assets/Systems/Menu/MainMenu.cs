@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -6,35 +7,52 @@ namespace Systems.Menu
 {
     public class MainMenu : MonoBehaviour
     {
-        // public PlayerInput playerInput;
+        [SerializeField] private PlayerInput playerInput;
+        [SerializeField] private PlayerManager playerManager;
+        [SerializeField] private GameObject settingsPanel;
 
-        void Start()
+
+        private void Start()
         {
-            // playerInput.SwitchCurrentActionMap("UI");
-            // Cursor.lockState = CursorLockMode.Confined;
+            settingsPanel.SetActive(false);
+            playerInput.actions["Player/Settings"].performed += OnSettingsAction;
+            playerInput.actions["UI/Settings"].performed += OnSettingsAction;
+
+            
         }
         
         // This method is called by the Play button
         public void PlayGame()
         {
-            // playerInput.SwitchCurrentActionMap("Player");
-            // Cursor.lockState = CursorLockMode.Locked;
+            // Change "GameScene" to the name of the scene you want to load.
             SceneManager.LoadScene("Main Scene");
-        }
-
-        public void ReturnToMainMenu()
-        {
-            SceneManager.LoadScene("Main Menu");
         }
 
         // This method is called by the Quit button
         public void QuitGame()
         {
+            // This will quit the game when built.
             Application.Quit();
 
+            // If you're testing in the editor, you can use the following line to stop play mode:
             #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
             #endif
+        }
+
+        private void OnSettingsAction(InputAction.CallbackContext context)
+        {
+            settingsPanel.SetActive(!settingsPanel.activeSelf);
+            if (settingsPanel.activeSelf)
+            {
+                playerInput.SwitchCurrentActionMap("UI");
+                Cursor.lockState = CursorLockMode.Confined;
+            }
+            else
+            {
+                playerInput.SwitchCurrentActionMap("Player");
+                Cursor.lockState = playerManager.targetCursorMode;
+            }
         }
     }
 }
