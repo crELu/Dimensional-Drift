@@ -60,6 +60,11 @@ namespace Enemies.AI
                 }
                 ecb.RemoveComponent<Yuumi>(entity);
             }
+            foreach (var (temp, entity) in SystemAPI.Query<RefRO<Yuumi>>().WithEntityAccess())
+            {
+                var enemy = temp.ValueRO.Attached;
+                if (!SystemAPI.Exists(enemy)) ecb.DestroyEntity(entity);
+            }
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
             

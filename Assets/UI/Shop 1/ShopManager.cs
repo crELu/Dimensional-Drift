@@ -97,7 +97,7 @@ public class ShopManager : MonoBehaviour
             {
                 var clone = Instantiate(augment);
                 clone.rarity = tier;
-                clone.baseCost *= 1+tier*2;
+                clone.baseCost *= 1+tier;
                 validItems.Add(clone);
             }
         }

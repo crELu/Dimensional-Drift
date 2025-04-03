@@ -13,6 +13,7 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
     public EntityCommandBuffer.ParallelWriter Ecb;
     public NativeParallelHashSet<Entity>.ParallelWriter DestroyedSetWriter;
     public NativeQueue<SfxCommand>.ParallelWriter AudioWriter;
+    public NativeQueue<OneShotData>.ParallelWriter VfxWriter;
     public void Execute(in FindPairsResult result) {
         ColliderDistanceResult r;
         if (Physics.DistanceBetween(
@@ -71,17 +72,16 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
                     playerProj.Health -= (int)math.ceil(10000f / ((1+playerProjStats.Stats.pierce)*(1+playerProjStats.Stats.power)));
                 }
                 
-                ComponentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW = enemyProj;
-                ComponentLookups.PlayerWeaponLookup.GetRW(pProj).ValueRW = playerProj;
-                
                 if (enemyProj.Mass <= 0)
                 {
-                    DestroyedSetWriter.Add(entityB);
+                    enemyProj.Mass = 0;
                 }
                 if (playerProj.Health <= 0)
                 {
                     DestroyedSetWriter.Add(pProj);
                 }
+                ComponentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW = enemyProj;
+                ComponentLookups.PlayerWeaponLookup.GetRW(pProj).ValueRW = playerProj;
             }
         }
     }

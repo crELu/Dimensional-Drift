@@ -122,7 +122,6 @@ public partial struct TrailUpdateSystem : ISystem
                     Ecb.RemoveComponent<TrailSystemData>(chunkIndex, entity);
                     Ecb.RemoveComponent<TrailTexture>(chunkIndex, entity);
                     NumDeletions.Enqueue(true);
-                    //VFXManager.main.UnregisterParticles(Texture.Name, Texture.Id, 1);
                     Position.TryAdd(i, Color.clear);
                 }
             }

@@ -518,6 +518,9 @@ public partial struct PhysicsSystem: ISystem {
         var destroyedSet = new NativeParallelHashSet<Entity>(physicsState.ValueRO.collisionLayer.colliderBodies.Length, Allocator.TempJob);
         var destroyedSetWriter = destroyedSet.AsParallelWriter();
         
+        var vfxReceiver = SystemAPI.GetSingleton<GraphicsReceiver>();
+        var vfxWriter = vfxReceiver.AudioCommands.AsParallelWriter();
+        
         var pairsProcessor = new PairsProcessor {
             ComponentLookups = componentLookups,
             Ecb = ecbWriter,
@@ -535,6 +538,7 @@ public partial struct PhysicsSystem: ISystem {
             Ecb = ecbWriter,
             DestroyedSetWriter = destroyedSetWriter,
             AudioWriter = soundWriter,
+            VfxWriter = vfxWriter,
         };
         var playerPairsProcessor = new PlayerPairs {
             ComponentLookups = componentLookups,
@@ -556,10 +560,10 @@ public partial struct PhysicsSystem: ISystem {
         // Temp intel vacuum
         
         
-        // dependency = Physics.FindPairs(
-        //         physicsState.ValueRO.PlayerInteractLayer,
-        //         physicsState.ValueRO.IntelLayer, playerInteractionsPairsProcessor)
-        //     .ScheduleParallel(dependency);
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerInteractLayer,
+                physicsState.ValueRO.IntelLayer, playerInteractionsPairsProcessor)
+            .ScheduleParallel(dependency);
         
         // Collide player enemy weapons
         dependency = Physics.FindPairs(

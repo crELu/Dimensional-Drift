@@ -20,6 +20,7 @@ namespace Enemies
         // public static AnimationCurve catFreqG, enemyCountG;
         // public static AnimationCurve catFreq, enemyCount;
         public List<WaveEnemy> enemies;
+        public List<Waves> waves;
         public int difficulty;
         public GameObject yuumi;
         public AnimationCurve starfishFreq;
@@ -30,6 +31,7 @@ namespace Enemies
                 Difficulty=difficulty,
                 CatPrefab = baker.ToEntity(yuumi),
                 StarfishFreq = starfishFreq,
+                Waves = waves,
             });
             var buffer = baker.AddBuffer<WaveEnemyData>(entity);
             for (int i = 0; i < enemies.Count; i++)
@@ -48,6 +50,7 @@ namespace Enemies
     {
         public int Difficulty;
         public int Wave;
+        public List<Waves> Waves;
         public float WaveTimer;
         public Entity CatPrefab;
         public AnimationCurve StarfishFreq;
@@ -90,9 +93,9 @@ namespace Enemies
         {
             public EntityCommandBuffer.ParallelWriter Ecb;
             [ReadOnly] public NativeArray<int> EntitiesToSpawn;
+            [ReadOnly] public NativeArray<bool> CatRate;
             public int Radius;
             public Entity YuumiPrefab;
-            public float CatRate;
             [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
             [ReadOnly] public ComponentLookup<EnemyStats> EnemyStats;
             [ReadOnly] public DynamicBuffer<WaveEnemyData> Enemies;
@@ -108,7 +111,7 @@ namespace Enemies
                 
                 var entity = Ecb.Instantiate(jobIndex, Enemies[i].Prefab);
 
-                if (random.NextFloat(0, 1) < CatRate) {
+                if (CatRate[jobIndex]) {
                     var stats = EnemyStats[Enemies[i].Prefab];
                     var catStats = EnemyStats[YuumiPrefab];
                     var cat = Ecb.Instantiate(jobIndex, YuumiPrefab);
@@ -147,28 +150,39 @@ namespace Enemies
                     PlayerManager.waveCount = wave.Wave;
                     PlayerManager.main.inventory.UpdateUI();
                     PlayerManager.main.StartNewWave(wave.Wave);
-                    var count = GetEnemyCount(wave.Wave, wave.Difficulty);
                     
+                    int count;
+                    if (wave.Wave > wave.Waves.Count)
+                    {
+                        count = GetEnemyCount(wave.Wave, wave.Difficulty);
+                    }
+                    else
+                    {
+                        count = wave.Waves[wave.Wave].Count;
+                    }
+                    var enemiesToSpawn = new NativeArray<int>(count, Allocator.TempJob);
+                    var catIndicator = new NativeArray<bool>(count, Allocator.TempJob);
                     wave.WaveTimer = GetWaveTimer(wave.Wave);
                     PlayerManager.maxWaveTimer = wave.WaveTimer;
-                    var enemiesToSpawn = new NativeArray<int>(count, Allocator.TempJob);
                     
                     var enemyPrefabs = SystemAPI.GetBuffer<WaveEnemyData>(e);
                     
-                    var random = _rng.GetSequence(0);
-                    float[] weights = new float[12];
-                    for (int i = 0; i < enemyPrefabs.Length; i++)
+                    if (wave.Wave > wave.Waves.Count)
                     {
-                        weights[i] = enemyPrefabs[i].Weight;
+                        GetRandomEnemies(enemyPrefabs, enemiesToSpawn, catIndicator, count, wave.StarfishFreq.Evaluate(wave.Wave - wave.Waves.Count));
                     }
-                    float totalWeight = 0;
-                    
-                    foreach (var t in weights)
-                        totalWeight += t;
-
-                    for (int i = 0; i < count; i++)
+                    else
                     {
-                        enemiesToSpawn[i] = MathsBurst.ChooseWeightedRandom(ref random, weights, totalWeight);
+                        var i = 0;
+                        foreach (var enemyType in wave.Waves[wave.Wave].enemies)
+                        {
+                            for (int j = 0; j < enemyType.count; j++)
+                            {
+                                enemiesToSpawn[i] = (int)enemyType.type;
+                                catIndicator[i] = enemyType.cat;
+                                i++;
+                            }
+                        }
                     }
 
                     var ecb = GetEntityCommandBuffer(ref state);
@@ -178,7 +192,7 @@ namespace Enemies
                         Enemies = enemyPrefabs,
                         EntitiesToSpawn = enemiesToSpawn,
                         YuumiPrefab = wave.CatPrefab,
-                        CatRate = wave.StarfishFreq.Evaluate(wave.Wave),
+                        CatRate = catIndicator,
                         LocalTransformLookup = _localTransformLookup,
                         EnemyStats = _enemyStatsLookup,
                         Radius = 1000,
@@ -187,9 +201,28 @@ namespace Enemies
 
                     state.Dependency = job.Schedule(enemiesToSpawn.Length, 16, state.Dependency);
                     state.Dependency = enemiesToSpawn.Dispose(state.Dependency);
+                    state.Dependency = catIndicator.Dispose(state.Dependency);
                 }
                 
                 state.EntityManager.AddComponentData(e, wave);
+            }
+        }
+
+        private void GetRandomEnemies(DynamicBuffer<WaveEnemyData> enemyPrefabs, NativeArray<int> enemiesToSpawn, NativeArray<bool> cat, int count, float catRate)
+        {
+            var random = _rng.GetSequence(0);
+            float[] weights = new float[12];
+            for (int i = 0; i < enemyPrefabs.Length; i++)
+            {
+                weights[i] = enemyPrefabs[i].Weight;
+            }
+            float totalWeight = 0;
+            foreach (var t in weights)
+                totalWeight += t;
+            for (int i = 0; i < count; i++)
+            {
+                enemiesToSpawn[i] = MathsBurst.ChooseWeightedRandom(ref random, weights, totalWeight);
+                cat[i] = random.NextFloat(0, 1) < catRate;
             }
         }
         private int GetEnemyCount(int wave, int difficulty)

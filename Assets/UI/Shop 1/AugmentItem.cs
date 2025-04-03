@@ -14,6 +14,7 @@ public class AugmentItem : Item
     public override Sprite Icon => icon;
     public override void DoAction()
     {
+        PlayerStats.main.augments.Add(icon);
         switch (target)
         {
             case ShopAugmentTarget.Character:

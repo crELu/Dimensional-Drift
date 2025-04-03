@@ -228,9 +228,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 416c8eeb473a4a7197b0b5f77bcca924, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 400
+  health: 500
   size: 20
-  intel: {fileID: 1231305184969748935, guid: cb4a7fa663eefdd4a82550cec515e921, type: 3}
+  intel: {fileID: 6554463660852499394, guid: 8539499b98d0959408ef1aa1ded39a5f, type: 3}
   linearPid:
     kp: 4
     ki: 0.1
