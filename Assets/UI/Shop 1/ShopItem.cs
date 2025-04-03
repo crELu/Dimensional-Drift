@@ -48,13 +48,13 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointe
         Unselect();
     }
 
-    private void Select()
+    public void Select()
     {
         string rarityText = data.rarity == 0 ? "I" : data.rarity == 1 ? "II" : "III";
         shopManager.DisplayText(data.Description, $"{data.itemTitle} {rarityText}", data.baseCost);
     }
 
-    private void Unselect()
+    public void Unselect()
     {
         shopManager.ClearText();
     }
@@ -69,11 +69,22 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointe
         rarity.sprite = manager.rarities[data.rarity];
     }
 
-    private void OnPurchaseClicked()
+    public void OnPurchaseClicked()
     {
         if (playerInventory.SpendIntel(data.baseCost))
         {
             data.DoAction();
+            
+            // Get parent index before disabling
+            int slotIndex = transform.parent.GetSiblingIndex();
+            
+            // Disable the parent gameObject
+            transform.parent.gameObject.SetActive(false);
+            
+            // Notify ShopManager to update selection
+            shopManager.HandleItemPurchased(slotIndex);
+            
+            // Now we can destroy the item
             Destroy(gameObject);
         }
     }

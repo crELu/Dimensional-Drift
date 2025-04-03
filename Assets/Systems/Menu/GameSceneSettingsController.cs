@@ -1,13 +1,18 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-
+using System.Collections;
+using UnityEngine.EventSystems;
 
 public class GameSceneSettingsController : MonoBehaviour
 {
     public GameObject settingsPanel;
     private float previousTimeScale = 1f;
     public PlayerInput playerInput;
+
+    // public GameObject firstShopSelectable;
+    public GameObject firstSettingsSelectable;
+    public GameObject deathScreenReplayButton;
 
     private void Start()
     {
@@ -31,6 +36,9 @@ public class GameSceneSettingsController : MonoBehaviour
             Cursor.lockState = CursorLockMode.Confined;
             previousTimeScale = Time.timeScale;
             Time.timeScale = 0f;
+
+            SettingsUIController settingsUI = settingsPanel.GetComponentInChildren<SettingsUIController>();
+            StartCoroutine(SelectUIWithDelay(settingsUI.volumeSlider.gameObject));
         }
         else // Closing settings
         {
@@ -45,6 +53,18 @@ public class GameSceneSettingsController : MonoBehaviour
                 PlayerInputs.main.RebindActions();
             }
         }
+    }
+
+    private IEnumerator SelectUIWithDelay(GameObject selectableObject)
+    {
+        // Wait for UI to be fully initialized
+        yield return new WaitForEndOfFrame();
+        
+        // Select the UI element
+        EventSystem.current.SetSelectedGameObject(null);
+        yield return null;
+        EventSystem.current.SetSelectedGameObject(selectableObject);
+        Debug.Log($"Selected: {selectableObject.name}");
     }
     
     public void PlayMenu()

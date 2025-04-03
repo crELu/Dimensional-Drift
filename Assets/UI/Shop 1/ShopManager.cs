@@ -56,22 +56,56 @@ public class ShopManager : MonoBehaviour
 
     private void InitializeShopItems()
     {
+        // Clear existing items
         foreach (Transform child in shopSlots) if (child.childCount != 0) Destroy(child.GetChild(0).gameObject);
-
+        
         for (int i = 0; i < availableItems.Count; i++)
         {
             var item = availableItems[i];
             var cont = shopSlots[i];
             ShopItem itemGo = Instantiate(shopItemPrefab, cont);
             itemGo.Initialize(item, this);
+            
+            // Setup button components
+            Button parentButton = cont.GetComponent<Button>();
+            parentButton.onClick.AddListener(itemGo.OnPurchaseClicked);
+            
+            // Add EventTrigger if it doesn't exist
+            EventTrigger eventTrigger = cont.GetComponent<EventTrigger>();
+            if (eventTrigger == null)
+                eventTrigger = cont.gameObject.AddComponent<EventTrigger>();
+            
+            // Clear existing entries
+            eventTrigger.triggers.Clear();
+            
+            // Create Select entry
+            EventTrigger.Entry selectEntry = new EventTrigger.Entry();
+            selectEntry.eventID = EventTriggerType.Select;
+            selectEntry.callback.AddListener((data) => { itemGo.Select(); });
+            eventTrigger.triggers.Add(selectEntry);
+            
+            // Create Deselect entry
+            EventTrigger.Entry deselectEntry = new EventTrigger.Entry();
+            deselectEntry.eventID = EventTriggerType.Deselect;
+            deselectEntry.callback.AddListener((data) => { itemGo.Unselect(); });
+            eventTrigger.triggers.Add(deselectEntry);
+
+            // Create Submit entry for purchase action
+            EventTrigger.Entry submitEntry = new EventTrigger.Entry();
+            submitEntry.eventID = EventTriggerType.Submit;
+            submitEntry.callback.AddListener((data) => { itemGo.OnPurchaseClicked(); });
+            eventTrigger.triggers.Add(submitEntry);
         }
-        
-        // if (shopItemsContainer.childCount > 0)
-        //     firstShopSelectable = shopItemsContainer.GetChild(0).GetComponent<Selectable>();
     }
 
     public void RefreshShop()
     {
+        // Re-enable all shop slots first
+        foreach (var slot in shopSlots)
+        {
+            slot.gameObject.SetActive(true);
+        }
+
         List<Item> validItems = new();
         foreach (var augment in augmentPool)
         {
@@ -126,7 +160,7 @@ public class ShopManager : MonoBehaviour
             Time.timeScale = 0f;
             PlayerInputs.main.playerInput.SwitchCurrentActionMap("UI");
             Cursor.lockState = CursorLockMode.Confined;
-            //EventSystem.current.SetSelectedGameObject(firstShopSelectable.gameObject);
+            EventSystem.current.SetSelectedGameObject(firstShopSelectable.gameObject);
             SwitchToPage(true);
             playerInventory.UpdateUI();
         }
@@ -135,6 +169,7 @@ public class ShopManager : MonoBehaviour
             Time.timeScale = 1f;
             Cursor.lockState = playerManager.targetCursorMode;
             PlayerInputs.main.playerInput.SwitchCurrentActionMap("Player");
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
 
@@ -157,5 +192,23 @@ public class ShopManager : MonoBehaviour
         infoTitle.text = "";
         infoDescription.text = "";
         infoCost.text = "";
+    }
+
+    // Add this method to handle post-purchase selection
+    public void HandleItemPurchased(int purchasedIndex)
+    {
+        // Find first active shop slot and select it
+        foreach (var slot in shopSlots)
+        {
+            if (slot.gameObject.activeSelf && slot.childCount > 0)
+            {
+                EventSystem.current.SetSelectedGameObject(slot.gameObject);
+                return;
+            }
+        }
+        
+        // If no slots are active, select the refresh button
+        if (firstShopSelectable != null)
+            EventSystem.current.SetSelectedGameObject(firstShopSelectable.gameObject);
     }
 }
