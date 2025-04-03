@@ -439,10 +439,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   projectile: {fileID: 2006387325404477191, guid: 5bfd51b5dd37e7b4eb150485f0bfd2ee, type: 3}
-  range: 50
+  range: 80
   speed: 50
   visionCone: {x: 0, y: 45}
-  cd: 4
+  cd: 2
   bursts: 1
   burstLength: 0.5
 --- !u!1 &6291649056924822601

@@ -158,7 +158,7 @@ namespace Enemies
                     }
                     else
                     {
-                        count = wave.Waves[wave.Wave].Count;
+                        count = wave.Waves[wave.Wave-1].Count;
                     }
                     var enemiesToSpawn = new NativeArray<int>(count, Allocator.TempJob);
                     var catIndicator = new NativeArray<bool>(count, Allocator.TempJob);
@@ -174,7 +174,7 @@ namespace Enemies
                     else
                     {
                         var i = 0;
-                        foreach (var enemyType in wave.Waves[wave.Wave].enemies)
+                        foreach (var enemyType in wave.Waves[wave.Wave-1].enemies)
                         {
                             for (int j = 0; j < enemyType.count; j++)
                             {

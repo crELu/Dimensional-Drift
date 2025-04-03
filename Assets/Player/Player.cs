@@ -85,9 +85,10 @@ public class PlayerManager : MonoBehaviour
     private bool _isScanning;
     public float ScanRadius { get; private set; }
     public int ScanState { get; private set; }
-
+    private float _startTime;
     void Awake() {
         main = this;
+        _startTime = Time.time;
     }
     
     void Start()
@@ -100,8 +101,16 @@ public class PlayerManager : MonoBehaviour
     
     public void AddAugment(Augment augment, int tier)
     {
-        if (augment.Target != AugmentType.Character) Debug.LogError($"Wrong augment type {augment.Target} for player.");
-        if (tier < 0 || tier > 2) Debug.LogError($"Invalid augment tier {tier}.");
+        if (augment.Target != AugmentType.Character)
+        {
+            Debug.LogError($"Wrong augment type {augment.Target} for player.");
+            return;
+        }
+        if (tier < 0 || tier > 2)
+        {
+            Debug.LogError($"Invalid augment tier {tier}.");
+            return;
+        }
 
         if (augment is CharacterAugment coreAug)
         {
@@ -109,9 +118,16 @@ public class PlayerManager : MonoBehaviour
             if (tier == 0)
             {
                 if (augments.Exists(nameChecker))
+                {
                     Debug.LogError($"Tried to add T1 augment {augment.Id} for player, but it already exists.");
-                else if (augments.Count >= 3)
+                    return;
+                }
+                if (augments.Count >= 3)
+                {
                     Debug.LogError($"Tried to add T1 augment {augment.Id} for player, but there are already 3.");
+                    
+                }
+                    
                 var clone = Instantiate(coreAug);
                 clone.Stacks = 1;
                 augments.Add(clone);
@@ -119,13 +135,19 @@ public class PlayerManager : MonoBehaviour
             else if (tier == 1)
             {
                 if (!augments.Exists(e => nameChecker(e) && e.Stacks == 1))
+                {
                     Debug.LogError($"Tried to add T2 augment {augment.Id} for player, but no T1 exists.");
+                    return;
+                }
                 augments.Find(nameChecker).Stacks++;
             }
             else if (tier == 2)
             {
                 if (!augments.Exists(e => nameChecker(e) && e.Stacks == 2))
+                {
                     Debug.LogError($"Tried to add T3 augment {augment.Id} for player, but no T2 exists.");
+                    return;
+                }
                 augments.Find(nameChecker).Stacks++;
             }
         }
@@ -265,18 +287,12 @@ public class PlayerManager : MonoBehaviour
         health = Mathf.Min(MaxHealth, health);
         shield += ShieldRegen * Time.deltaTime;
         shield = Mathf.Min(MaxShield, shield);
-        sd.sizeDelta = new Vector2(shield / MaxShield * 1024, 32);
-        hp.sizeDelta = new Vector2(health / MaxHealth * 1024, 64);
+        sd.sizeDelta = new Vector2(shield / MaxShield * 850, 32);
+        hp.sizeDelta = new Vector2(health / MaxHealth * 1112, 64);
         if (health <= 0)
         {
-            GameObject deathMessageObject = GameObject.Find("Death Message");
-            if (deathMessageObject != null)
-            {
-                TextMeshProUGUI deathMessage =
-                    deathMessageObject.GetComponent<TextMeshProUGUI>();
-
-                deathMessage.SetText("You Died!");
-            }
+            Time.timeScale = 0;
+            PlayerStats.main.UpdateUI(waveCount, Time.time - _startTime);
         }
     }
 

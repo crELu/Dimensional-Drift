@@ -107,6 +107,7 @@ public partial struct GunSystem : ISystem
                 if (enemyProj.Mass != -1)
                 {
                     enemyProj.Mass = 0;
+                    ecb.SetComponent(result.entity, enemyProj);
                 }
             }
             ecb.RemoveComponent<GunExplosion>(entity);

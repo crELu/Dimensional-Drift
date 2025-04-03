@@ -96,7 +96,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         // Debug.Log("rotate speed: " + rotateSpeed);
-        SettingsManager.Instance.SetBaseMouseSensitivity(rotateSpeed);
+        
 
         _anim = GetComponent<Animator>();
         _camera = Camera.main;
@@ -113,12 +113,13 @@ public class PlayerMovement : MonoBehaviour
         _perspective = Matrix4x4.Perspective(fov, _aspect, near, far);
         Camera.main.projectionMatrix = _perspective;
         SwitchDims();
+        SettingsManager.Instance.SetBaseMouseSensitivity(rotateSpeed);
     }
     
     void Update()
     {
         DoRotation();
-        
+        if (!_camera) _camera = Camera.main;
         boostImage.material.SetFloat(T, _boost/100);
         boostImage.material.SetFloat(T2, _boostUse/100);
         _boostUse -= Time.deltaTime * 40;

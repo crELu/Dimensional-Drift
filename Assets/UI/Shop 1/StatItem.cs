@@ -10,7 +10,6 @@ public class StatItem : Item
     public override Sprite Icon => icon;
     public override void DoAction()
     {
-        PlayerStats.main.augments.Add(icon);
         PlayerManager.main.AddStats(stats);
     }
 }

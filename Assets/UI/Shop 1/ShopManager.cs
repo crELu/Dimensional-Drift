@@ -28,7 +28,6 @@ public class ShopManager : MonoBehaviour
     [SerializeField] public List<Sprite> rarities = new();
     
     [Header("UI Navigation")]
-    [SerializeField] private PlayerInput playerInput;
     [SerializeField] private Selectable firstShopSelectable;
 
     // private bool isShopActive = true;
@@ -36,18 +35,18 @@ public class ShopManager : MonoBehaviour
     private void Start()
     {
         shopInvParentPanel.SetActive(false);
-        playerInput.actions["Player/Shop"].performed += OnShopAction;
-        playerInput.actions["UI/Shop"].performed += OnShopAction;
+        PlayerInputs.main.playerInput.actions["Player/Shop"].performed += OnShopAction;
+        PlayerInputs.main.playerInput.actions["UI/Shop"].performed += OnShopAction;
         RefreshShop();
-        playerInput.SwitchCurrentActionMap("Player");
+        PlayerInputs.main.playerInput.SwitchCurrentActionMap("Player");
         // if (availableItems.Count > 0)
         //     EventSystem.current.SetSelectedGameObject(availableItems[0].gameObject);
     }
 
     private void OnDestroy()
     {
-        playerInput.actions["Player/Shop"].performed -= OnShopAction;
-        playerInput.actions["UI/Shop"].performed -= OnShopAction;
+        PlayerInputs.main.playerInput.actions["Player/Shop"].performed -= OnShopAction;
+        PlayerInputs.main.playerInput.actions["UI/Shop"].performed -= OnShopAction;
     }
 
     private void OnShopAction(InputAction.CallbackContext context)
@@ -125,7 +124,7 @@ public class ShopManager : MonoBehaviour
         if (newState)
         {
             Time.timeScale = 0f;
-            playerInput.SwitchCurrentActionMap("UI");
+            PlayerInputs.main.playerInput.SwitchCurrentActionMap("UI");
             Cursor.lockState = CursorLockMode.Confined;
             //EventSystem.current.SetSelectedGameObject(firstShopSelectable.gameObject);
             SwitchToPage(true);
@@ -135,7 +134,7 @@ public class ShopManager : MonoBehaviour
         {
             Time.timeScale = 1f;
             Cursor.lockState = playerManager.targetCursorMode;
-            playerInput.SwitchCurrentActionMap("Player");
+            PlayerInputs.main.playerInput.SwitchCurrentActionMap("Player");
         }
     }
 

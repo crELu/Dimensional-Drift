@@ -7,7 +7,7 @@ public class CameraManager : MonoBehaviour
     public Transform board;
     public Transform lookTarget;
     private Vector3 _offset;
-    public Vector3 offsetMult = new Vector3(0, 2, -5);
+    public AnimationCurve offsetX, offsetY, offsetZ;
     public float smoothAccel, smoothVel, rollSpeed, rollModifier;
     private Vector3 _velocity, _accel;
     private Vector3 smoothTarget;
@@ -30,6 +30,7 @@ public class CameraManager : MonoBehaviour
     {
     }
 
+    private Vector3 pastLocal;
     // Update is called once per frame
     void LateUpdate()
     {
@@ -41,18 +42,22 @@ public class CameraManager : MonoBehaviour
             var tRoll = v.x * 65;
             _roll = Mathf.Lerp(_roll, tRoll, Time.deltaTime * rollSpeed);
             board.localRotation = Quaternion.Euler(0, 0, _roll + extraRoll);
-            var disp = Vector3.Scale(v, offsetMult) * (v.z+1)/2;
-            targetPosition = PlayerManager.main.transform.position + PlayerManager.main.transform.TransformDirection(_offset + disp);
+            Vector3 scale = new Vector3(offsetX.Evaluate(v.x), offsetY.Evaluate(v.y), offsetZ.Evaluate(v.z));
+            var disp = Vector3.Scale(v, scale) * (v.z+1)/2;
+            targetPosition = _offset + disp;
         }
         else
         {
             board.localRotation = Quaternion.Euler(0, 0, 0);
-            targetPosition = PlayerManager.main.transform.position + PlayerManager.main.transform.TransformDirection(_offset);
+            targetPosition = _offset;
         }
 
         var a = isDashing ? rollModifier : 1;
-        smoothTarget = Vector3.Slerp(smoothTarget, targetPosition, smoothAccel * a * Time.deltaTime);
-        transform.position = Vector3.Slerp(transform.position, smoothTarget, smoothVel * a * Time.deltaTime);
+        pastLocal = Vector3.Slerp(pastLocal, targetPosition, smoothAccel * a * Time.deltaTime);
+        
+        var targ = PlayerManager.main.transform.TransformPoint(pastLocal);
+        transform.position = Vector3.Slerp(transform.position, targ, smoothVel * a * Time.deltaTime);
+        
         var lookTarg = Vector3.Slerp(lookTarget.position, PlayerManager.Position, DimensionManager.normT);
         transform.LookAt(lookTarg, DimensionManager.Dim3 ? Vector3.up : Up2d);
         var screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);

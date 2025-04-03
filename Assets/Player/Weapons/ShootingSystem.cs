@@ -106,6 +106,7 @@ public partial struct PlayerShootingSystem : ISystem
         
         var deltaTime = SystemAPI.Time.DeltaTime;
         var bullets = PlayerManager.Bullets;
+        Debug.Log(bullets.Count);
         EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
 
         Entity player = SystemAPI.GetSingletonEntity<PlayerAspect>();
@@ -136,7 +137,7 @@ public partial struct PlayerShootingSystem : ISystem
             
             //var prefab = projectiles.ElementAt((int)attack.projectile).Projectile;
 
-            while (bulletQueue.Count > 0 && SystemAPI.Time.ElapsedTime > bulletQueue.Peek().time)
+            while (bulletQueue.Count > 0 && Time.time > bulletQueue.Peek().time)
             {
                 var bulletData = bulletQueue.Dequeue();
                 var prefab = _projectiles[(int)attack.Projectile];

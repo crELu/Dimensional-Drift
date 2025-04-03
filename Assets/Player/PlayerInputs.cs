@@ -29,9 +29,16 @@ public class PlayerInputs: MonoBehaviour
 
     private void Awake()
     {
-        main = this;
-        DontDestroyOnLoad(this);
-        RebindActions();
+        if (main == null)
+        {
+            main = this;
+            DontDestroyOnLoad(this);
+            RebindActions();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void RebindActions()

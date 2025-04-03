@@ -125,9 +125,17 @@ public class PlayerWeapon : MonoBehaviour
             if (tier == 0)
             {
                 if (CoreAugments.Exists(nameChecker))
-                    Debug.LogError($"Tried to add T1 augment {augment.Id} for weaponType {weaponType}, but it already exists.");
-                else if (CoreAugments.Count >= 3)
-                    Debug.LogError($"Tried to add T1 augment {augment.Id} for weaponType {weaponType}, but there are already 3.");
+                {
+                    Debug.LogError(
+                        $"Tried to add T1 augment {augment.Id} for weaponType {weaponType}, but it already exists.");
+                    return;
+                }
+                if (CoreAugments.Count >= 3)
+                {
+                    Debug.LogError(
+                        $"Tried to add T1 augment {augment.Id} for weaponType {weaponType}, but there are already 3.");
+                    
+                }
                 var clone = Instantiate(coreAug);
                 clone.Stacks = 1;
                 CoreAugments.Add(clone);
@@ -135,13 +143,21 @@ public class PlayerWeapon : MonoBehaviour
             else if (tier == 1)
             {
                 if (!CoreAugments.Exists(e => nameChecker(e) && e.Stacks == 1))
-                    Debug.LogError($"Tried to add T2 augment {augment.Id} for weaponType {weaponType}, but no T1 exists.");
+                {
+                    Debug.LogError(
+                        $"Tried to add T2 augment {augment.Id} for weaponType {weaponType}, but no T1 exists.");
+                    return;
+                }
                 CoreAugments.Find(nameChecker).Stacks++;
             }
             else if (tier == 2)
             {
                 if (!CoreAugments.Exists(e => nameChecker(e) && e.Stacks == 2))
-                    Debug.LogError($"Tried to add T3 augment {augment.Id} for weaponType {weaponType}, but no T2 exists.");
+                {
+                    Debug.LogError(
+                        $"Tried to add T3 augment {augment.Id} for weaponType {weaponType}, but no T2 exists.");
+                    return;
+                }
                 CoreAugments.Find(nameChecker).Stacks++;
             }
         }

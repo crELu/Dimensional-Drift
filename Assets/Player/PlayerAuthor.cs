@@ -10,6 +10,7 @@ using Unity.Physics.Extensions;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms;
 using Collider = Latios.Psyshock.Collider;
 using Random = UnityEngine.Random;
@@ -80,10 +81,20 @@ public partial struct PlayerPhysicsSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
+        SceneManager.sceneUnloaded += BigBomb;
+    }
+
+    private void BigBomb(Scene unloaded)
+    {
+        if (unloaded.name != "Main Scene")
+            return;
+        World.DisposeAllWorlds();
+        DefaultWorldInitialization.Initialize("Default World", false);
     }
 
     public void OnDestroy(ref SystemState state)
     {
+        
     }
 
     public void OnUpdate(ref SystemState state)

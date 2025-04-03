@@ -20,7 +20,13 @@ public class PlayerInventory : MonoBehaviour
         // Placeholder for default weapon initialization
     }
 
-    public void AddIntel(float amount) { Intel += amount; UpdateUI(); }
+    public void AddIntel(float amount)
+    {
+        Intel += amount;
+        PlayerStats.main.intelGained += amount;
+        UpdateUI(); 
+        
+    }
     public bool SpendIntel(float amount)
     {
         if (Intel >= amount)

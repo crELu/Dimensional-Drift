@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 
 public class GameSceneSettingsController : MonoBehaviour
@@ -44,5 +45,10 @@ public class GameSceneSettingsController : MonoBehaviour
                 PlayerInputs.main.RebindActions();
             }
         }
+    }
+    
+    public void PlayMenu()
+    {
+        SceneManager.LoadScene("Main Menu");
     }
 }

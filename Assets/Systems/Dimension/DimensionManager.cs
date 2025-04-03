@@ -35,7 +35,7 @@ public class DimensionManager : MonoBehaviour
     
     void Update()
     {
-        _dimSwitchAction.performed += _ => SwitchDimension();
+        if (_dimSwitchAction.triggered) SwitchDimension();
     }
 
     void SwitchDimension()

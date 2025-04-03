@@ -19,6 +19,6 @@ MonoBehaviour:
   type: 2
   target: 1
   icon: {fileID: 21300000, guid: eb95ba56a1fe35a4fbdeaa5fa4843d23, type: 3}
-  textT1: 
-  textT2: 
-  textT3: 
+  textT1: +50% DMG, +20% Ammo Comsumption.
+  textT2: +100% DMG, +30% Ammo Comsumption.
+  textT3: +150% DMG, +40% Ammo Comsumption.

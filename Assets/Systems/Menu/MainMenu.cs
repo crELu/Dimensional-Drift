@@ -7,14 +7,12 @@ namespace Systems.Menu
 {
     public class MainMenu : MonoBehaviour
     {
-
-        public PlayerInput playerInput;
         public GameObject settingsPanel;
 
 
         private void Start()
         {
-            playerInput.SwitchCurrentActionMap("UI");
+            PlayerInputs.main.playerInput.SwitchCurrentActionMap("UI");
             Cursor.lockState = CursorLockMode.Confined;
             settingsPanel.SetActive(false);
         }
@@ -23,6 +21,7 @@ namespace Systems.Menu
         public void PlayGame()
         {
             SceneManager.LoadScene("Main Scene");
+            Time.timeScale = 1;
         }
 
         // This method is called by the Quit button

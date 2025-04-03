@@ -14,14 +14,18 @@ public class AugmentItem : Item
     public override Sprite Icon => icon;
     public override void DoAction()
     {
-        PlayerStats.main.augments.Add(icon);
+        
         switch (target)
         {
             case ShopAugmentTarget.Character:
                 PlayerManager.main.AddAugment(augment, rarity);
+                PlayerStats.main.carAug.Add(icon);
                 break;
             default:
                 PlayerManager.main.weapons[(int)target].AddAugment(augment, rarity);
+                if (target == ShopAugmentTarget.Weapon1) PlayerStats.main.gunAug.Add(icon);
+                if (target == ShopAugmentTarget.Weapon2) PlayerStats.main.lasAug.Add(icon);
+                if (target == ShopAugmentTarget.Weapon3) PlayerStats.main.canAug.Add(icon);
                 break;
         }
     }
