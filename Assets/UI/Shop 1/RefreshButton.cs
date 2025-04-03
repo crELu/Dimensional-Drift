@@ -33,7 +33,7 @@ public class RefreshButton : MonoBehaviour, ISelectHandler, IDeselectHandler, IP
 
     private void Select()
     {
-        shopManager.DisplayText("", $"", cost);
+        shopManager.DisplayText("Refreshes the augment selection.", $"Refresh Shop", cost);
     }
 
     private void Unselect()
