@@ -3,6 +3,9 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using Systems.Menu;
+using UnityEngine.EventSystems;
+using System.Collections;
 
 public class SettingsUIController : MonoBehaviour
 {
@@ -48,6 +51,9 @@ public class SettingsUIController : MonoBehaviour
         applyButton.onClick.AddListener(ApplySettings);
         closeButton.onClick.AddListener(CloseSettings);
         applyButton.interactable = false;
+
+        // Add this to Start() method after initializing UI
+        StartCoroutine(SelectFirstUIElement());
     }
 
     private void InitializeUI()
@@ -111,6 +117,7 @@ public class SettingsUIController : MonoBehaviour
     private void ApplySettings()
     {
         SettingsManager.Instance.ApplySettings();
+        EventSystem.current.SetSelectedGameObject(closeButton.gameObject);
         applyButton.interactable = false;
     }
 
@@ -137,9 +144,22 @@ public class SettingsUIController : MonoBehaviour
             
             // Re-bind actions after switching maps
             PlayerInputs.main.RebindActions();
-        }
+        } else {
+            GameObject mainMenu = GameObject.FindWithTag("MainMenu");
+            MainMenu mainMenuScript = mainMenu.GetComponent<MainMenu>();
+            mainMenuScript.CloseSettings();
+        }  
         
         // Just deactivate the panel
         gameObject.SetActive(false);
+    }
+
+    private IEnumerator SelectFirstUIElement()
+    {
+        yield return null;
+        EventSystem.current.SetSelectedGameObject(null);
+        yield return null;
+        EventSystem.current.SetSelectedGameObject(volumeSlider.gameObject);
+        Debug.Log($"Settings UI initialized, selected: {volumeSlider.name}");
     }
 }

@@ -52,9 +52,6 @@ public class SettingsManager : MonoBehaviour
         }
         
         SaveSettings();
-        Debug.Log("Settings applied");
-        Debug.Log("rotate speed: " + PlayerManager.main.movement.rotateSpeed);
-        Debug.Log("base sensitivity: " + baseMouseSensitivity);
     }
 
     public void SaveSettings()

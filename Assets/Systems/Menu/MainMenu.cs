@@ -2,19 +2,23 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System;
-
+using UnityEngine.EventSystems;
+using System.Collections;
 namespace Systems.Menu
 {
     public class MainMenu : MonoBehaviour
     {
+        
         public GameObject settingsPanel;
+        public GameObject firstSelectable;
 
 
         private void Start()
         {
-            PlayerInputs.main.playerInput.SwitchCurrentActionMap("UI");
             Cursor.lockState = CursorLockMode.Confined;
+            PlayerInputs.main.playerInput.SwitchCurrentActionMap("UI");
             settingsPanel.SetActive(false);
+            EventSystem.current.SetSelectedGameObject(firstSelectable);
         }
         
         // This method is called by the Play button
@@ -41,6 +45,29 @@ namespace Systems.Menu
         {
             // Debug.Log("OpenSettings");
             settingsPanel.SetActive(true);
+            
+            // Get the SettingsUIController
+            SettingsUIController settingsUI = settingsPanel.GetComponentInChildren<SettingsUIController>();
+            
+            // Set the first selectable UI element with a delay to ensure UI is initialized
+            StartCoroutine(SelectUIWithDelay(settingsUI.volumeSlider.gameObject));
+        }
+
+        private IEnumerator SelectUIWithDelay(GameObject selectableObject)
+        {
+            // Wait for UI to be fully initialized
+            yield return new WaitForEndOfFrame();
+            
+            // Select the UI element
+            EventSystem.current.SetSelectedGameObject(null);
+            yield return null;
+            EventSystem.current.SetSelectedGameObject(selectableObject);
+            Debug.Log($"Selected: {selectableObject.name}");
+        }
+
+        public void CloseSettings() {
+            EventSystem.current.SetSelectedGameObject(firstSelectable);
+            Debug.Log($"Selected: {firstSelectable.name}");
         }
     }
 }
