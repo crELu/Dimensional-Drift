@@ -2011,6 +2011,78 @@ MonoBehaviour:
   capacity: 12
   texSize: 32
   effectPrefab: {fileID: 72309740819474193, guid: 525ae27e9e1da0e4f9e9e2059035fd05, type: 3}
+--- !u!1 &142437661
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 142437662}
+  - component: {fileID: 142437664}
+  - component: {fileID: 142437663}
+  m_Layer: 5
+  m_Name: HitEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &142437662
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142437661}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628576426}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1920, y: 1080}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &142437663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142437661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 2100000, guid: 76328200d7a141240b5b7dc03e2869ef, type: 2}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 2800000, guid: df43c04cdfd9d92459d240f05bc65b4d, type: 3}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &142437664
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142437661}
+  m_CullTransparentMesh: 1
 --- !u!1 &142772559
 GameObject:
   m_ObjectHideFlags: 0
@@ -12813,6 +12885,33 @@ MonoBehaviour:
   <Ammo>k__BackingField: 50
   ammoText: {fileID: 921422260}
   waveImage: {fileID: 1946974684}
+  hitEffect: {fileID: 142437663}
+  shieldColor: {r: 0.4433962, g: 0.4433962, b: 0.4433962, a: 0.4745098}
+  healthColor: {r: 0.5566038, g: 0.18970497, b: 0, a: 0.6745098}
+  hitCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   velocityText: {fileID: 1810764401}
   velocity: 0
   currentWeapon: 0
@@ -15714,6 +15813,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a39a15777d2537d42b88dfaf331feeb9, type: 2}
   - {fileID: 11400000, guid: 2e4f9bafe16465145bd7902563807a89, type: 2}
   - {fileID: 11400000, guid: 16f166cf68a5c2042b9accd229b6f023, type: 2}
+  - {fileID: 11400000, guid: de5193a264dbcd642bfec8f31eb8cb6a, type: 2}
+  - {fileID: 11400000, guid: 58584553fd301714fa18a6b90d885c54, type: 2}
+  - {fileID: 11400000, guid: de5193a264dbcd642bfec8f31eb8cb6a, type: 2}
   availableItems:
   - {fileID: 11400000, guid: 2073b492a761c6e43b9d0c0599481f06, type: 2}
   - {fileID: 11400000, guid: b6185ed25307d694ba8b474e13708f31, type: 2}
@@ -16368,6 +16470,7 @@ RectTransform:
   m_Children:
   - {fileID: 618626617}
   - {fileID: 1824293363}
+  - {fileID: 142437662}
   - {fileID: 1747465258}
   - {fileID: 2004114692}
   - {fileID: 306562969}

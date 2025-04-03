@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d811f4a105394d618cca0e820e4b5e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 5
+  damage: 3
   weight: -1
   dieOnHit: 0
 --- !u!54 &4955774692025816020
@@ -159,6 +159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lifetime: 2
+  dimensionalDamage: 0
 --- !u!136 &8314295806543353982
 CapsuleCollider:
   m_ObjectHideFlags: 0

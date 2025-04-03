@@ -445,6 +445,7 @@ GameObject:
   - component: {fileID: -5315727716842901443}
   - component: {fileID: -940508756970288902}
   - component: {fileID: 1967765872396024727}
+  - component: {fileID: -7902539879556912030}
   m_Layer: 1
   m_Name: Bomb
   m_TagString: Untagged
@@ -582,6 +583,20 @@ MonoBehaviour:
   lifetime: 1
   scale: {x: 1, y: 1, z: 1, w: 0}
   vfxType: Sunfish Bomb
+--- !u!114 &-7902539879556912030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4895124560806928564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43ba655cec194cd19620c77002295e58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lifetime: 60
+  dimensionalDamage: 0
 --- !u!1 &5363332413824433557
 GameObject:
   m_ObjectHideFlags: 0

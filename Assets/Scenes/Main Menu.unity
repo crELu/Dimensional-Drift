@@ -623,7 +623,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3c6a892d352469eb964d1c92b6c7bee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInput: {fileID: 182296432}
   settingsPanel: {fileID: 40339791}
   firstSelectable: {fileID: 719272081}
 --- !u!4 &292732703

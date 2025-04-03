@@ -60,6 +60,9 @@ public class PlayerManager : MonoBehaviour
     public float health, shield;
     [field:SerializeField] public float Ammo { get; private set; }
     public RawImage ammoText, waveImage;
+    public RawImage hitEffect;
+    [ColorUsage(true, true)] public Color shieldColor, healthColor;
+    public AnimationCurve hitCurve;
     [SerializeField] private TextMeshProUGUI velocityText;
     public float velocity;
     [Header("Weapon Settings")] 
@@ -97,6 +100,7 @@ public class PlayerManager : MonoBehaviour
         Application.targetFrameRate = 60;
         CalcStats();
         T = Shader.PropertyToID("_t");
+        hitEffect.material.SetFloat("_Alpha", 0);
     }
     
     public void AddAugment(Augment augment, int tier)
@@ -278,14 +282,39 @@ public class PlayerManager : MonoBehaviour
 
     public void DoDamage(float damage)
     {
+        if (damage <= 0) return;
         var sDamage = Mathf.Min(damage, shield);
         shield -= sDamage;
         damage -= sDamage;
-        
+        _dispColor = damage > 0 ? healthColor : shieldColor;
         health -= damage;
 
         // Andrew TODO
         // PlayerDamageTrack.PlayOneShot(DamageSFX);
+        if (_damageCoroutine == null) _damageCoroutine = StartCoroutine(DamageEffect());
+        else _damageInd = 1;
+    }
+
+    private float _damageInd;
+    private Coroutine _damageCoroutine;
+    private Color _dispColor;
+    private IEnumerator DamageEffect()
+    {
+        _damageInd = 1;
+        while (_damageInd > 0)
+        {
+            _damageInd -= Time.deltaTime/.4f;
+            hitEffect.material.SetFloat("_Alpha", hitCurve.Evaluate(_damageInd));
+            hitEffect.material.SetColor("_Color", _dispColor);
+            yield return null;
+        }
+        _damageCoroutine = null;
+    }
+    
+    public void Heal(float healing)
+    {
+        health += healing;
+        health = Mathf.Min(MaxHealth, health);
     }
 
     private void CheckHealth()

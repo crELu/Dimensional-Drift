@@ -23,6 +23,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_fe5ccdb934d84eb68918b7d514386f40_Texture_1_Texture2D:
         m_Texture: {fileID: 2800000, guid: df43c04cdfd9d92459d240f05bc65b4d, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -45,13 +49,22 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Alpha: 1
-    - _Mask_Contrast: 0.6
-    - _Mask_Noise: 0.3
-    - _Mask_Size: -0.18
+    - _Alpha: 0.767811
+    - _ColorMask: 15
+    - _Mask_Contrast: 0.2
+    - _Mask_Noise: 1.3
+    - _Mask_Size: 0.8
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UIMaskSoftnessX: 1
+    - _UIMaskSoftnessY: 1
     m_Colors:
-    - _Color: {r: 1, g: 0, b: 0.046400547, a: 0}
+    - _ClipRect: {r: 0, g: 0, b: 0, a: 0}
+    - _Color: {r: 0.5566038, g: 0.18970497, b: 0, a: 0.6745098}
     - _Vector2: {r: 1, g: 1, b: 0, a: 0}
-    - _Vector2_1: {r: 0, g: -0.9, b: 0, a: 0}
+    - _Vector2_1: {r: 0, g: 2, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
