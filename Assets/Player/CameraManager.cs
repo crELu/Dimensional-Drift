@@ -68,7 +68,7 @@ public class CameraManager : MonoBehaviour
         if (DimensionManager.normT == 1)
         {
             transform.rotation = Quaternion.LookRotation(Vector3.down, Up2d);
-            transform.position = targetPosition;
+            transform.position = PlayerManager.main.transform.TransformPoint(_offset);
         }
     }
 }

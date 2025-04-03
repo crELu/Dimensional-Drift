@@ -138,7 +138,14 @@ namespace Enemies.AI
                 var v = math.normalizesafe( bodyTransform.Position - prevTransform.Position);
                 var ideal = prevTransform.Position + v * body.Spacing;
                 var vel = math.length(ideal - bodyTransform.Position);
-                bodyTransform.Position = math.lerp(bodyTransform.Position, ideal, body.Speed) ;
+                if (vel > 50f)
+                {
+                    bodyTransform.Position = ideal;
+                }
+                else
+                {
+                    bodyTransform.Position = math.lerp(bodyTransform.Position, ideal, body.Speed) ;
+                }
 
                 float3 idealUp = prevTransform.Up();
                 float3 newUp = math.normalize(math.lerp(bodyTransform.Up(), idealUp, math.clamp(vel/body.RollSpeed, 0, 1)));

@@ -52,7 +52,7 @@ namespace Enemies.AI
             foreach (var (temp, entity) in SystemAPI.Query<RefRO<Yuumi>>().WithEntityAccess().WithNone<LocalTransform>())
             {
                 var enemy = temp.ValueRO.Attached;
-                if (SystemAPI.Exists(enemy))
+                if (SystemAPI.Exists(enemy) && SystemAPI.HasComponent<EnemyCollisionReceiver>(enemy))
                 {
                     var enemyStats = state.EntityManager.GetComponentData<EnemyCollisionReceiver>(enemy);
                     enemyStats.Invulnerable = false;

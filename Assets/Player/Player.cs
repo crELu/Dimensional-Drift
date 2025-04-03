@@ -158,6 +158,8 @@ public class PlayerManager : MonoBehaviour
         _extraStats += s;
     }
 
+    private Coroutine _scanner;
+    
     void Update()
     {
         CheckHealth();
@@ -168,9 +170,10 @@ public class PlayerManager : MonoBehaviour
         ammoText.material.SetFloat(T, Ammo/MaxAmmo);
         waveImage.material.SetFloat(T, waveTimer/maxWaveTimer);
         AddAmmo(AmmoRegen * Time.deltaTime);
-        if (PlayerInputs.main.Scan && !_isScanning)
+        if (PlayerInputs.main.Scan)
         {
-            StartCoroutine(Scan());
+            if (_scanner == null) _scanner = StartCoroutine(Scan());
+            else _isScanning = false;
         }
         if (PlayerInputs.main.WeaponDown)
         {
@@ -239,7 +242,7 @@ public class PlayerManager : MonoBehaviour
     {
         _isScanning = true;
         float t = 0;
-        while (t < 12)
+        while (_isScanning)
         {
             t += Time.deltaTime;
             if (t < 10)
@@ -247,16 +250,19 @@ public class PlayerManager : MonoBehaviour
                 ScanState = 1;
                 ScanRadius = t * 400;
             }
-            else 
-            {
-                ScanState = -1;
-            }
-            
+            yield return null;
+        }
+
+        t = 2;
+        while (t>0)
+        {
+            t -= Time.deltaTime;
+            ScanState = -1;
             yield return null;
         }
 
         ScanState = 0;
-        _isScanning = false;
+        _scanner = null;
     }
 
     private void CalcStats()

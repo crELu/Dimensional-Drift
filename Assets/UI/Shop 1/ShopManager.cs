@@ -135,6 +135,7 @@ public class ShopManager : MonoBehaviour
             Time.timeScale = 1f;
             Cursor.lockState = playerManager.targetCursorMode;
             PlayerInputs.main.playerInput.SwitchCurrentActionMap("Player");
+            PlayerInputs.main.RebindActions();
         }
     }
 
