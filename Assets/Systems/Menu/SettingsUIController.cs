@@ -141,6 +141,7 @@ public class SettingsUIController : MonoBehaviour
             PlayerInputs.main.playerInput.SwitchCurrentActionMap("Player");
             Cursor.lockState = CursorLockMode.Locked;
             Time.timeScale = previousTimeScale;
+            EventSystem.current.SetSelectedGameObject(null);
             
             // Re-bind actions after switching maps
             PlayerInputs.main.RebindActions();
