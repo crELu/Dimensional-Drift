@@ -6,6 +6,7 @@ namespace Player.Laser.Core
     [CreateAssetMenu(fileName = "Web", menuName = "Augments/Laser/Core/Web")]
     public class Web: CoreAugment
     {
-        //TODO
+        public override string Id => "Web";
+        public override AugmentType Target => AugmentType.Laser;
     }
 }

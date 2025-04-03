@@ -141,13 +141,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2468182615947036046}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 029d9e12c13e458b95fb1ffade7552e1, type: 3}
+  m_Script: {fileID: 11500000, guid: cadc6a505c674049a8218ccc42075bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 1
-  spreadCount: 5000
+  spreadCount: 100
   spreadAngle: 360
-  distance: 3
+  distance: 1
 --- !u!1 &7844676093104595269
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,15 +207,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 7844676093104595269}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 325a83af18d34e12a1d990939726613c, type: 3}
+  m_Script: {fileID: 11500000, guid: db956e81361440ea96939b8d19dd2ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   active: 1
-  projectile: {fileID: 2006387325404477191, guid: 80c5abc3ad0e64449a735fbf4ff8800e, type: 3}
-  range: 1000
-  speed: 20
-  visionCone: {x: 0, y: 360}
-  cd: 5
+  projectile: {fileID: 0}
+  range: 0
+  speed: 0
+  visionCone: {x: 0, y: 0}
+  cd: 1
   bursts: 1
   burstLength: 0.5
 --- !u!95 &2442758821146310990

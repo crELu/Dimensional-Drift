@@ -18,8 +18,10 @@ public class LaserWeapon : PlayerWeapon
     public static float3 LaserOffset;
     public static float3 LaserRotationOffset;
     
+    public Transform target;
+    private Vector3 Position => PlayerManager.main.transform.InverseTransformPoint(target.position);
     [SerializeField] private float _chargeTimer;
-    [SerializeField] private float _laserDuration;
+    [SerializeField] private float _laserDuration, _maxDuration;
     public static bool LaserIsActive;
     
     private int _laserCount;
@@ -27,7 +29,7 @@ public class LaserWeapon : PlayerWeapon
     protected new void Start()
     {
         base.Start();
-        LaserOffset = Vector3.Scale(position.localPosition, position.parent.localScale);
+        LaserOffset = Vector3.Scale(target.localPosition, target.parent.localScale);
         LaserRotationOffset = laserRotationOffset;
     }
     
@@ -69,25 +71,37 @@ public class LaserWeapon : PlayerWeapon
     
     protected new void Update()
     {
+        var player = PlayerManager.main;
         base.Update();
         _laserDuration -= Time.deltaTime;
-        if (LaserIsActive && _laserDuration <= 0)
+        
+        if (LaserIsActive)
         {
-            maxLaserCount = 0;
-            _chargeTimer = 0;
-            LaserIsActive = false;
+            var cost = BaseStats.ammoUse * 3 / _maxDuration * Time.deltaTime;
+            if (_laserDuration >= 0 && cost <= player.Ammo)
+            {
+                player.UseAmmo(cost);
+            } else
+            {
+                Debug.Log($"died{cost} {player.Ammo} {_laserDuration}");
+                maxLaserCount = 0;
+                _chargeTimer = 0;
+                LaserIsActive = false;
+            }
         }
     }
     
     protected override Attack BaseWeaponAttack(WeaponStats stats)
     {
-        AttackInfo info = new AttackInfo() { Stats = stats.bulletStats, Scale = new float3(stats.size, stats.size, stats.speed), Speed = 0 };
+        BaseEffects effects = new BaseEffects {Laser = new LaserEffects()};
+        AttackInfo info = new AttackInfo { Stats = stats.bulletStats, Scale = new float3(stats.size, stats.size, stats.speed), Speed = 0 , Effects = effects};
         Attack attack = new Attack { Bullets = new(), Info = info, Projectile = Attack.ProjectileType.LaserBasic };
         
         if (maxLaserCount == 0)
         {
-            attack.Bullets.Enqueue(new Bullet { position = position.position, rotation = Quaternion.identity, time = 0 });
+            attack.Bullets.Enqueue(new Bullet { position = Position, rotation = Quaternion.identity, time = Time.time });
             _laserDuration = stats.bulletStats.duration;
+            _maxDuration = _laserDuration;
             Cooldown += stats.bulletStats.duration;
         }
 

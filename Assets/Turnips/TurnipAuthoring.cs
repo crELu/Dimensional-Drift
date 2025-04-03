@@ -35,7 +35,7 @@ namespace Turnips
                 }
                 else
                 {
-                    t.Position.y = math.lerp(0, -1000, DimensionManager.t);
+                    if (DimensionManager.t == 1) t.Position.y = -1000;
                 }
 
                 transform.ValueRW = t;

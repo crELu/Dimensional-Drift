@@ -78,7 +78,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Map",
+                    "name": "Sprint",
                     "type": "Button",
                     "id": "90483004-1dc4-4863-abd5-9e02f3efd9a9",
                     "expectedControlType": "",
@@ -87,7 +87,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Dim Up",
+                    "name": "Dim Switch",
                     "type": "Button",
                     "id": "2776c80d-3c14-4091-8c56-d04ced07a2b0",
                     "expectedControlType": "",
@@ -96,7 +96,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Dim Down",
+                    "name": "Scan",
                     "type": "Button",
                     "id": "b7230bb6-fc9b-4f52-8b25-f5e19cb2c2ba",
                     "expectedControlType": "",
@@ -126,6 +126,15 @@
                     "name": "Controller Look",
                     "type": "Button",
                     "id": "d8e0580f-6856-4f36-a817-bcfa4a80255a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Settings",
+                    "type": "Button",
+                    "id": "38b019a2-b458-470e-bf95-10dad2e6e51f",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -323,11 +332,11 @@
                 {
                     "name": "",
                     "id": "cbac6039-9c09-46a1-b5f2-4e5124ccb5ed",
-                    "path": "<Keyboard>/2",
+                    "path": "<Keyboard>/c",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Dim Down",
+                    "action": "Scan",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -338,7 +347,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Dim Down",
+                    "action": "Scan",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -400,10 +409,21 @@
                 {
                     "name": "",
                     "id": "daba33a1-ad0c-4742-a909-43ad1cdfbeb6",
-                    "path": "<Gamepad>/buttonSouth",
+                    "path": "<Gamepad>/leftStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8bc8d6b3-a63f-4287-a2c5-e3f5eddf0500",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
                     "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -433,33 +453,33 @@
                 {
                     "name": "",
                     "id": "60e2c178-d7b2-4dff-98e2-731fc9030ac8",
-                    "path": "<Keyboard>/space",
+                    "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Map",
+                    "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "a0896de5-d7e6-4819-a696-12d5737baf0b",
-                    "path": "<Gamepad>/buttonNorth",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Map",
+                    "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "1534dc16-a6aa-499d-9c3a-22b47347b52a",
-                    "path": "<Keyboard>/1",
+                    "path": "<Keyboard>/x",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Dim Up",
+                    "action": "Dim Switch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -470,7 +490,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Dim Up",
+                    "action": "Dim Switch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -537,6 +557,17 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Controller Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f69670c0-ae1c-4b68-b678-577f7c830dd9",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Settings",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -632,6 +663,24 @@
                     "type": "PassThrough",
                     "id": "9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be",
                     "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Shop",
+                    "type": "Button",
+                    "id": "54892243-c574-44a2-81bb-48a53939fa1e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Settings",
+                    "type": "Button",
+                    "id": "3d1f6f27-49e2-4e70-908b-4740b1c6a408",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -1053,6 +1102,39 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3e41f4de-5e1d-47f9-a071-14b114a5c51c",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Shop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "813a21d9-9da9-4dcd-8335-cf9a94b20746",
+                    "path": "<Gamepad>/dpad/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Shop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "83fb0afe-ced9-4cdf-872a-a0eb0032057d",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Settings",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -89,8 +89,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 618
     y: -432
-    width: 868
-    height: 152
+    width: 925
+    height: 276
 --- !u!114 &27
 MonoBehaviour:
   m_ObjectHideFlags: 0

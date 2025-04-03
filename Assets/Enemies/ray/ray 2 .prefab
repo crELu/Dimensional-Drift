@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93dba67b558f492f99d0443b8d32afec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0, g: 4.881738, b: 5.992157, a: 1}
+  color: {r: 0, g: 2.440869, b: 2.9960785, a: 1}
   lifetime: 0.2
   scale: {x: 1, y: 1, z: 1, w: 0}
   vfxType: EnemyEngine1
@@ -162,13 +162,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1494354842832313394}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 029d9e12c13e458b95fb1ffade7552e1, type: 3}
+  m_Script: {fileID: 11500000, guid: cadc6a505c674049a8218ccc42075bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 1
   spreadCount: 1
   spreadAngle: 0.5
-  distance: 1
+  distance: 0
 --- !u!114 &5633996880385038958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,13 +282,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4952570890464949573}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 029d9e12c13e458b95fb1ffade7552e1, type: 3}
+  m_Script: {fileID: 11500000, guid: cadc6a505c674049a8218ccc42075bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 1
   spreadCount: 1
   spreadAngle: 0.5
-  distance: 1
+  distance: 0
 --- !u!114 &9064788480588748157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -333,7 +333,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 52.899994, y: -6.4000006, z: -6.5}
-  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_LocalScale: {x: 6, y: 6, z: 6}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8126377027296844198}
@@ -436,15 +436,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 5180185838724031331}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 325a83af18d34e12a1d990939726613c, type: 3}
+  m_Script: {fileID: 11500000, guid: db956e81361440ea96939b8d19dd2ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   active: 1
-  projectile: {fileID: 2006387325404477191, guid: 3febfd123f11def4f9cadbcb484503a7, type: 3}
+  projectile: {fileID: 2006387325404477191, guid: c5d1d5fbf17e61f49aec71e76c4ab418, type: 3}
   range: 150
-  speed: 50
+  speed: 80
   visionCone: {x: 0, y: 15}
-  cd: 4
+  cd: 1
   bursts: 2
   burstLength: 0.5
 --- !u!114 &-2812262852094478619
@@ -460,32 +460,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 40
-  size: 10
+  size: 12
   intel: {fileID: 1973288489611225477, guid: f81dc56b200479e40ac7f69e3d7e71f9, type: 3}
-  baseMoveSpeed:
-    x: 90
-    y: 90
-    z: 90
   linearPid:
-    Kp: 20
-    Ki: 0
-    Kd: 0
-    integral:
-      x: 0
-      y: 0
-      z: 0
-  baseRotationSpeed:
-    x: 6
-    y: 2
-    z: 2
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 10
+      y: 10
+      z: 30
   angularPid:
-    Kp: 4
-    Ki: 0.1
-    Kd: 0.5
-    integral:
-      x: 0
-      y: 0
-      z: 0
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 2
+      y: 1
+      z: 1
   spacingRange: 20
   turnSpeed: 120
   moveWeight: 40

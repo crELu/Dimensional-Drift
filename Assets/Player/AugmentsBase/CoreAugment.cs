@@ -5,9 +5,9 @@ using UnityEngine;
 public class CoreAugment: Augment
 {
     public override int MaxStacks => 3;
-
-    public AugmentType coreType;
+    
     public WeaponStats tier1, tier2, tier3; // extra stats per level (applies to the entire weapon)
+    public int postPriority;
     
     protected Attack MainAttack;
     public override bool Verify()
@@ -18,6 +18,11 @@ public class CoreAugment: Augment
             return false;
         }
         return base.Verify();
+    }
+
+    protected float Pick(Vector3 values)
+    {
+        return Stacks == 3 ? values.z : Stacks == 2 ? values.y : values.x;
     }
 
     public override AllStats GetStats()

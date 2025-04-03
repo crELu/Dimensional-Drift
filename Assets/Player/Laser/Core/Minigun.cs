@@ -6,6 +6,7 @@ namespace Player.Laser.Core
     [CreateAssetMenu(fileName = "Minigun", menuName = "Augments/Laser/Core/Minigun")]
     public class Minigun: CoreAugment
     {
-        //TODO
+        public override string Id => "Minigun";
+        public override AugmentType Target => AugmentType.Laser;
     }
 }

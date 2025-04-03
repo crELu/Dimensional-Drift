@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: Jhin
   m_EditorClassIdentifier: 
   <MaxStacks>k__BackingField: 3
-  <Stacks>k__BackingField: 1
+  <Stacks>k__BackingField: 2
   <Requirements>k__BackingField: []
-  coreType: 0
   tier1:
     size: 0
     speed: 0

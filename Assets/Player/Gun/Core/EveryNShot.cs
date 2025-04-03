@@ -6,8 +6,9 @@ namespace Player.Gun.Core
     [CreateAssetMenu(fileName = "Jhin", menuName = "Augments/Gun/Core/Jhin")]
     public class EveryNShot: CoreAugment
     {
+        public override string Id => "Jhin";
         private int _counter;
-
+        public override AugmentType Target => AugmentType.Gun;
         public override void PostProcessing(WeaponStats stats, List<Attack> attacks)
         {
             _counter++;
@@ -19,7 +20,8 @@ namespace Player.Gun.Core
                     var a = attacks[i];
                     a.Info.Speed *= 2;
                     a.Info.Stats.damage *= 2;
-                    a.Projectile = Attack.ProjectileType.GunCrit;
+                    if (a.Projectile == Attack.ProjectileType.GunBasic) a.Projectile = Attack.ProjectileType.GunCrit;
+                    if (a.Projectile == Attack.ProjectileType.GunPortal) a.Projectile = Attack.ProjectileType.GunPortalCrit;
                     attacks[i] = a;
                 }
             }

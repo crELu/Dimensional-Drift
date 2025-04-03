@@ -16,7 +16,7 @@ namespace Enemies.AI
         public float moveWeight;
         public override void Bake(UniversalBaker baker, Entity entity)
         {
-            baker.AddComponent(entity, new GunRay
+            baker.AddSharedComponent(entity, new GunRay
             {
                 TurnSpeed = turnSpeed,
                 SpacingRange = spacingRange * spacingRange,
@@ -26,7 +26,7 @@ namespace Enemies.AI
         }
     }
     
-    public struct GunRay : IComponentData
+    public struct GunRay : ISharedComponentData
     {
         public float TurnSpeed;
         public float SpacingRange;
@@ -34,7 +34,7 @@ namespace Enemies.AI
     }
     
     [BurstCompile]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(BaseEnemyAI))]
     public partial struct GunRayAISystem : ISystem
     {
@@ -48,16 +48,17 @@ namespace Enemies.AI
             public float3 PlayerPosition;
             public float DeltaTime;
             public Dimension Dim;
-            private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, in PhysicsVelocity velocity, ref EnemyMovement movement, ref GunRay ray)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, in LocalTransform transform, in PhysicsVelocity velocity, ref EnemyMovement movement, in GunRay ray)
             {
                 var toPlayer = PlayerPosition - transform.Position;
+                var forw = MathsBurst.DimSwitcher(transform.Forward(), Dim == Dimension.Three);
                 
                 if (Dim != Dimension.Three) toPlayer.y = 0;
                 if (math.lengthsq(toPlayer) < ray.SpacingRange) toPlayer *= -1;
                 toPlayer = math.normalize(toPlayer);
                 
-                toPlayer = MathsBurst.RotateVectorTowards(transform.Forward(), toPlayer, ray.TurnSpeed * DeltaTime);
-                movement.TargetUpDir = ComputeCurveNormal(velocity.Linear, toPlayer, transform.Forward());
+                toPlayer = MathsBurst.RotateVectorTowards(forw, toPlayer, ray.TurnSpeed * DeltaTime);
+                movement.TargetUpDir = ComputeCurveNormal(velocity.Linear, toPlayer, forw);
                 movement.TargetFaceDir = toPlayer;
                 movement.TargetMoveVel = toPlayer * ray.MoveWeight;
             }

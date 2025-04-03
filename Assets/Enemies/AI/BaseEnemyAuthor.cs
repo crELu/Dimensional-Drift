@@ -1,5 +1,6 @@
 ﻿using System;
 using Latios;
+using Latios.Authoring;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -17,7 +18,7 @@ using Random = Unity.Mathematics.Random;
 
 namespace Enemies.AI
 {
-    class BaseEnemyAuthor : BaseAuthor
+    public class BaseEnemyAuthor : BaseAuthor
     {
         [Header("Enemy Settings")]
         public float health = 10;
@@ -27,18 +28,47 @@ namespace Enemies.AI
         public GameObject intel;
         
         [Header("Linear Settings")]
-        public float3 baseMoveSpeed = new(1);
-        public PID linearPid = new() {Kd=.5f, Ki = .1f, Kp = 4};
+        public PID.Params linearPid = new() {kd=.5f, ki = .1f, kp = 4};
         
         [Header("Angular Settings")]
-        public float3 baseRotationSpeed = new(1);
-        public PID angularPid = new() {Kd=.5f, Ki = .1f, Kp = 4};
+        public PID.Params angularPid = new() {kd=.5f, ki = .1f, kp = 4};
         
         public override void Bake(UniversalBaker baker, Entity entity)
         {
-            linearPid.SetBounds(baseMoveSpeed);
-            angularPid.SetBounds(baseRotationSpeed);
+            var builder = new BlobBuilder(Allocator.Temp);
+            ref PID.Params linear = ref builder.ConstructRoot<PID.Params>();
+            linear = linearPid;
+            var linearBlob = builder.CreateBlobAssetReference<PID.Params>(Allocator.Persistent);
+            builder.Dispose();
+            baker.AddBlobAsset(ref linearBlob, out var hash1);
+
+            builder = new BlobBuilder(Allocator.Temp);
+            ref PID.Params angular = ref builder.ConstructRoot<PID.Params>();
+            angular = angularPid;
+            var angularBlob = builder.CreateBlobAssetReference<PID.Params>(Allocator.Persistent);
+            builder.Dispose();
+            baker.AddBlobAsset(ref angularBlob, out var hash2);
             
+            var singles = GetComponentsInChildren<ThrusterAuthoring>();
+            var pairs = GetComponentsInChildren<ThrusterPairAuthoring>();
+            builder = new BlobBuilder(Allocator.Temp);
+            ref ThrusterBlob hobbyPool = ref builder.ConstructRoot<ThrusterBlob>();
+            
+            BlobBuilderArray<Thruster> singlesBuilder = builder.Allocate(
+                ref hobbyPool.Singles,
+                singles.Length
+            );
+            for (int i = 0; i < singles.Length; i++) singlesBuilder[i] = singles[i].GetData();
+            
+            BlobBuilderArray<ThrusterPair> pairsBuilder = builder.Allocate(
+                ref hobbyPool.Pairs,
+                pairs.Length
+            );
+            for (int i = 0; i < pairs.Length; i++) pairsBuilder[i] = pairs[i].GetData();
+            
+            var thrusters = builder.CreateBlobAssetReference<ThrusterBlob>(Allocator.Persistent);
+            
+            baker.AddComponent(entity, new EnemyCollisionReceiver {Size = size});
             baker.AddComponent(entity, new EnemyStats
             {
                 Health = health,
@@ -46,29 +76,39 @@ namespace Enemies.AI
                 IntelPrefab = baker.ToEntity(intel),
                 Size = size,
             });
+            baker.AddComponent(entity, new ScannableEnemy());
             baker.AddComponent(entity, new EnemyMovement
             {
-                LinearPid = linearPid,
-                AngularPid = angularPid,
+                LinearPidBlob = linearBlob,
+                AngularPidBlob = angularBlob,
+                Thrusters = thrusters
             });
-            var control = baker.AddBuffer<ThrusterPair>(entity);
-            var main = baker.AddBuffer<Thruster>(entity);
-            foreach (var t in GetComponentsInChildren<ThrusterPairAuthoring>())
-            {
-                control.Add(t.GetData());
-            }
-            foreach (var t in GetComponentsInChildren<ThrusterAuthoring>())
-            {
-                main.Add(t.GetData());
-            }
+            
         }
     }
+    public struct EnemyCollisionReceiver : IComponentData
+    {
+        public float LastDamage, Size;
+        public bool Invulnerable;
+    }
+    public struct EnemyGhostedTag : IComponentData { }
+    
     
     public struct EnemyStats : IComponentData
     {
         public float Health, MaxHealth, Size;
-        public bool Invulnerable;
         public Entity IntelPrefab;
+    }
+    
+    public struct ScannableEnemy : IComponentData
+    {
+        public float ScanSize;
+    }
+
+    public struct ThrusterBlob
+    {
+        public BlobArray<Thruster> Singles;
+        public BlobArray<ThrusterPair> Pairs;
     }
     
     public struct EnemyMovement : IComponentData 
@@ -77,26 +117,31 @@ namespace Enemies.AI
         public float3 TargetFaceDir;
         public float3 TargetUpDir;
         
+        public BlobAssetReference<PID.Params> LinearPidBlob;
+        public BlobAssetReference<PID.Params> AngularPidBlob;
+        
         public PID LinearPid;
-
         public PID AngularPid;
+
+        public BlobAssetReference<ThrusterBlob> Thrusters;
+        public ref BlobArray<Thruster> MainThrusters => ref Thrusters.Value.Singles;
+        public ref BlobArray<ThrusterPair> SideThrusters => ref Thrusters.Value.Pairs;
     }
 
     [BurstCompile]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+    [UpdateAfter(typeof(PhysicsSystem))]
     public partial struct BaseEnemyAI : ISystem
     {
-        private BufferLookup<Thruster> _tBuffer;
-        private BufferLookup<ThrusterPair> _tPBbuffer;
         private ComponentLookup<LocalTransform> _localTransform;
         
         [BurstCompile]
         public void OnCreate(ref SystemState state)
-        { 
+        {
+            state.RequireForUpdate<SoundReceiver>();
             state.InitSystemRng("BaseEnemyAI");
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
-            _tBuffer = state.GetBufferLookup<Thruster>();
-            _tPBbuffer = state.GetBufferLookup<ThrusterPair>();
+            
             _localTransform = state.GetComponentLookup<LocalTransform>(true);
         }
 
@@ -108,9 +153,6 @@ namespace Enemies.AI
             public EntityCommandBuffer.ParallelWriter Ecb;
             public float DeltaTime;
             public Dimension Dim;
-                
-            [ReadOnly] public BufferLookup<Thruster> MainThrusters;
-            [ReadOnly] public BufferLookup<ThrusterPair> Stabilizers;
             
             private void DoStuff(Entity e, ref LocalTransform transform, ref EnemyMovement enemy, PhysicsMass mass, ref PhysicsVelocity physicsVelocity)
             { 
@@ -125,34 +167,28 @@ namespace Enemies.AI
                 float3 velocity = transform.InverseTransformDirection(physicsVelocity.Linear);
                 
                 // Decompose velocity into desired and undesired components
-               // float speedTowardsTarget = math.clamp(math.dot(velocity, targetMoveDir), 0, enemy.BaseTargetSpeed);
+                // float speedTowardsTarget = math.clamp(math.dot(velocity, targetMoveDir), 0, enemy.BaseTargetSpeed);
                 //float3 desiredVelocity = speedTowardsTarget * targetMoveDir;
                 //float3 unwantedVelocity = velocity - desiredVelocity;
                 
                 //float3 correctionThrustLocal = -unwantedVelocity * enemy.BaseCorrectWeight;
                 
-                float3 targetThrust = enemy.LinearPid.Cycle(velocity, moveDir, DeltaTime);
+                float3 targetThrust = enemy.LinearPid.Cycle(enemy.LinearPidBlob.Value, velocity, moveDir, DeltaTime);
                 
                 float3 totalThrust = float3.zero;
                 
-                if (Stabilizers.TryGetBuffer(e, out DynamicBuffer<ThrusterPair> pairs))
+                for (int i = 0; i < enemy.SideThrusters.Length; i++)
                 {
-                    foreach (var pair in pairs)
-                    {
-                        float3 t = pair.ApplyOptimalThrust(targetThrust);
-                        totalThrust += t;
-                        targetThrust -= t;
-                    }
+                    float3 t = enemy.SideThrusters[i].ApplyOptimalThrust(targetThrust);
+                    totalThrust += t;
+                    targetThrust -= t;
                 }
                 
-                if (MainThrusters.TryGetBuffer(e, out DynamicBuffer<Thruster> mains))
+                for (int i = 0; i < enemy.MainThrusters.Length; i++)
                 {
-                    foreach (var main in mains)
-                    {
-                        float3 t = main.ApplyThrust(targetThrust);
-                        totalThrust += t;
-                        targetThrust -= t;
-                    }
+                    float3 t = enemy.MainThrusters[i].ApplyThrust(targetThrust);
+                    totalThrust += t;
+                    targetThrust -= t;
                 }
 
                 physicsVelocity.Linear += transform.TransformDirection(totalThrust) * DeltaTime;
@@ -170,7 +206,7 @@ namespace Enemies.AI
                     
                     var curAngularVelocity = physicsVelocity.Angular;               
                     
-                    physicsVelocity.Angular += DeltaTime * enemy.AngularPid.Cycle(curAngularVelocity, targetAngularVelocity, DeltaTime);;
+                    physicsVelocity.Angular += DeltaTime * enemy.AngularPid.Cycle(enemy.AngularPidBlob.Value, curAngularVelocity, targetAngularVelocity, DeltaTime);;
                 }
                 if (Dim != Dimension.Three)
                 {
@@ -196,6 +232,7 @@ namespace Enemies.AI
             public EntityCommandBuffer.ParallelWriter Ecb;
             [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
             public SystemRng Rng;
+            public NativeQueue<SfxCommand>.ParallelWriter AudioWriter;
             
             public bool OnChunkBegin(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
@@ -208,15 +245,22 @@ namespace Enemies.AI
             {
             }
 
-            private void Execute([ChunkIndexInQuery] int chunkIndex, Entity enemy, EnemyStats enemyStats)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, in Entity enemy, ref EnemyStats enemyStats, ref EnemyCollisionReceiver damageInfo)
             {
+                enemyStats.Health -= damageInfo.LastDamage;
+                damageInfo.LastDamage = 0;
+                
                 if (enemyStats.Health <= 0)
                 {
                     var transform = TransformLookup[enemy];
-                    var intel = Ecb.Instantiate(chunkIndex, enemyStats.IntelPrefab);
-                    var s = TransformLookup[enemyStats.IntelPrefab];
-                    Ecb.SetComponent(chunkIndex, intel, LocalTransform.FromPositionRotationScale(transform.Position, transform.Rotation, s.Scale));
-                    Ecb.SetComponent(chunkIndex, intel, new PhysicsVelocity{Linear = Rng.NextFloat3Direction() * 5});
+                    AudioWriter.Enqueue(new SfxCommand {Name = "Enemy Die", Position = transform.Position});
+                    if (enemyStats.IntelPrefab != Entity.Null)
+                    {
+                        var intel = Ecb.Instantiate(chunkIndex, enemyStats.IntelPrefab);
+                        var s = TransformLookup[enemyStats.IntelPrefab];
+                        Ecb.SetComponent(chunkIndex, intel, LocalTransform.FromPositionRotationScale(transform.Position, transform.Rotation, s.Scale));
+                        Ecb.SetComponent(chunkIndex, intel, new PhysicsVelocity{Linear = Rng.NextFloat3Direction() * 5});
+                    }
                     Ecb.DestroyEntity(chunkIndex, enemy);
                 }
             }
@@ -225,14 +269,9 @@ namespace Enemies.AI
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            _tBuffer.Update(ref state);
-            _tPBbuffer.Update(ref state);
-            
             EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
             var d1 = new BaseEnemyMoveJob
             {
-                MainThrusters = _tBuffer,
-                Stabilizers = _tPBbuffer,
                 Ecb = ecb,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
                 Dim = DimensionManager.burstDim.Data,
@@ -242,11 +281,15 @@ namespace Enemies.AI
             
             _localTransform.Update(ref state);
             ecb = GetEntityCommandBuffer(ref state);
+            
+            var soundReceiver = SystemAPI.GetSingleton<SoundReceiver>();
+            var soundWriter = soundReceiver.AudioCommands.AsParallelWriter();
             var d2 = new BaseEnemyHealthJob
             {
                 Ecb = ecb,
                 TransformLookup = _localTransform,
                 Rng = state.GetJobRng(),
+                AudioWriter = soundWriter,
             }.ScheduleParallel(state.Dependency);
             state.Dependency = d2;
         }

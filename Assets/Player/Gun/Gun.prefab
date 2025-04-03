@@ -124,24 +124,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseStats:
     size: 1
-    speed: 80
+    speed: 120
     attackSpeed: 3
     attackDelay: 1
     accuracy: 1
     ammoUse: 0
     count: 0
     bulletStats:
-      damage: 8
+      damage: 5
       duration: 2
       extraction: 0
       power: 0
       pierce: 0
   position: {fileID: 0}
-  BasicAugments: []
   SpecializedAugments: []
   CoreAugments: []
   WeaponTrack: {fileID: 6247009144885427980}
   WeaponSFX: {fileID: 8300000, guid: 91e3613d19c82024986b6231cca3d570, type: 3}
+  weaponType: 0
 --- !u!82 &6247009144885427980
 AudioSource:
   m_ObjectHideFlags: 0

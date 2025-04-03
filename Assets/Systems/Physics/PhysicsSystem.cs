@@ -27,6 +27,7 @@ using static Unity.Mathematics.math;
 using CapsuleCollider = Latios.Psyshock.CapsuleCollider;
 using Collider = Latios.Psyshock.Collider;
 using Physics = Latios.Psyshock.Physics;
+using SphereCollider = Latios.Psyshock.SphereCollider;
 
 
 // Static helper methods
@@ -119,11 +120,40 @@ partial struct ColliderBodiesJob: IJobParallelFor {
 
         colliderBodies[i] = new ColliderBody {
             collider = projectedCollider,
-            transform = new TransformQvvs(projectedPosition, t.Rotation, 1, t.Scale),
+            transform = new TransformQvvs(projectedPosition, t.Rotation, t.Scale, 1),
             entity = entities[i]
         };
 
         //PhysicsDebug.DrawCollider(colliderBodies[i].collider, colliderBodies[i].transform, UnityEngine.Color.red);
+    }
+}
+
+// Build a mapping from each `Entity` to the index of its `ColliderBody` in the
+// current collision layer
+[BurstCompile]
+partial struct BodyIndicesJob: IJobParallelFor {
+    public NativeArray<ColliderBody>.ReadOnly colliderBodies;
+    public NativeParallelHashMap<Entity, int>.ParallelWriter writer;
+
+    [BurstCompile]
+    public void Execute(int i) {
+        writer.TryAdd(colliderBodies[i].entity, i);
+    }
+}
+
+// Helpers to find objects within a radius
+public interface IRadiusProcessor {
+    // objectResult stores the object that was within the radius
+    // distanceResult stores information about how close the object was, etc.
+    void Execute(in FindObjectsResult objectResult, in PointDistanceResult distanceResult);
+}
+
+// An implementation of IRadiusProcessor that draws the collider (for testing)
+[BurstCompile]
+public struct DebugDrawRadiusProcessor: IRadiusProcessor {
+    [BurstCompile]
+    public void Execute(in FindObjectsResult objectResult, in PointDistanceResult _) {
+        PhysicsDebug.DrawCollider(objectResult.collider, objectResult.transform, UnityEngine.Color.red);
     }
 }
 
@@ -134,7 +164,8 @@ public struct PhysicsComponentLookups {
     public PhysicsComponentLookup<LocalTransform> transform;
 
     public PhysicsComponentLookup<PlayerData> PlayerLookup;
-    public PhysicsComponentLookup<EnemyStats> EnemyLookup;
+    public PhysicsComponentLookup<PlayerProjectileDeath> PlayerWeaponStatsLookup;
+    public PhysicsComponentLookup<EnemyCollisionReceiver> EnemyLookup;
     public PhysicsComponentLookup<PlayerProjectile> PlayerWeaponLookup;
     public PhysicsComponentLookup<DamagePlayer> EnemyWeaponLookup;
     public PhysicsComponentLookup<Obstacle> TerrainLookup;
@@ -147,99 +178,13 @@ public struct PhysicsComponentLookups {
         PlayerLookup.Update(ref state);
         EnemyLookup.Update(ref state);
         PlayerWeaponLookup.Update(ref state);
+        PlayerWeaponStatsLookup.Update(ref state);
         EnemyWeaponLookup.Update(ref state);
         TerrainLookup.Update(ref state);
         IntelLookup.Update(ref state);
     }
 }
 
-// Collision handling implementation.
-[BurstCompile]
-public struct PairsProcessor: IFindPairsProcessor {
-    public PhysicsComponentLookups componentLookups;
-    public NativeParallelHashSet<Entity>.ParallelWriter destroyedSetWriter;
-
-    public void Execute(in FindPairsResult result) {
-        ColliderDistanceResult r;
-        if (Physics.DistanceBetween(
-                    result.bodyA.collider, result.bodyA.transform,
-                    result.bodyB.collider, result.bodyB.transform,
-                    0, out r))
-        {
-            Calculate(result.entityA, result.entityB);
-            Calculate(result.entityB, result.entityA);
-        }
-    }
-    
-    [BurstCompile]
-    private void Calculate(SafeEntity entityA, SafeEntity entityB)
-    {
-        if (componentLookups.PlayerLookup.HasComponent(entityA) && componentLookups.EnemyWeaponLookup.HasComponent(entityB)) // Enemy Hit Player
-        {
-            DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW;
-            PlayerData player = componentLookups.PlayerLookup.GetRW(entityA).ValueRW;
-            player.LastDamage += enemyProj.Damage;
-            componentLookups.PlayerLookup.GetRW(entityA).ValueRW = player;
-            if (enemyProj.DieOnHit)
-            {
-                destroyedSetWriter.Add(entityB);
-            }
-        }
-        else if (componentLookups.EnemyLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB)) // Player Hit Enemy
-        {
-            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
-            EnemyStats enemy = componentLookups.EnemyLookup.GetRW(entityA).ValueRW;
-            enemy.Health -= playerProj.Stats.damage;
-
-            playerProj.Health -= (int)math.ceil(10000f / (1+playerProj.Stats.pierce));
-                
-            componentLookups.EnemyLookup.GetRW(entityA).ValueRW = enemy;
-            componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
-                
-            if (playerProj.Health == 0)
-            {
-                destroyedSetWriter.Add(entityB);
-            }
-        }
-        else if (componentLookups.EnemyWeaponLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
-        {
-            DamagePlayer enemyProj = componentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW;
-            PlayerProjectile playerProj = componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW;
-            if (enemyProj.Mass == -1)
-            {
-                destroyedSetWriter.Add(entityB);
-            }
-            else
-            {
-                while (enemyProj.Mass > 0 && playerProj.Health > 0)
-                {
-                    enemyProj.Mass--;
-                    playerProj.Health -= (int)math.ceil(10000f / ((1+playerProj.Stats.pierce)*(1+playerProj.Stats.power)));
-                }
-                
-                componentLookups.EnemyWeaponLookup.GetRW(entityA).ValueRW = enemyProj;
-                componentLookups.PlayerWeaponLookup.GetRW(entityB).ValueRW = playerProj;
-                
-                if (enemyProj.Mass == 0)
-                {
-                    destroyedSetWriter.Add(entityA);
-                }
-                if (playerProj.Health == 0)
-                {
-                    destroyedSetWriter.Add(entityB);
-                }
-            }
-        }
-        else if (componentLookups.TerrainLookup.HasComponent(entityA) && componentLookups.EnemyWeaponLookup.HasComponent(entityB))
-        {
-            destroyedSetWriter.Add(entityB);
-        }
-        else if (componentLookups.TerrainLookup.HasComponent(entityA) && componentLookups.PlayerWeaponLookup.HasComponent(entityB))
-        {
-            destroyedSetWriter.Add(entityB);
-        }
-    }
-}
 
 // Enumerator implementation for iterating over bodies within a radius
 [BurstCompile]
@@ -251,9 +196,7 @@ public struct BodiesInRadius {
 
     public object Current {
         [BurstCompile]
-        get {
-            return current;
-        } 
+        get => current;
     }
 
     [BurstCompile]
@@ -281,27 +224,29 @@ public struct PhysicsSystemState: IComponentData {
     public CollisionLayer collisionLayer;
 
     // Collision layers with specific types of objects
-    public CollisionLayer playerLayer;
-    public CollisionLayer playerWeaponLayer;
-    public CollisionLayer enemyLayer;
-    public CollisionLayer enemyWeaponLayer;
-    public CollisionLayer terrainLayer;
-    public CollisionLayer intelLayer;
+    public CollisionLayer PlayerLayer;
+    public CollisionLayer PlayerInteractLayer;
+    public CollisionLayer PlayerWeaponLayer;
+    public CollisionLayer EnemyLayer;
+    public CollisionLayer EnemyGhostLayer;
+    public CollisionLayer EnemyWeaponLayer;
+    public CollisionLayer TerrainLayer;
+    public CollisionLayer IntelLayer;
 
     public Dimension dimension;
     public float3 projectDirection2D;
 
     [BurstCompile]
-    public void GetInRadius(in float3 _point, float radius, out BodiesInRadius bodies) {
+    public void GetInRadius(in float3 _point, float radius, CollisionLayer layer, out BodiesInRadius bodies) {
         float3 point = _point;
         if (dimension == Dimension.Two) {
             GeometryHelper.ProjectPoint2D(projectDirection2D, point, out point);
         }
         var radiusAabb = new Aabb(point + new float3(-radius), point + new float3(radius));
-        var candidates = Physics.FindObjects(radiusAabb, collisionLayer);
+        var candidates = Physics.FindObjects(radiusAabb, layer);
 
         bodies = new BodiesInRadius {
-            enumerator = Physics.FindObjects(radiusAabb, collisionLayer),
+            enumerator = candidates,
             point = point,
             radius = radius
         };
@@ -310,12 +255,14 @@ public struct PhysicsSystemState: IComponentData {
     [BurstCompile]
     public void Dispose() {
         collisionLayer.Dispose();
-        playerLayer.Dispose();
-        playerWeaponLayer.Dispose();
-        enemyLayer.Dispose();
-        enemyWeaponLayer.Dispose();
-        terrainLayer.Dispose();
-        intelLayer.Dispose();
+        PlayerLayer.Dispose();
+        PlayerInteractLayer.Dispose();
+        PlayerWeaponLayer.Dispose();
+        EnemyLayer.Dispose();
+        EnemyGhostLayer.Dispose();
+        EnemyWeaponLayer.Dispose();
+        TerrainLayer.Dispose();
+        IntelLayer.Dispose();
     }
 }
 
@@ -325,12 +272,13 @@ public partial struct PhysicsSystem: ISystem {
     LatiosWorldUnmanaged latiosWorld;
 
     PhysicsComponentLookups componentLookups;
-
+    
     EntityQuery physicsObjectQuery;
 
     EntityQuery playerQuery;
     EntityQuery playerWeaponQuery;
     EntityQuery enemyQuery;
+    EntityQuery enemyGhostedQuery;
     EntityQuery enemyWeaponQuery;
     EntityQuery terrainQuery;
     EntityQuery intelQuery;
@@ -339,30 +287,62 @@ public partial struct PhysicsSystem: ISystem {
 
     [BurstCompile]
     private JobHandle BuildLayer(
-            in Aabb worldBounds, in Dimension dim,
-            in float3 projectDirection2D, in EntityQuery query,
-            out CollisionLayer collisionLayer)
+        in Aabb worldBounds, in Dimension dim,
+        in float3 projectDirection2D, in EntityQuery query,
+        out CollisionLayer collisionLayer)
     {
-        var entities = query.ToEntityArray(Allocator.TempJob);
-        var colliderBodies = new NativeArray<ColliderBody>(entities.Length, Allocator.TempJob);
-        var entityColliders = query.ToComponentDataArray<Collider>(Allocator.TempJob);
-        var entityTransforms = query.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+        return BuildLayer(worldBounds, dim, projectDirection2D, query, out collisionLayer, new NativeArray<ColliderBody>());
+    }
 
-        var colliderBodiesDependency = new ColliderBodiesJob {
-            projectDirection2D = projectDirection2D,
-            colliderBodies = colliderBodies,
-            entities = entities,
-            entityColliders = entityColliders,
-            entityTransforms = entityTransforms,
-            Dim = dim
-        }.Schedule(entities.Length, 64);
-        colliderBodiesDependency = entities.Dispose(colliderBodiesDependency);
-        colliderBodiesDependency = entityColliders.Dispose(colliderBodiesDependency);
-        colliderBodiesDependency = entityTransforms.Dispose(colliderBodiesDependency);
+    [BurstCompile]
+    private JobHandle BuildLayer(
+            in Aabb worldBounds, in Dimension dim,
+            in float3 projectDirection2D, in EntityQuery? query,
+            out CollisionLayer collisionLayer, NativeArray<ColliderBody>? bodies)
+    {
+        var size = 0;
+        if (bodies.HasValue) size += bodies.Value.Length;
+        NativeArray<Entity> entities;
+        NativeArray<ColliderBody> colliderBodies;
+        JobHandle dependency = new JobHandle();
+        if (query.HasValue)
+        {
+            entities = query.Value.ToEntityArray(Allocator.TempJob);
+            size += entities.Length;
+            colliderBodies = new NativeArray<ColliderBody>(size, Allocator.TempJob);
+            
+            var entityColliders = query.Value.ToComponentDataArray<Collider>(Allocator.TempJob);
+            var entityTransforms = query.Value.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
+            
+            dependency = new ColliderBodiesJob {
+                projectDirection2D = projectDirection2D,
+                colliderBodies = colliderBodies,
+                entities = entities,
+                entityColliders = entityColliders,
+                entityTransforms = entityTransforms,
+                Dim = dim
+            }.Schedule(entities.Length, 64);
+            
+            dependency = entities.Dispose(dependency);
+            dependency = entityColliders.Dispose(dependency);
+            dependency = entityTransforms.Dispose(dependency);
 
+            if (bodies.HasValue)
+            {
+                for (var i = 0; i < bodies.Value.Length; i++)
+                {
+                    colliderBodies[entities.Length + i] = bodies.Value[i];
+                }
+            }
+        }
+        else
+        {
+            colliderBodies = bodies.Value;
+        }
+        
         var physicsLayerDependency = Physics.BuildCollisionLayer(colliderBodies)
             .WithSubdivisions(5, 5, 5).WithWorldBounds(worldBounds)
-            .ScheduleParallel(out collisionLayer, Allocator.Persistent, colliderBodiesDependency);
+            .ScheduleParallel(out collisionLayer, Allocator.Persistent, dependency);
         physicsLayerDependency = colliderBodies.Dispose(physicsLayerDependency);
 
         return physicsLayerDependency;
@@ -370,16 +350,18 @@ public partial struct PhysicsSystem: ISystem {
 
     [BurstCompile]
     public void OnCreate(ref SystemState state) {
-        latiosWorld = state.GetLatiosWorldUnmanaged();
+        state.RequireForUpdate<PlayerData>();
+        state.RequireForUpdate<SoundReceiver>();
 
+        latiosWorld = state.GetLatiosWorldUnmanaged();
         componentLookups = new PhysicsComponentLookups {
             velocity = state.GetComponentLookup<Unity.Physics.PhysicsVelocity>(),
             mass = state.GetComponentLookup<Unity.Physics.PhysicsMass>(),
             transform = state.GetComponentLookup<LocalTransform>(),
-            
+            PlayerWeaponStatsLookup = state.GetComponentLookup<PlayerProjectileDeath>(),
             PlayerLookup = state.GetComponentLookup<PlayerData>(),
             EnemyWeaponLookup = state.GetComponentLookup<DamagePlayer>(),
-            EnemyLookup = state.GetComponentLookup<EnemyStats>(),
+            EnemyLookup = state.GetComponentLookup<EnemyCollisionReceiver>(),
             PlayerWeaponLookup = state.GetComponentLookup<PlayerProjectile>(),
             TerrainLookup = state.GetComponentLookup<Obstacle>(),
             IntelLookup = state.GetComponentLookup<Intel>()
@@ -406,7 +388,15 @@ public partial struct PhysicsSystem: ISystem {
             .Build(ref state);
 
         enemyQuery = new EntityQueryBuilder(Allocator.Temp)
-            .WithAllRW<EnemyStats>()
+            .WithAllRW<EnemyCollisionReceiver>()
+            .WithNone<EnemyGhostedTag>()
+            .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
+            .WithAll<Collider, Unity.Physics.PhysicsMass>()
+            .Build(ref state);
+        
+        enemyGhostedQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAllRW<EnemyCollisionReceiver>()
+            .WithAll<EnemyGhostedTag>()
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
             .WithAll<Collider, Unity.Physics.PhysicsMass>()
             .Build(ref state);
@@ -446,14 +436,18 @@ public partial struct PhysicsSystem: ISystem {
     public void OnUpdate(ref SystemState state) {
         RefRW<PhysicsSystemState> physicsState = SystemAPI.GetSingletonRW<PhysicsSystemState>();
         physicsState.ValueRW.dimension = DimensionManager.burstDim.Data;
-
+        
         // Create world bounds centered on the player
         var playerEntity = SystemAPI.GetSingletonEntity<PlayerData>();
         var playerTransform = SystemAPI.GetComponent<LocalTransform>(playerEntity);
-        var worldBoundHalfSize = new float3(200);
+        
+        if (!SystemAPI.TryGetSingleton(out SoundReceiver soundReceiver)) return;
+        var soundWriter = soundReceiver.AudioCommands.AsParallelWriter();
+        GeometryHelper.ProjectPoint2D(projectDirection2D, playerTransform.Position, out float3 playerCenter);
+        var worldBoundHalfSize = new float3(100);
         var playerAabb = new Aabb(
-                playerTransform.Position - worldBoundHalfSize,
-                playerTransform.Position + worldBoundHalfSize);
+            playerCenter - worldBoundHalfSize,
+            playerCenter + worldBoundHalfSize);
 
         physicsState.ValueRW.Dispose();
 
@@ -463,27 +457,43 @@ public partial struct PhysicsSystem: ISystem {
 
         var buildPlayerLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                playerQuery, out physicsState.ValueRW.playerLayer);
+                playerQuery, out physicsState.ValueRW.PlayerLayer);
+
+        var playerHitbox = new NativeArray<ColliderBody>(1, Allocator.TempJob);
+        
+        playerHitbox[0] = new()
+        {
+            collider = new SphereCollider(playerCenter, 30), transform = TransformQvvs.identity,
+            entity = playerEntity
+        };
+        
+        var buildPlayerInteractLayer = BuildLayer(
+            playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
+            null, out physicsState.ValueRW.PlayerInteractLayer, new NativeArray<ColliderBody>(playerHitbox, Allocator.TempJob));
 
         var buildPlayerWeaponLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                playerWeaponQuery, out physicsState.ValueRW.playerWeaponLayer);
+                playerWeaponQuery, out physicsState.ValueRW.PlayerWeaponLayer);
 
         var buildEnemyLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                enemyQuery, out physicsState.ValueRW.enemyLayer);
+                enemyQuery, out physicsState.ValueRW.EnemyLayer);
+        
+        var buildEnemyGhostLayer = BuildLayer(
+            playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
+            enemyGhostedQuery, out physicsState.ValueRW.EnemyGhostLayer);
 
         var buildEnemyWeaponLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                enemyWeaponQuery, out physicsState.ValueRW.enemyWeaponLayer);
+                enemyWeaponQuery, out physicsState.ValueRW.EnemyWeaponLayer);
 
         var buildTerrainLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                terrainQuery, out physicsState.ValueRW.terrainLayer);
+                terrainQuery, out physicsState.ValueRW.TerrainLayer);
 
         var buildIntelLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-                intelQuery, out physicsState.ValueRW.intelLayer);
+                intelQuery, out physicsState.ValueRW.IntelLayer);
 
         var buildLayers = JobHandle.CombineDependencies(
                 buildMainLayer, buildPlayerLayer, buildPlayerWeaponLayer);
@@ -491,73 +501,128 @@ public partial struct PhysicsSystem: ISystem {
                 buildLayers, buildEnemyLayer, buildEnemyWeaponLayer);
         buildLayers = JobHandle.CombineDependencies(
                 buildLayers, buildTerrainLayer, buildIntelLayer);
+        buildLayers = JobHandle.CombineDependencies(
+            buildLayers, buildPlayerInteractLayer, buildEnemyGhostLayer);
 
         componentLookups.Update(ref state);
+        var ecb = new EntityCommandBuffer(Allocator.TempJob);
+        var ecbWriter = ecb.AsParallelWriter();
+
         var destroyedSet = new NativeParallelHashSet<Entity>(physicsState.ValueRO.collisionLayer.colliderBodies.Length, Allocator.TempJob);
         var destroyedSetWriter = destroyedSet.AsParallelWriter();
-
+        
         var pairsProcessor = new PairsProcessor {
-            componentLookups = componentLookups,
-            destroyedSetWriter = destroyedSetWriter
+            ComponentLookups = componentLookups,
+            Ecb = ecbWriter,
+            DeltaTime = SystemAPI.Time.fixedDeltaTime,
+            Dim = physicsState.ValueRW.dimension,
+            DestroyedSetWriter = destroyedSetWriter
         };
-
-        var Dependency = buildLayers;
-
+        var terrainProcessor = new TerrainPairs {
+            ComponentLookups = componentLookups,
+            Ecb = ecbWriter,
+            DestroyedSetWriter = destroyedSetWriter
+        };
+        var playerWeaponPairsProcessor = new PlayerWeaponPairs {
+            ComponentLookups = componentLookups,
+            Ecb = ecbWriter,
+            DestroyedSetWriter = destroyedSetWriter,
+            AudioWriter = soundWriter,
+        };
+        var playerPairsProcessor = new PlayerPairs {
+            ComponentLookups = componentLookups,
+            Ecb = ecbWriter,
+            DestroyedSetWriter = destroyedSetWriter
+        };
+        var playerInteractionsPairsProcessor = new PlayerInteractions {
+            ComponentLookups = componentLookups,
+            Ecb = ecbWriter,
+            DestroyedSetWriter = destroyedSetWriter
+        };
+        
         // Collider player with intel
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerLayer,
-                physicsState.ValueRO.intelLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
-        // Collide player with terrain
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerLayer,
-                physicsState.ValueRO.terrainLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
-        // Collide enemies with terrain
-        //var enemyTerrain = Physics.FindPairs(
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.enemyLayer,
-                physicsState.ValueRO.terrainLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
+        var dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerLayer,
+                physicsState.ValueRO.IntelLayer, playerPairsProcessor)
+            .ScheduleParallel(buildLayers);
+        
+        // Temp intel vacuum
+        
+        
+        // dependency = Physics.FindPairs(
+        //         physicsState.ValueRO.PlayerInteractLayer,
+        //         physicsState.ValueRO.IntelLayer, playerInteractionsPairsProcessor)
+        //     .ScheduleParallel(dependency);
+        
+        // Collide player enemy weapons
+        dependency = Physics.FindPairs(
+            physicsState.ValueRO.PlayerLayer,
+                physicsState.ValueRO.EnemyWeaponLayer, playerPairsProcessor)
+            .ScheduleParallel(dependency);
+        
         // Collide enemies with enemies
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
-        // Collide enemy weapons with player
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.enemyWeaponLayer,
-                physicsState.ValueRO.playerLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.EnemyLayer, pairsProcessor)
+            .ScheduleParallel(dependency);
+        
         // Collide player weapons with enemies
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerWeaponLayer,
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerWeaponLayer, physicsState.ValueRO.EnemyLayer, playerWeaponPairsProcessor)
+            .ScheduleParallel(dependency);
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerWeaponLayer, physicsState.ValueRO.EnemyGhostLayer, playerWeaponPairsProcessor)
+            .ScheduleParallel(dependency);
         // Collide player weapons with enemy weapons
-        Dependency = Physics.FindPairs(
-                physicsState.ValueRO.playerWeaponLayer,
-                physicsState.ValueRO.enemyLayer, pairsProcessor)
-            .ScheduleParallel(Dependency);
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerWeaponLayer,
+                physicsState.ValueRO.EnemyWeaponLayer, playerWeaponPairsProcessor)
+            .ScheduleParallel(dependency);
+        
+        // Collide player with terrain
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.TerrainLayer,
+                physicsState.ValueRO.PlayerLayer, terrainProcessor)
+            .ScheduleParallel(dependency);
+        // Collide player weapons with terrain
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.TerrainLayer,
+                physicsState.ValueRO.PlayerWeaponLayer, terrainProcessor)
+            .ScheduleParallel(dependency);
+        // Collide enemies with terrain
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.TerrainLayer,
+                physicsState.ValueRO.EnemyLayer, terrainProcessor)
+            .ScheduleParallel(dependency);
+        // Collide enemy weapons with terrain
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.TerrainLayer,
+                physicsState.ValueRO.EnemyWeaponLayer, terrainProcessor)
+            .ScheduleParallel(dependency);
 
         JobHandle.ScheduleBatchedJobs();
-        Dependency.Complete();
-
+        dependency.Complete();
+        
+        //PhysicsDebug.DrawLayer(physicsState.ValueRO.PlayerLayer).Run();
+        PhysicsDebug.DrawLayer(physicsState.ValueRO.EnemyLayer).Run();
+        //PhysicsDebug.DrawLayer(physicsState.ValueRO.IntelLayer).Run();
+        
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
+        
         foreach (Entity entity in destroyedSet) {
             state.EntityManager.DestroyEntity(entity);
         }
         destroyedSet.Dispose();
-
-        /*
-        // Example of using GetColliderBodiesInRange to draw the colliders on
-        // all the objects within 100 units of the origin
-        BodiesInRadius inRadius;
-        physicsState.ValueRO.GetInRadius(new float3(0f), 100f, out inRadius);
-        foreach ((FindObjectsResult, PointDistanceResult) result in inRadius) {
-            PhysicsDebug.DrawCollider(result.Item1.collider, result.Item1.transform, UnityEngine.Color.red);
-        }
-        */
+        
 
         // Draw bounding box gizmos
-        // PhysicsDebug.DrawLayer(physicsState.ValueRO.collisionLayer).Run();
+        
+    }
+    
+    private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
+    {
+        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+        return ecb.AsParallelWriter();
     }
 }

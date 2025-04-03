@@ -77,6 +77,7 @@ public struct TrailSystemData : ICleanupComponentData
 }
 
 [BurstCompile]
+[UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial struct TrailUpdateSystem : ISystem
 {
     private ComponentLookup<TrailData> _trailLookup;

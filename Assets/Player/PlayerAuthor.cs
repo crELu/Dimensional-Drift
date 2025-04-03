@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Latios.Psyshock;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -10,7 +11,9 @@ using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
+using Collider = Latios.Psyshock.Collider;
 using Random = UnityEngine.Random;
+using SphereCollider = Latios.Psyshock.SphereCollider;
 
 public class PlayerAuthor : BaseAuthor
 {
@@ -40,7 +43,6 @@ public struct PlayerProjectilePrefab: IBufferElementData
 
 public struct PlayerData : IComponentData
 {
-    public float AttackTime;
     public float LastDamage;
     public float LastIntel;
 }
@@ -72,181 +74,6 @@ public readonly partial struct PlayerAspect : IAspect
 
 }
 
-public partial struct PlayerSystem : ISystem
-{
-    private ComponentLookup<LocalTransform> _localTransformLookup;
-    private ComponentLookup<LaserTag> _laserTagLookup;
-    private NativeArray<Entity> _projectiles;
-
-    public void OnCreate(ref SystemState state)
-    {
-        state.RequireForUpdate<PlayerData>();
-        _localTransformLookup = state.GetComponentLookup<LocalTransform>(isReadOnly: true);
-        _laserTagLookup = state.GetComponentLookup<LaserTag>(isReadOnly: true);
-    }
-
-    public void OnDestroy(ref SystemState state) { }
-    
-    [BurstCompile]
-    public partial struct BulletFiringJob : IJobParallelFor
-    {
-        public EntityCommandBuffer.ParallelWriter ECB;
-        public NativeArray<BulletEntity> BulletsToFire;
-        public LocalTransform PlayerTransform;
-        public quaternion PlayerLookRotation;
-        public float3 PlayerPosition;
-        public PhysicsVelocity PlayerVelocity;
-    
-        [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
-        [ReadOnly] public ComponentLookup<LaserTag> LaserTagLookup;
-
-        public void Execute(int index)
-        {
-            var be = BulletsToFire[index];
-            var bullet = be.Bullet;
-            var prefab = be.Prefab;
-
-            var originalTransform = TransformLookup[prefab];
-        
-            var position = bullet.position;
-            var rotation = math.mul(PlayerLookRotation, bullet.rotation);
-
-            Entity newEntity = ECB.Instantiate(index, prefab);
-        
-            ECB.SetComponent(index, newEntity, LocalTransform.FromPositionRotationScale(
-                position,
-                rotation,
-                originalTransform.Scale
-            ));
-            ECB.AddComponent(index, newEntity, new PostTransformMatrix{Value = float4x4.Scale(be.Stats.Scale)});
-            
-            
-            if (IsLaser(prefab))
-            {
-                ECB.AddComponent(index, newEntity, new LaserTag());
-                ECB.AddComponent(index, newEntity, new Lifetime { Time = float.MaxValue});
-            }
-            else 
-            {
-                // Add PhysicsVelocity for regular bullets
-                ECB.AddComponent(index, newEntity, new PhysicsVelocity
-                {
-                    Linear = PlayerVelocity.Linear + math.mul(rotation, math.forward()) * be.Stats.Speed
-                });
-                ECB.AddComponent(index, newEntity, new Lifetime { Time = be.Stats.Stats.duration });
-
-            }
-            ECB.AddComponent(index, newEntity, new PlayerProjectile()
-            {
-                Stats = be.Stats.Stats,
-                Health = 10000,
-            });
-        }
-        
-        private bool IsLaser(Entity prefab)
-        {
-            return LaserTagLookup.HasComponent(prefab);
-        }
-    }
-
-    public struct BulletEntity
-    {
-        public Bullet Bullet;
-        public AttackInfo Stats;
-        public Entity Prefab;
-    }
-
-    
-    public void OnUpdate(ref SystemState state)
-    {
-        _localTransformLookup.Update(ref state);
-        _laserTagLookup.Update(ref state);
-        
-        var deltaTime = SystemAPI.Time.DeltaTime;
-        var bullets = PlayerManager.Bullets;
-        EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
-
-        Entity player = SystemAPI.GetSingletonEntity<PlayerAspect>();
-        PlayerAspect p = SystemAPI.GetAspect<PlayerAspect>(player);
-        var playerTransform = SystemAPI.GetComponent<LocalTransform>(player);
-        var playerVelocity = SystemAPI.GetComponent<PhysicsVelocity>(player);
-        var projectilePrefabs = SystemAPI.GetBuffer<PlayerProjectilePrefab>(player);
-        
-        PlayerData pData = p.Player;
-        PlayerManager.main.DoDamage(pData.LastDamage);
-        pData.LastDamage = 0;
-        PlayerManager.main.intel += pData.LastIntel;
-        pData.LastIntel = 0;
-        
-        if (PlayerManager.fire)
-        {
-            pData.AttackTime = 0;
-        }
-        pData.AttackTime += deltaTime;
-        var bulletsToFire = new List<BulletEntity>();
-
-        if (!_projectiles.IsCreated)
-        {
-            _projectiles = new NativeArray<Entity>(projectilePrefabs.Length, Allocator.Persistent);
-            for (int i = 0; i < projectilePrefabs.Length; i++)
-            {
-                _projectiles[i] = projectilePrefabs[i].Projectile;
-            }
-        }
-        
-        foreach (var attack in bullets)
-        {
-            var bulletQueue = attack.Bullets;
-            
-            //var prefab = projectiles.ElementAt((int)attack.projectile).Projectile;
-
-            while (bulletQueue.Count > 0 && pData.AttackTime > bulletQueue.Peek().time)
-            {
-                var bulletData = bulletQueue.Dequeue();
-                var prefab = _projectiles[(int)attack.Projectile];
-                bulletsToFire.Add(new() {
-                    Bullet = bulletData,
-                    Stats = attack.Info,
-                    Prefab = prefab
-                });
-            }
-        }
-        
-        
-        var job = new BulletFiringJob
-        {
-            ECB = ecb,
-            BulletsToFire = new NativeArray<BulletEntity>(bulletsToFire.ToArray(), Allocator.TempJob),
-            PlayerTransform = playerTransform,
-            PlayerLookRotation = PlayerManager.main.movement.LookRotation,
-            PlayerPosition = playerTransform.Position,
-            PlayerVelocity = playerVelocity,
-            TransformLookup = _localTransformLookup,
-            LaserTagLookup = _laserTagLookup
-        };
-
-        // Schedule with initial dependency chain
-        JobHandle handle = job.Schedule(bulletsToFire.Count, 64, state.Dependency);
-        
-        
-        // Combine disposals with main handle
-        //handle = job.PlayerTransform.Dispose(handle);
-
-        state.Dependency = handle;
-    
-        p.Player = pData;
-        
-    }
-    
-    
-    private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
-    {
-        var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-        return ecb.AsParallelWriter();
-    }
-}
-
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(PhysicsSystemGroup))]
 public partial struct PlayerPhysicsSystem : ISystem
@@ -274,63 +101,23 @@ public partial struct PlayerPhysicsSystem : ISystem
             playerPhysics.Angular = float3.zero;
             playerData.movement.Position = player.Transform.Position;
             transform.Rotation = playerData.transform.rotation;
-                
-            player.Transform = transform;
+            
+            PlayerManager.burstPos.Data = transform.Position;
             player.PhysicsVelocity = playerPhysics;
-        }
-    }
-}
-
-[UpdateInGroup(typeof(PresentationSystemGroup ))]
-public partial struct LaserSystem : ISystem
-{
-    public void OnCreate(ref SystemState state)
-    {
-        //state.RequireForUpdate<PlayerAspect>();
-        state.RequireForUpdate<PlayerData>();
-    }
-
-    public void OnUpdate(ref SystemState state)
-    {
-        Entity playerE = SystemAPI.GetSingletonEntity<PlayerAspect>();
-        PlayerAspect player = SystemAPI.GetAspect<PlayerAspect>(playerE);
-        var playerTransform = player.Transform;
-        var playerData = PlayerManager.main;
-        if (LaserWeapon.LaserIsActive)
-        {
-            foreach (var (laserTransform, _) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<LaserTag>>())
-            {
-                laserTransform.ValueRW.Position = playerTransform.Position + 
-                                                  math.rotate(playerData.transform.rotation, LaserWeapon.LaserOffset);
-                laserTransform.ValueRW.Rotation = playerData.movement.LookRotation;
+            playerData.velocity.text = $"{math.length(player.PhysicsVelocity.Linear):F0}";
+            RefRW<PhysicsSystemState> physicsState = SystemAPI.GetSingletonRW<PhysicsSystemState>();
+            physicsState.ValueRO.GetInRadius(player.Transform.Position, 30f, physicsState.ValueRO.IntelLayer, out BodiesInRadius inRadius);
+            foreach ((FindObjectsResult, PointDistanceResult) result in inRadius) {
+                if (!state.EntityManager.Exists(result.Item1.entity)) continue;
+                var intelPos = SystemAPI.GetComponent<LocalTransform>(result.Item1.entity);
+                
+                var intelVel = SystemAPI.GetComponent<PhysicsVelocity>(result.Item1.entity);
+                var d = transform.Position - intelPos.Position;
+                if (DimensionManager.CurrentDim == Dimension.Two) d.y = 0;
+                intelVel.Linear = math.normalize(d) * 40;
+                SystemAPI.SetComponent(result.Item1.entity, intelVel);
+                //PhysicsDebug.DrawCollider(result.Item1.collider, result.Item1.transform, UnityEngine.Color.red);
             }
         }
-        else
-        {
-            DespawnLasers(ref state);
-        }
-    }
-    
-    [BurstCompile]
-    partial struct DespawnLasersJob : IJobEntity
-    {
-        public EntityCommandBuffer.ParallelWriter ECB;
-    
-        public void Execute(Entity entity, [EntityIndexInQuery] int index, in LaserTag laser)
-        {
-            ECB.DestroyEntity(index, entity);
-        }
-    }
-
-    private void DespawnLasers(ref SystemState state)
-    {
-        var ecb = new EntityCommandBuffer(Allocator.TempJob);
-        var job = new DespawnLasersJob { ECB = ecb.AsParallelWriter() };
-    
-        state.Dependency = job.ScheduleParallel(state.Dependency);
-    
-        state.Dependency.Complete();
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
     }
 }

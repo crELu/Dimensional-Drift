@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 35, y: 35, z: 35}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4710591424690228671}
@@ -139,27 +139,19 @@ MonoBehaviour:
   health: 1
   size: 10
   intel: {fileID: 1973288489611225477, guid: f81dc56b200479e40ac7f69e3d7e71f9, type: 3}
-  baseMoveSpeed:
-    x: 1
-    y: 1
-    z: 1
   linearPid:
-    Kp: 0
-    Ki: 0
-    Kd: 0
-    integral:
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
       x: 0
       y: 0
       z: 0
-  baseRotationSpeed:
-    x: 1
-    y: 1
-    z: 1
   angularPid:
-    Kp: 0
-    Ki: 0
-    Kd: 0
-    integral:
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
       x: 0
       y: 0
       z: 0

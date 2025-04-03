@@ -6,7 +6,7 @@ public class CharacterAugment: Augment
 {
     public override int MaxStacks => 3;
 
-    public AugmentType coreType = AugmentType.Character;
+    public override AugmentType Target => AugmentType.Character;
     public CharacterStats tier1, tier2, tier3; // extra stats per level (applies to the entire weapon)
     
     public override bool Verify()

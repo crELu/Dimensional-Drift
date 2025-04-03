@@ -6,6 +6,6 @@ namespace Player.Cannon.Core
     [CreateAssetMenu(fileName = "Drone", menuName = "Augments/Cannon/Core/Drone")]
     public class Drone: CoreAugment
     {
-        //TODO
+        public override AugmentType Target => AugmentType.Cannon;
     }
 }

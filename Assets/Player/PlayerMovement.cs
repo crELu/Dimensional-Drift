@@ -25,7 +25,6 @@ using Vector3 = UnityEngine.Vector3;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Camera Settings")]
-    public Transform cameraFixture;
     public Quaternion normalCameraRot, orthoCameraRot;
     public Vector3 normalCameraPos, orthoCameraPos;
     public float orthographicSize;
@@ -36,13 +35,15 @@ public class PlayerMovement : MonoBehaviour
     private float _aspect;
     [SerializeField] private MatrixBlender blender;
     private Matrix4x4 _ortho, _perspective;
-    
+    private float _pitch, _yaw;
     [Header("Movement Settings")]
     public float baseAccel;
-    public float moveSpeed, rotateSpeed, controllerRotateSpeed;
+    public float rotateSpeed, controllerRotateSpeed;
+    public float boostMultiplier;
     public AnimationCurve accelSpeedScaling;
     public AnimationCurve accelDotScaling;
     public float baseDrag = 5f;
+    public AnimationCurve forwardAlignmentScaling;
     public AnimationCurve dragSpeedScaling;
     public float wallForce;
     public MeshRenderer wall;
@@ -52,9 +53,7 @@ public class PlayerMovement : MonoBehaviour
     public float dashCooldown;
     public float dashSpeed;
     public AnimationCurve dashCurve;
-    // public float zoomOutMultiplier;
-    // public float dashFovOffset;
-    // public float dashOrthoSizeOffset;
+    public AnimationCurve dashRollCurve;
     private float _dashCd;
     private float _dashSpeed;
     private bool _isDashing;
@@ -64,11 +63,18 @@ public class PlayerMovement : MonoBehaviour
     private InputAction _lookAction;
     private InputAction _controllerLookAction;
     private InputAction _dashAction;
+    private InputAction _sprintAction;
     private InputAction _flyUpAction;
     private InputAction _flyDownAction;
     
     private Animator _anim;
     private Camera _camera;
+    public Vector3 RelativeMovement { get; private set; }
+
+    [Header("Sound")]
+    [SerializeField] private AudioSource DimSwitchTrack;
+    [SerializeField] private AudioClip DimSwitchUp;
+    [SerializeField] private AudioClip DimSwitchDown;
     
     
     public float3 Position
@@ -109,13 +115,14 @@ public class PlayerMovement : MonoBehaviour
         _lookAction = InputSystem.actions.FindAction("Look");
         _controllerLookAction = InputSystem.actions.FindAction("Controller Look");
         _dashAction = InputSystem.actions.FindAction("Dash");
+        _sprintAction = InputSystem.actions.FindAction("Sprint");
         _flyUpAction = InputSystem.actions.FindAction("Fly Up");
         _flyDownAction = InputSystem.actions.FindAction("Fly Down");
         _anim = GetComponent<Animator>();
         _camera = Camera.main;
         DimensionManager.DimSwitch.AddListener(SwitchDims);
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
-        _camera.transform.localPosition = normalCameraPos;
+        //_camera.transform.localPosition = normalCameraPos;
         _camera.orthographicSize = orthographicSize;
         _camera.fieldOfView = fov;
         InputUser.onChange += HandleInputChange;
@@ -139,14 +146,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (device != null && (change == InputUserChange.DevicePaired || change == InputUserChange.DeviceLost))
         {
-                if (device is Keyboard || device is Mouse)
-                {
-                    _isUsingController = false;
-                }
-                else if (device is Gamepad)
-                {
-                    _isUsingController = true;
-                }
+            if (device is Keyboard || device is Mouse)
+            {
+                _isUsingController = false;
+            }
+            else if (device is Gamepad)
+            {
+                _isUsingController = true;
+            }
         }
     }    
     
@@ -157,12 +164,25 @@ public class PlayerMovement : MonoBehaviour
         {
             case Dimension.Three:
                 StartCoroutine(DoCameraTransition());
-                if (!_isUsingController) Cursor.lockState = CursorLockMode.Locked;   
+                if (!_isUsingController)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    PlayerManager.main.targetCursorMode = CursorLockMode.Locked;
+
+                    DimSwitchTrack.PlayOneShot(DimSwitchUp);
+                }   
                 crosshair.SetActive(true);
                 break;
             case Dimension.Two:
                 StartCoroutine(DoCameraTransition());
-                if (!_isUsingController) Cursor.lockState = CursorLockMode.Confined;
+                if (!_isUsingController)
+                {
+                    CameraManager.main.Angle = Mathf.Atan2(transform.forward.x, transform.forward.z) * Mathf.Rad2Deg;
+                    Cursor.lockState = CursorLockMode.Confined;
+                    PlayerManager.main.targetCursorMode = CursorLockMode.Confined;
+
+                    DimSwitchTrack.PlayOneShot(DimSwitchDown);
+                }
                 crosshair.SetActive(false);
                 break;
             case Dimension.One:
@@ -182,29 +202,12 @@ public class PlayerMovement : MonoBehaviour
             _camera.orthographic = false;
         }        
         
-        Vector3 startPosition = Dim3 ? orthoCameraPos : normalCameraPos;
-        Quaternion startRotation = Dim3 ? orthoCameraRot : normalCameraRot;
-
-        Quaternion targetCameraRotation = Dim3 ? normalCameraRot : orthoCameraRot;
-
-        Vector3 targetPosition = !Dim3 ? orthoCameraPos : normalCameraPos;
-        
         blender.BlendToMatrix(Dim3 ? _perspective : _ortho, DimensionManager.Duration);
-        var movementCurve = Dim3 ? movementCurve3D : movementCurve2D;
-        var rotationCurve = Dim3 ? rotationCurve3D : rotationCurve2D;
         
         while (DimensionManager.t < 1f)
-        {
-            var t = !Dim3 ? DimensionManager.t : DimensionManager.t;
-            _camera.transform.localPosition = Vector3.Lerp(startPosition, targetPosition, movementCurve.Evaluate(t));
-            
-            _camera.transform.localRotation = Quaternion.Slerp(startRotation, targetCameraRotation, rotationCurve.Evaluate(t));
-            
+        { 
             yield return null;
         }
-        
-        _camera.transform.localPosition = targetPosition;
-        _camera.transform.localRotation = targetCameraRotation;
         
         if (!Dim3)
         {
@@ -223,30 +226,22 @@ public class PlayerMovement : MonoBehaviour
        
     private void DoRotation()
     {
-        
         if (Dim3)
         {
             Vector2 inputRotation;
             if (_isUsingController)
             {
                 inputRotation = ControllerLookInput * (controllerRotateSpeed * Time.deltaTime);
-
             }
             else
             {
                 inputRotation = LookInput * (rotateSpeed * Time.deltaTime);
             }
 
-            var characterRotation = Quaternion.Euler(0, inputRotation.x, 0);
-            transform.rotation *= characterRotation;
-            
-            // Calculate camera pitch (up/down) using LookInput.y
-            float cameraPitch = cameraFixture.localRotation.eulerAngles.x;
-            if (cameraPitch > 180f)
-                cameraPitch -= 360f;            
-            cameraPitch -= inputRotation.y;
-            cameraPitch = math.clamp(cameraPitch, -75f, 70f);
-            cameraFixture.localRotation = Quaternion.Euler(cameraPitch, 0, 0);
+            _pitch -= inputRotation.y;
+            _yaw += inputRotation.x;
+            _pitch = Mathf.Clamp(_pitch, -85, 85);
+            transform.rotation = Quaternion.Euler(_pitch, _yaw, 0);
         }
         else
         {
@@ -264,28 +259,36 @@ public class PlayerMovement : MonoBehaviour
             {
                 angle = Mathf.Atan2(mouseDirection.y, mouseDirection.x);
             }
-            float angleDegrees = -angle * Mathf.Rad2Deg + 90f + cameraFixture.eulerAngles.y;
+
+            float angleDegrees = -angle * Mathf.Rad2Deg + 90 + CameraManager.main.Angle;
             Quaternion targetRotation = Quaternion.Euler(0f, angleDegrees, 0f);
             transform.rotation = targetRotation;
-            cameraFixture.rotation = Quaternion.identity;
         }
     }
     
     public Vector3 GetMovement(Vector3 velocity)
     {
-        Vector3 inputVector = MoveInput.y * MoveForward + MoveInput.x * Right + FlyInput * MoveUp;
+        var moveVector = new Vector3(MoveInput.x, FlyInput, MoveInput.y);
+        var moveDir = moveVector.z * MoveForward + moveVector.x * Right + moveVector.y * MoveUp;
+        var f = Vector3.ProjectOnPlane(moveDir, transform.up).normalized;
+        var r = Vector3.Cross(velocity + transform.forward * 5, transform.up).normalized;
+        var u = Vector3.Cross(velocity + transform.forward * 5, transform.right).normalized;
+        RelativeMovement = new Vector3(Vector3.Dot(f, r), Vector3.Dot(f, u), moveDir.normalized.z);
         if (Dim3)
         {
-            inputVector += FlyInput * MoveUp;
+            moveDir += FlyInput * MoveUp;
         }
         Vector3 impulse = Vector3.zero;
-        if (inputVector != Vector3.zero)
+        if (moveDir != Vector3.zero)
         {
-            float speedMultipliers = accelDotScaling.Evaluate(Vector3.Dot(inputVector, velocity)) *
-                                     accelSpeedScaling.Evaluate(velocity.magnitude/moveSpeed);
-            impulse = baseAccel * speedMultipliers * inputVector;
+            float speedMultipliers = accelDotScaling.Evaluate(Vector3.Dot(moveDir, velocity)) *
+                                     accelSpeedScaling.Evaluate(velocity.magnitude) *
+                                     (_sprintAction.ReadValue<float>() != 0 ? boostMultiplier : 1) *
+                                     (Dim3 ? forwardAlignmentScaling.Evaluate(moveVector.normalized.z) : 1);
+            Debug.Log(_sprintAction.ReadValue<float>() != 0);
+            impulse = baseAccel * speedMultipliers * moveDir;
         }
-        impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude / moveSpeed)); 
+        impulse -= velocity * (baseDrag * dragSpeedScaling.Evaluate(velocity.magnitude)); 
         if (transform.position.magnitude > 900)
         {
             impulse -= Vector3.ClampMagnitude(transform.position, transform.position.magnitude - 900 + 100) * wallForce;
@@ -316,17 +319,18 @@ public class PlayerMovement : MonoBehaviour
         {
             _dashDir.Normalize();
         }
-        StartCoroutine(Dash());
+        StartCoroutine(Dash(CameraManager.main.RollDir));
 
         
         
         return _dashDir * _dashSpeed;
     }
 
-    private IEnumerator Dash()
+    private IEnumerator Dash(float dir)
     {
         _isDashing = true;
         _dashCd = dashCooldown;
+        CameraManager.main.isDashing = true;
         float timer = 0;
         while (timer < dashDur)
         {
@@ -345,10 +349,13 @@ public class PlayerMovement : MonoBehaviour
             // {
             //     _camera.orthographicSize = orthographicSize + Mathf.Lerp(0, dashOrthoSizeOffset, smoothStep);
             // }
+            CameraManager.main.extraRoll = dir * 360 * dashRollCurve.Evaluate(timer / dashDur);
             timer += Time.deltaTime;
             _dashSpeed = dashSpeed * dashCurve.Evaluate(timer / dashDur);
             yield return null;
         }
+        CameraManager.main.isDashing = false;
+        CameraManager.main.extraRoll = 0;
         _isDashing = false;
     }
 }

@@ -226,6 +226,7 @@ GameObject:
   - component: {fileID: 7799325963679718346}
   - component: {fileID: 7507185298645006462}
   - component: {fileID: 1611954033966093485}
+  - component: {fileID: 7355385452750243390}
   - component: {fileID: 7331520028186522782}
   m_Layer: 0
   m_Name: spike
@@ -329,32 +330,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 50
-  size: 9
+  size: 10
   intel: {fileID: 1231305184969748935, guid: cb4a7fa663eefdd4a82550cec515e921, type: 3}
-  baseMoveSpeed:
-    x: 5
-    y: 5
-    z: 5
   linearPid:
-    Kp: 4
-    Ki: 0.1
-    Kd: 0.5
-    integral:
-      x: 0
-      y: 0
-      z: 0
-  baseRotationSpeed:
-    x: 1
-    y: 1
-    z: 0.1
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 5
+      y: 5
+      z: 5
   angularPid:
-    Kp: 4
-    Ki: 0.1
-    Kd: 0.5
-    integral:
-      x: 0
-      y: 0
-      z: 0
+    kp: 4
+    ki: 0.1
+    kd: 0.5
+    outputLimit:
+      x: 1
+      y: 1
+      z: 1
   attackRange: 150
   hideRange: 20
   spacingRange: 75
@@ -369,17 +362,40 @@ MonoBehaviour:
   m_GameObject: {fileID: 4051934337747174715}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 325a83af18d34e12a1d990939726613c, type: 3}
+  m_Script: {fileID: 11500000, guid: db956e81361440ea96939b8d19dd2ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   projectile: {fileID: 2006387325404477191, guid: 068c42873f57e6e478da5b26ef804f82, type: 3}
-  range: 500
+  range: 300
   speed: 0
   visionCone: {x: 0, y: 360}
   cd: 5
   bursts: 1
-  burstLength: 0
+  burstLength: 0.5
+--- !u!136 &7355385452750243390
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4051934337747174715}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1
+  m_Height: 3
+  m_Direction: 2
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!135 &7331520028186522782
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -455,7 +471,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5061125549162199800}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 029d9e12c13e458b95fb1ffade7552e1, type: 3}
+  m_Script: {fileID: 11500000, guid: cadc6a505c674049a8218ccc42075bbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   debug: 1

@@ -13,36 +13,49 @@ MonoBehaviour:
   m_Name: Homing
   m_EditorClassIdentifier: 
   <MaxStacks>k__BackingField: 3
-  <Stacks>k__BackingField: 1
+  <Stacks>k__BackingField: 3
   <Requirements>k__BackingField: []
-  coreType: 1
   tier1:
-    damage: 0
     size: 0
     speed: 0
     attackSpeed: 0
     attackDelay: 0
-    duration: 0
     accuracy: 0
+    ammoUse: 0
     count: 0
-    precision: 0
+    bulletStats:
+      damage: 0
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
   tier2:
-    damage: 0
     size: 0
     speed: 0
     attackSpeed: 0
     attackDelay: 0
-    duration: 0
     accuracy: 0
+    ammoUse: 0
     count: 0
-    precision: 0
+    bulletStats:
+      damage: 0
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
   tier3:
-    damage: 0
     size: 0
     speed: 0
     attackSpeed: 0
     attackDelay: 0
-    duration: 0
     accuracy: 0
+    ammoUse: 0
     count: 0
-    precision: 0
+    bulletStats:
+      damage: 0
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
+  postPriority: 0
+  RocketCount: {x: 0, y: 15, z: 65}

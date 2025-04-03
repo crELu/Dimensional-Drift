@@ -86,7 +86,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 1, g: 0.23783004, b: 0, a: 1}
   lifetime: 3
-  scale: {x: 1, y: 1, z: 1, w: 0}
+  scale: {x: 8, y: 8, z: 8, w: 0}
   vfxType: PlayerCannon
 --- !u!114 &7918589941069970403
 MonoBehaviour:
@@ -100,6 +100,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce6cc9a555fb49608113f06e21757afa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  infPierce: 0
+  attack: 2
 --- !u!114 &-5267809409064220718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,10 +111,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2006387325404477191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22d6b7d930a94607b4cb484a3532ea8a, type: 3}
+  m_Script: {fileID: 11500000, guid: 43ba655cec194cd19620c77002295e58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifetime: 15
+  lifetime: 2
+  dimensionalDamage: 1
 --- !u!54 &4955774692025816020
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -1,11 +1,26 @@
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace Systems.Menu
 {
     public class MainMenu : MonoBehaviour
     {
+        [SerializeField] private PlayerInput playerInput;
+        [SerializeField] private PlayerManager playerManager;
+        [SerializeField] private GameObject settingsPanel;
+
+
+        private void Start()
+        {
+            settingsPanel.SetActive(false);
+            playerInput.actions["Player/Settings"].performed += OnSettingsAction;
+            playerInput.actions["UI/Settings"].performed += OnSettingsAction;
+
+            
+        }
+        
         // This method is called by the Play button
         public void PlayGame()
         {
@@ -23,6 +38,21 @@ namespace Systems.Menu
             #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
             #endif
+        }
+
+        private void OnSettingsAction(InputAction.CallbackContext context)
+        {
+            settingsPanel.SetActive(!settingsPanel.activeSelf);
+            if (settingsPanel.activeSelf)
+            {
+                playerInput.SwitchCurrentActionMap("UI");
+                Cursor.lockState = CursorLockMode.Confined;
+            }
+            else
+            {
+                playerInput.SwitchCurrentActionMap("Player");
+                Cursor.lockState = playerManager.targetCursorMode;
+            }
         }
     }
 }
