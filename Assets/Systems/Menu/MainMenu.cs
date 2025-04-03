@@ -1,30 +1,27 @@
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using System;
 
 namespace Systems.Menu
 {
     public class MainMenu : MonoBehaviour
     {
-        [SerializeField] private PlayerInput playerInput;
-        [SerializeField] private PlayerManager playerManager;
-        [SerializeField] private GameObject settingsPanel;
+
+        public PlayerInput playerInput;
+        public GameObject settingsPanel;
 
 
         private void Start()
         {
+            playerInput.SwitchCurrentActionMap("UI");
+            Cursor.lockState = CursorLockMode.Confined;
             settingsPanel.SetActive(false);
-            playerInput.actions["Player/Settings"].performed += OnSettingsAction;
-            playerInput.actions["UI/Settings"].performed += OnSettingsAction;
-
-            
         }
         
         // This method is called by the Play button
         public void PlayGame()
         {
-            // Change "GameScene" to the name of the scene you want to load.
             SceneManager.LoadScene("Main Scene");
         }
 
@@ -40,19 +37,11 @@ namespace Systems.Menu
             #endif
         }
 
-        private void OnSettingsAction(InputAction.CallbackContext context)
+        // This method is called by the Options/Settings button
+        public void OpenSettings()
         {
-            settingsPanel.SetActive(!settingsPanel.activeSelf);
-            if (settingsPanel.activeSelf)
-            {
-                playerInput.SwitchCurrentActionMap("UI");
-                Cursor.lockState = CursorLockMode.Confined;
-            }
-            else
-            {
-                playerInput.SwitchCurrentActionMap("Player");
-                Cursor.lockState = playerManager.targetCursorMode;
-            }
+            // Debug.Log("OpenSettings");
+            settingsPanel.SetActive(true);
         }
     }
 }

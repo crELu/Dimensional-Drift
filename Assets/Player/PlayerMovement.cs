@@ -53,6 +53,8 @@ public class PlayerMovement : MonoBehaviour
     public float wallForce;
     public MeshRenderer wall;
     public RawImage boostImage;
+    public bool invertX = false;
+    public bool invertY = false;
     
     [Header("Dash Settings")]
     public float dashDur;
@@ -93,6 +95,9 @@ public class PlayerMovement : MonoBehaviour
     
     void Start()
     {
+        // Debug.Log("rotate speed: " + rotateSpeed);
+        SettingsManager.Instance.SetBaseMouseSensitivity(rotateSpeed);
+
         _anim = GetComponent<Animator>();
         _camera = Camera.main;
         DimensionManager.DimSwitch.AddListener(SwitchDims);
@@ -220,6 +225,10 @@ public class PlayerMovement : MonoBehaviour
             {
                 inputRotation = PlayerInputs.main.LookInput * (rotateSpeed * Time.deltaTime);
             }
+
+            // Apply invert settings BEFORE updating pitch/yaw
+            if (invertX) inputRotation.x = -inputRotation.x;
+            if (invertY) inputRotation.y = -inputRotation.y;
 
             _pitch -= inputRotation.y;
             _yaw += inputRotation.x;

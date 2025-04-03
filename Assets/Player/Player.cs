@@ -86,9 +86,12 @@ public class PlayerManager : MonoBehaviour
     public float ScanRadius { get; private set; }
     public int ScanState { get; private set; }
 
+    void Awake() {
+        main = this;
+    }
+    
     void Start()
     {
-        main = this;
         transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
         Application.targetFrameRate = 60;
         CalcStats();
