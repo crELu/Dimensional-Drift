@@ -19,7 +19,7 @@ public class ShopManager : MonoBehaviour
     [SerializeField] private GameObject inventoryPage;
     [SerializeField] private TextMeshProUGUI infoTitle, infoDescription, infoCost;
     [SerializeField] private ShopItem shopItemPrefab;
-
+    [SerializeField] private Button refreshButton;
     [Header("Shop Items")]
     [SerializeField] private List<Item> augmentPool;
     [SerializeField] private List<Item> shardPool;
@@ -100,10 +100,17 @@ public class ShopManager : MonoBehaviour
 
     public void RefreshShop()
     {
-        // Re-enable all shop slots first
+        // Reset all shop slots first
         foreach (var slot in shopSlots)
         {
-            slot.gameObject.SetActive(true);
+            // Instead of just activating, also reset any CanvasGroup
+            CanvasGroup canvasGroup = slot.GetComponent<CanvasGroup>();
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 1;
+                canvasGroup.interactable = true;
+                canvasGroup.blocksRaycasts = true;
+            }
         }
 
         List<Item> validItems = new();
@@ -195,20 +202,8 @@ public class ShopManager : MonoBehaviour
     }
 
     // Add this method to handle post-purchase selection
-    public void HandleItemPurchased(int purchasedIndex)
+    public void UpdateUIItemPurchased()
     {
-        // Find first active shop slot and select it
-        foreach (var slot in shopSlots)
-        {
-            if (slot.gameObject.activeSelf && slot.childCount > 0)
-            {
-                EventSystem.current.SetSelectedGameObject(slot.gameObject);
-                return;
-            }
-        }
-        
-        // If no slots are active, select the refresh button
-        if (firstShopSelectable != null)
-            EventSystem.current.SetSelectedGameObject(firstShopSelectable.gameObject);
+        EventSystem.current.SetSelectedGameObject(refreshButton.gameObject);
     }
 }

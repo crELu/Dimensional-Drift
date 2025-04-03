@@ -19,6 +19,7 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointe
     [Header("UI Elements")]
     public Image itemIcon;
     public Image rarity;
+    public bool isPurchased = false;
     
     public Item data;
     private ShopManager shopManager;
@@ -50,12 +51,14 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointe
 
     public void Select()
     {
+        if (isPurchased) return;
         string rarityText = data.rarity == 0 ? "I" : data.rarity == 1 ? "II" : "III";
         shopManager.DisplayText(data.Description, $"{data.itemTitle} {rarityText}", data.baseCost);
     }
 
     public void Unselect()
     {
+        if (isPurchased) return;
         shopManager.ClearText();
     }
 
@@ -74,17 +77,21 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointe
         if (playerInventory.SpendIntel(data.baseCost))
         {
             data.DoAction();
+            isPurchased = true;
             
-            // Get parent index before disabling
-            int slotIndex = transform.parent.GetSiblingIndex();
+            // Instead of disabling the parent, make it invisible and non-interactive
+            CanvasGroup canvasGroup = transform.parent.GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+                canvasGroup = transform.parent.gameObject.AddComponent<CanvasGroup>();
             
-            // Disable the parent gameObject
-            transform.parent.gameObject.SetActive(false);
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
             
-            // Notify ShopManager to update selection
-            shopManager.HandleItemPurchased(slotIndex);
+            // Update selection to the refresh button
+            shopManager.UpdateUIItemPurchased();
             
-            // Now we can destroy the item
+            // Now destroy the item
             Destroy(gameObject);
         }
     }
