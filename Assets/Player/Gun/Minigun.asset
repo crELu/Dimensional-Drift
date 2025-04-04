@@ -12,37 +12,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54f9e732eb7647a2b0812a6d1dec3aa9, type: 3}
   m_Name: Minigun
   m_EditorClassIdentifier: 
-  <MaxStacks>k__BackingField: 3
-  <Stacks>k__BackingField: 2
+  <Stacks>k__BackingField: 3
   <Requirements>k__BackingField: []
-  coreType: 0
   tier1:
-    damage: -20
     size: 0
     speed: 0
-    attackSpeed: 20
-    attackDelay: 500
-    duration: 0
-    accuracy: 0
-    count: 1
-    precision: 0
-  tier2:
-    damage: -50
-    size: 0
-    speed: 0
-    attackSpeed: 100
-    attackDelay: 500
-    duration: 0
-    accuracy: 0
-    count: 0
-    precision: 0
-  tier3:
-    damage: 0
-    size: 0
-    speed: 0
-    attackSpeed: 0
+    attackSpeed: 30
     attackDelay: 0
-    duration: 0
-    accuracy: 0
+    accuracy: -20
+    ammoUse: 0
     count: 0
-    precision: 0
+    bulletStats:
+      damage: 0
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
+  tier2:
+    size: 0
+    speed: 0
+    attackSpeed: 50
+    attackDelay: 0
+    accuracy: -60
+    ammoUse: 0
+    count: 0
+    bulletStats:
+      damage: 0
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
+  tier3:
+    size: 0
+    speed: 0
+    attackSpeed: 500
+    attackDelay: 0
+    accuracy: 0
+    ammoUse: 0
+    count: 0
+    bulletStats:
+      damage: 0
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
+  postPriority: 0

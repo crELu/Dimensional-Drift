@@ -12,37 +12,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e11f8fd335214c31963f2de650c4b0f3, type: 3}
   m_Name: Beam
   m_EditorClassIdentifier: 
-  <MaxStacks>k__BackingField: 3
   <Stacks>k__BackingField: 1
   <Requirements>k__BackingField: []
-  coreType: 2
   tier1:
-    damage: 0
     size: 0
     speed: 0
     attackSpeed: 0
     attackDelay: 0
-    duration: 0
     accuracy: 0
+    ammoUse: 20
     count: 0
-    precision: 0
+    bulletStats:
+      damage: 50
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
   tier2:
-    damage: 0
     size: 0
     speed: 0
     attackSpeed: 0
     attackDelay: 0
-    duration: 0
     accuracy: 0
+    ammoUse: 30
     count: 0
-    precision: 0
+    bulletStats:
+      damage: 100
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
   tier3:
-    damage: 0
     size: 0
     speed: 0
     attackSpeed: 0
     attackDelay: 0
-    duration: 0
     accuracy: 0
+    ammoUse: 40
     count: 0
-    precision: 0
+    bulletStats:
+      damage: 150
+      duration: 0
+      extraction: 0
+      power: 0
+      pierce: 0
+  postPriority: 0

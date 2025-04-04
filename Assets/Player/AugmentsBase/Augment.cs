@@ -8,11 +8,11 @@ using UnityEngine;
 public class Augment: ScriptableObject
 {
     public virtual string Id => throw new NotImplementedException();
-    [field:SerializeField] public virtual int MaxStacks { get; private set; }
+    public virtual int MaxStacks => throw new NotImplementedException();
     [field:SerializeField, Range(1, 3)]public int Stacks { get; set; }
     [field:SerializeField] public List<Requirement> Requirements { get; private set; }
     public virtual AugmentType Target => throw new NotImplementedException();
-    public virtual AllStats GetStats()
+    public virtual AllStats GetStats(AllStats prevStats)
     {
         throw new NotImplementedException();
     }

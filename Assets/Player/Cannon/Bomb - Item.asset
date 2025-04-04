@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40e19351c690431fabcae8110d39b151, type: 3}
+  m_Name: Bomb - Item
+  m_EditorClassIdentifier: 
+  itemTitle: Explosive
+  baseCost: 100
+  rarity: 0
+  augment: {fileID: 11400000, guid: 5c0fb0ab8d66eef4e95e8eeaed8b9485, type: 2}
+  type: 1
+  target: 2
+  icon: {fileID: 21300000, guid: b2c45ef2eab158840af61577362d00b4, type: 3}
+  textT1: '+10% Ammo Comsumption.
+
+    Shrapnel: On Death, release 5 shrapnel that
+    deal 80% damage each.'
+  textT2: '+20% Ammo Comsumption.
+
+    Shrapnel+: Release 25 shrapnel.'
+  textT3: '+30% Ammo Comsumption.
+
+    Shrapnel++: Release 60+(5 per Count) shrapnel.'

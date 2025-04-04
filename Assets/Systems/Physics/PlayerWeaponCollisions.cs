@@ -13,6 +13,7 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
     public EntityCommandBuffer.ParallelWriter Ecb;
     public NativeParallelHashSet<Entity>.ParallelWriter DestroyedSetWriter;
     public NativeQueue<SfxCommand>.ParallelWriter AudioWriter;
+    public NativeQueue<OneShotData>.ParallelWriter VfxWriter;
     public void Execute(in FindPairsResult result) {
         ColliderDistanceResult r;
         if (Physics.DistanceBetween(
@@ -35,8 +36,18 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
         {
             EnemyCollisionReceiver enemy = ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW;
             if (!enemy.Invulnerable) enemy.LastDamage += playerProjStats.Stats.damage;
-
             playerProj.Health -= (int)math.ceil(10000f / (1+playerProjStats.Stats.pierce));
+
+            if (ComponentLookups.PlayerProjectileEffects.InterferenceLookup.HasComponent(pProj))
+            {
+                var strength = ComponentLookups.PlayerProjectileEffects.InterferenceLookup.GetRW(pProj).ValueRW.Strength;
+                var enemyVel = ComponentLookups.velocity.GetRW(entityB).ValueRW;
+                var projVel = ComponentLookups.velocity.GetRW(pProj).ValueRW;
+                var force = math.sqrt(strength / enemy.Size / enemy.Size * 10);
+                enemyVel.Angular += math.normalize(math.cross(projVel.Linear, math.up())) * force / 5;
+                enemyVel.Linear += math.normalize(projVel.Linear) * force;
+                ComponentLookups.velocity.GetRW(entityB).ValueRW = enemyVel;
+            }
             
             ComponentLookups.EnemyLookup.GetRW(entityB).ValueRW = enemy;
             AudioWriter.Enqueue(new SfxCommand {Name = "Hit Enemy", Position = projPos.Position});
@@ -61,17 +72,16 @@ public struct PlayerWeaponPairs: IFindPairsProcessor {
                     playerProj.Health -= (int)math.ceil(10000f / ((1+playerProjStats.Stats.pierce)*(1+playerProjStats.Stats.power)));
                 }
                 
-                ComponentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW = enemyProj;
-                ComponentLookups.PlayerWeaponLookup.GetRW(pProj).ValueRW = playerProj;
-                
                 if (enemyProj.Mass <= 0)
                 {
-                    DestroyedSetWriter.Add(entityB);
+                    enemyProj.Mass = 0;
                 }
                 if (playerProj.Health <= 0)
                 {
                     DestroyedSetWriter.Add(pProj);
                 }
+                ComponentLookups.EnemyWeaponLookup.GetRW(entityB).ValueRW = enemyProj;
+                ComponentLookups.PlayerWeaponLookup.GetRW(pProj).ValueRW = playerProj;
             }
         }
     }

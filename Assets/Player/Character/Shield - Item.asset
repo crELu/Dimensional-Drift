@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40e19351c690431fabcae8110d39b151, type: 3}
+  m_Name: Shield - Item
+  m_EditorClassIdentifier: 
+  itemTitle: Shield
+  baseCost: 100
+  rarity: 0
+  augment: {fileID: 11400000, guid: e448e2f0132644e418d3540674869314, type: 2}
+  type: 4
+  target: 4
+  icon: {fileID: 21300000, guid: d007f8d8c4abd1e49b2017b6a52970b1, type: 3}
+  textT1: +20 Shield, +10% Shield Regen, -10% Boost Recovery
+  textT2: +30 Shield, +25% Shield, +25% Shield Regen, -25% Boost Recovery
+  textT3: At full Health and Shield, gain +20% DMG and Ammo Recovery.

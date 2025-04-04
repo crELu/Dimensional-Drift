@@ -12,7 +12,7 @@ public class PlayerWeapon : MonoBehaviour
 
     [SerializeField] protected WeaponStats baseStats;
     protected WeaponStats Stats;
-    protected WeaponStats BaseStats;
+    protected WeaponStats MainStats;
     protected WeaponStats AddonStats;
     
     [SerializeField] protected List<SpecializedAugment> SpecializedAugments = new();
@@ -24,7 +24,7 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] private AugmentType weaponType;
     public AugmentType WeaponType => weaponType;
 
-    private float Cd => 1 / BaseStats.attackSpeed;
+    private float Cd => 1 / MainStats.attackSpeed;
     protected float Cooldown;
 
     protected void Start()
@@ -40,7 +40,7 @@ public class PlayerWeapon : MonoBehaviour
             if (core.Verify()) core.Compile(Stats);
         }
 
-        BaseStats = baseStats * Stats;
+        MainStats = baseStats * Stats;
     }
 
     protected void Update()
@@ -52,10 +52,10 @@ public class PlayerWeapon : MonoBehaviour
     {
         Compile();
         
-        if (pressed && Cooldown < 0 && BaseStats.ammoUse <= player.Ammo)
+        if (pressed && Cooldown < 0 && MainStats.ammoUse <= player.Ammo)
         {
             Cooldown = Cd;
-            player.UseAmmo(BaseStats.ammoUse);
+            player.UseAmmo(MainStats.ammoUse);
             RecalcBullets();
 
             WeaponTrack.PlayOneShot(WeaponSFX);
@@ -68,7 +68,7 @@ public class PlayerWeapon : MonoBehaviour
     {
         Compile(); // TODO remove this at some point when we can guarantee this runs after anything is changed
         List<Attack> current = new ();
-        current.Add(BaseWeaponAttack(BaseStats));
+        current.Add(BaseWeaponAttack(MainStats));
         foreach (var core in CoreAugments)
         {
             var attack = core.Fire(Stats);
@@ -91,28 +91,76 @@ public class PlayerWeapon : MonoBehaviour
         AllStats s = new();
         foreach (var augment in CoreAugments)
         {
-            s += augment.GetStats();
+            s += augment.GetStats(new AllStats{weaponStats = MainStats});
         }
         foreach (var augment in SpecializedAugments)
         {
-            s += augment.GetStats();
+            s += augment.GetStats(new AllStats{weaponStats = MainStats});
         }
 
         return s;
     }
 
-    public void AddAugment(Augment augment)
+    public (bool, int) ValidAugment(Augment augment)
     {
-        if (augment.Target != weaponType)
+        if (augment.Target != weaponType) return (false, 0);
+        if (!CoreAugments.Exists(e => e.Id == augment.Id))
         {
-            Debug.Log($"Wrong augment type {augment.Target} for weaponType {weaponType}.");
+            if (CoreAugments.Count >= 3) return (false, 0);
+            return (true, 0);
         }
+        var aug = CoreAugments.Find(e => e.Id == augment.Id);
+        if (aug.Stacks >= 3) return (false, 0);
+        return (true, aug.Stacks);
+    }
+
+    public void AddAugment(Augment augment, int tier)
+    {
+        if (augment.Target != weaponType) Debug.LogError($"Wrong augment type {augment.Target} for weaponType {weaponType}.");
+        if (tier < 0 || tier > 2) Debug.LogError($"Invalid augment tier {tier}.");
+
         if (augment is CoreAugment coreAug)
-            CoreAugments.Add(coreAug);
-        else if (augment is SpecializedAugment specAug)
-            SpecializedAugments.Add(specAug);
-        else if (augment is StatsAugment statsAug)
-            AddonStats += statsAug.GetStats().weaponStats;
+        {
+            Predicate<CoreAugment> nameChecker = e => e.Id == coreAug.Id;
+            if (tier == 0)
+            {
+                if (CoreAugments.Exists(nameChecker))
+                {
+                    Debug.LogError(
+                        $"Tried to add T1 augment {augment.Id} for weaponType {weaponType}, but it already exists.");
+                    return;
+                }
+                if (CoreAugments.Count >= 3)
+                {
+                    Debug.LogError(
+                        $"Tried to add T1 augment {augment.Id} for weaponType {weaponType}, but there are already 3.");
+                    
+                }
+                var clone = Instantiate(coreAug);
+                clone.Stacks = 1;
+                CoreAugments.Add(clone);
+            }
+            else if (tier == 1)
+            {
+                if (!CoreAugments.Exists(e => nameChecker(e) && e.Stacks == 1))
+                {
+                    Debug.LogError(
+                        $"Tried to add T2 augment {augment.Id} for weaponType {weaponType}, but no T1 exists.");
+                    return;
+                }
+                CoreAugments.Find(nameChecker).Stacks++;
+            }
+            else if (tier == 2)
+            {
+                if (!CoreAugments.Exists(e => nameChecker(e) && e.Stacks == 2))
+                {
+                    Debug.LogError(
+                        $"Tried to add T3 augment {augment.Id} for weaponType {weaponType}, but no T2 exists.");
+                    return;
+                }
+                CoreAugments.Find(nameChecker).Stacks++;
+            }
+        }
     }
 }
 

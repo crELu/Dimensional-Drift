@@ -138,7 +138,7 @@ namespace Enemies.AI
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<SoundReceiver>();
+            state.RequireForUpdate<VfxReceiver>();
             state.InitSystemRng("BaseEnemyAI");
             state.RequireForUpdate<BeginSimulationEntityCommandBufferSystem.Singleton>();
             
@@ -233,6 +233,7 @@ namespace Enemies.AI
             [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
             public SystemRng Rng;
             public NativeQueue<SfxCommand>.ParallelWriter AudioWriter;
+            public float DamageMult;
             
             public bool OnChunkBegin(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
@@ -247,7 +248,7 @@ namespace Enemies.AI
 
             private void Execute([ChunkIndexInQuery] int chunkIndex, in Entity enemy, ref EnemyStats enemyStats, ref EnemyCollisionReceiver damageInfo)
             {
-                enemyStats.Health -= damageInfo.LastDamage;
+                enemyStats.Health -= damageInfo.LastDamage * DamageMult;
                 damageInfo.LastDamage = 0;
                 
                 if (enemyStats.Health <= 0)
@@ -282,14 +283,15 @@ namespace Enemies.AI
             _localTransform.Update(ref state);
             ecb = GetEntityCommandBuffer(ref state);
             
-            var soundReceiver = SystemAPI.GetSingleton<SoundReceiver>();
-            var soundWriter = soundReceiver.AudioCommands.AsParallelWriter();
+            var soundReceiver = SystemAPI.GetSingleton<VfxReceiver>();
+            var soundWriter = soundReceiver.VfxCommands.AsParallelWriter();
             var d2 = new BaseEnemyHealthJob
             {
                 Ecb = ecb,
                 TransformLookup = _localTransform,
                 Rng = state.GetJobRng(),
                 AudioWriter = soundWriter,
+                DamageMult = PlayerManager.burstPos.Data.Damage,
             }.ScheduleParallel(state.Dependency);
             state.Dependency = d2;
         }

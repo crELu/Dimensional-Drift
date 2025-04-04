@@ -16,12 +16,14 @@ using Unity.Collections;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics.Extensions;
 using Unity.Transforms;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Unity.Mathematics.math;
 using CapsuleCollider = Latios.Psyshock.CapsuleCollider;
@@ -99,6 +101,8 @@ public struct GeometryHelper {
 partial struct ColliderBodiesJob: IJobParallelFor {
     public float3 projectDirection2D;
     public NativeArray<ColliderBody> colliderBodies;
+    [ReadOnly]
+    public ComponentLookup<PostTransformMatrix> postTransformLookup;
     public NativeArray<Entity> entities;
     public NativeArray<LocalTransform> entityTransforms;
     public NativeArray<Collider> entityColliders;
@@ -110,6 +114,15 @@ partial struct ColliderBodiesJob: IJobParallelFor {
         float3 projectedPosition = t.Position;
         Collider projectedCollider = entityColliders[i];
         
+        float3 scale = new float3(t.Scale);
+        if (postTransformLookup.HasComponent(entities[i])) {
+            float4x4 postTransform = postTransformLookup.GetRefRO(entities[i]).ValueRO.Value;
+            scale = new float3(
+                length(new float3(postTransform.c0.x, postTransform.c1.x, postTransform.c2.x)),
+                length(new float3(postTransform.c0.y, postTransform.c1.y, postTransform.c2.y)),
+                length(new float3(postTransform.c0.z, postTransform.c1.z, postTransform.c2.z)));
+        }
+        
         if (Dim == Dimension.Two)
         {
             GeometryHelper.ProjectPoint2D(
@@ -120,7 +133,7 @@ partial struct ColliderBodiesJob: IJobParallelFor {
 
         colliderBodies[i] = new ColliderBody {
             collider = projectedCollider,
-            transform = new TransformQvvs(projectedPosition, t.Rotation, t.Scale, 1),
+            transform = new TransformQvvs(projectedPosition, t.Rotation, scale.x, 1),
             entity = entities[i]
         };
 
@@ -170,6 +183,8 @@ public struct PhysicsComponentLookups {
     public PhysicsComponentLookup<DamagePlayer> EnemyWeaponLookup;
     public PhysicsComponentLookup<Obstacle> TerrainLookup;
     public PhysicsComponentLookup<Intel> IntelLookup;
+    public PhysicsComponentLookup<Turnips.TurnipTag> TurnipLookup;
+    public PlayerProjectileEffectLookups PlayerProjectileEffects;
 
     public void Update(ref SystemState state) {
         velocity.Update(ref state);
@@ -181,7 +196,9 @@ public struct PhysicsComponentLookups {
         PlayerWeaponStatsLookup.Update(ref state);
         EnemyWeaponLookup.Update(ref state);
         TerrainLookup.Update(ref state);
+        TurnipLookup.Update(ref state);
         IntelLookup.Update(ref state);
+        PlayerProjectileEffects.Update(ref state);
     }
 }
 
@@ -231,6 +248,7 @@ public struct PhysicsSystemState: IComponentData {
     public CollisionLayer EnemyGhostLayer;
     public CollisionLayer EnemyWeaponLayer;
     public CollisionLayer TerrainLayer;
+    public CollisionLayer TurnipLayer;
     public CollisionLayer IntelLayer;
 
     public Dimension dimension;
@@ -262,6 +280,7 @@ public struct PhysicsSystemState: IComponentData {
         EnemyGhostLayer.Dispose();
         EnemyWeaponLayer.Dispose();
         TerrainLayer.Dispose();
+        TurnipLayer.Dispose();
         IntelLayer.Dispose();
     }
 }
@@ -272,7 +291,7 @@ public partial struct PhysicsSystem: ISystem {
     LatiosWorldUnmanaged latiosWorld;
 
     PhysicsComponentLookups componentLookups;
-    
+    ComponentLookup<PostTransformMatrix> postTransformLookup;
     EntityQuery physicsObjectQuery;
 
     EntityQuery playerQuery;
@@ -281,6 +300,7 @@ public partial struct PhysicsSystem: ISystem {
     EntityQuery enemyGhostedQuery;
     EntityQuery enemyWeaponQuery;
     EntityQuery terrainQuery;
+    EntityQuery turnipQuery;
     EntityQuery intelQuery;
 
     float3 projectDirection2D;
@@ -320,6 +340,7 @@ public partial struct PhysicsSystem: ISystem {
                 entities = entities,
                 entityColliders = entityColliders,
                 entityTransforms = entityTransforms,
+                postTransformLookup = postTransformLookup,
                 Dim = dim
             }.Schedule(entities.Length, 64);
             
@@ -351,7 +372,7 @@ public partial struct PhysicsSystem: ISystem {
     [BurstCompile]
     public void OnCreate(ref SystemState state) {
         state.RequireForUpdate<PlayerData>();
-        state.RequireForUpdate<SoundReceiver>();
+        state.RequireForUpdate<VfxReceiver>();
 
         latiosWorld = state.GetLatiosWorldUnmanaged();
         componentLookups = new PhysicsComponentLookups {
@@ -364,8 +385,10 @@ public partial struct PhysicsSystem: ISystem {
             EnemyLookup = state.GetComponentLookup<EnemyCollisionReceiver>(),
             PlayerWeaponLookup = state.GetComponentLookup<PlayerProjectile>(),
             TerrainLookup = state.GetComponentLookup<Obstacle>(),
+            TurnipLookup = state.GetComponentLookup<Turnips.TurnipTag>(),
             IntelLookup = state.GetComponentLookup<Intel>()
         };
+        componentLookups.PlayerProjectileEffects.Init(ref state);
 
         // Top-down 2D projection
         projectDirection2D = new float3(0f, 1f, 0f);
@@ -412,6 +435,10 @@ public partial struct PhysicsSystem: ISystem {
             .WithAllRW<Unity.Physics.PhysicsVelocity, LocalTransform>()
             .WithAll<Collider, Unity.Physics.PhysicsMass>()
             .Build(ref state);
+        
+        turnipQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<Turnips.TurnipTag, Collider, LocalTransform>()
+            .Build(ref state);
 
         intelQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAllRW<Intel>()
@@ -419,6 +446,8 @@ public partial struct PhysicsSystem: ISystem {
             .WithAll<Collider, Unity.Physics.PhysicsMass>()
             .Build(ref state);
         
+        postTransformLookup = state.GetComponentLookup<PostTransformMatrix>();
+
 
         state.EntityManager.AddComponent<PhysicsSystemState>(state.SystemHandle);
         SystemAPI.SetComponent(state.SystemHandle, new PhysicsSystemState {
@@ -437,12 +466,14 @@ public partial struct PhysicsSystem: ISystem {
         RefRW<PhysicsSystemState> physicsState = SystemAPI.GetSingletonRW<PhysicsSystemState>();
         physicsState.ValueRW.dimension = DimensionManager.burstDim.Data;
         
+        postTransformLookup.Update(ref state);
+        
         // Create world bounds centered on the player
         var playerEntity = SystemAPI.GetSingletonEntity<PlayerData>();
         var playerTransform = SystemAPI.GetComponent<LocalTransform>(playerEntity);
         
-        if (!SystemAPI.TryGetSingleton(out SoundReceiver soundReceiver)) return;
-        var soundWriter = soundReceiver.AudioCommands.AsParallelWriter();
+        if (!SystemAPI.TryGetSingleton(out VfxReceiver soundReceiver)) return;
+        var soundWriter = soundReceiver.VfxCommands.AsParallelWriter();
         GeometryHelper.ProjectPoint2D(projectDirection2D, playerTransform.Position, out float3 playerCenter);
         var worldBoundHalfSize = new float3(100);
         var playerAabb = new Aabb(
@@ -469,8 +500,8 @@ public partial struct PhysicsSystem: ISystem {
         
         var buildPlayerInteractLayer = BuildLayer(
             playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
-            null, out physicsState.ValueRW.PlayerInteractLayer, new NativeArray<ColliderBody>(playerHitbox, Allocator.TempJob));
-
+            null, out physicsState.ValueRW.PlayerInteractLayer, playerHitbox);
+        
         var buildPlayerWeaponLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
                 playerWeaponQuery, out physicsState.ValueRW.PlayerWeaponLayer);
@@ -494,7 +525,11 @@ public partial struct PhysicsSystem: ISystem {
         var buildIntelLayer = BuildLayer(
                 playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
                 intelQuery, out physicsState.ValueRW.IntelLayer);
-
+        
+        var buildTurnipLayer = BuildLayer(
+            playerAabb, DimensionManager.burstDim.Data, projectDirection2D,
+            turnipQuery, out physicsState.ValueRW.TurnipLayer);
+        
         var buildLayers = JobHandle.CombineDependencies(
                 buildMainLayer, buildPlayerLayer, buildPlayerWeaponLayer);
         buildLayers = JobHandle.CombineDependencies(
@@ -503,13 +538,19 @@ public partial struct PhysicsSystem: ISystem {
                 buildLayers, buildTerrainLayer, buildIntelLayer);
         buildLayers = JobHandle.CombineDependencies(
             buildLayers, buildPlayerInteractLayer, buildEnemyGhostLayer);
-
+        buildLayers = JobHandle.CombineDependencies(
+            buildLayers, buildTurnipLayer);
+        
+        
         componentLookups.Update(ref state);
         var ecb = new EntityCommandBuffer(Allocator.TempJob);
         var ecbWriter = ecb.AsParallelWriter();
 
         var destroyedSet = new NativeParallelHashSet<Entity>(physicsState.ValueRO.collisionLayer.colliderBodies.Length, Allocator.TempJob);
         var destroyedSetWriter = destroyedSet.AsParallelWriter();
+        
+        var vfxReceiver = SystemAPI.GetSingleton<GraphicsReceiver>();
+        var vfxWriter = vfxReceiver.AudioCommands.AsParallelWriter();
         
         var pairsProcessor = new PairsProcessor {
             ComponentLookups = componentLookups,
@@ -528,6 +569,7 @@ public partial struct PhysicsSystem: ISystem {
             Ecb = ecbWriter,
             DestroyedSetWriter = destroyedSetWriter,
             AudioWriter = soundWriter,
+            VfxWriter = vfxWriter,
         };
         var playerPairsProcessor = new PlayerPairs {
             ComponentLookups = componentLookups,
@@ -540,6 +582,13 @@ public partial struct PhysicsSystem: ISystem {
             DestroyedSetWriter = destroyedSetWriter
         };
         
+        var turnipPairsProcessor = new TurnipPairs {
+            ComponentLookups = componentLookups,
+            DestroyedSetWriter = destroyedSetWriter
+        };
+        
+        
+        
         // Collider player with intel
         var dependency = Physics.FindPairs(
                 physicsState.ValueRO.PlayerLayer,
@@ -549,10 +598,10 @@ public partial struct PhysicsSystem: ISystem {
         // Temp intel vacuum
         
         
-        // dependency = Physics.FindPairs(
-        //         physicsState.ValueRO.PlayerInteractLayer,
-        //         physicsState.ValueRO.IntelLayer, playerInteractionsPairsProcessor)
-        //     .ScheduleParallel(dependency);
+        dependency = Physics.FindPairs(
+                physicsState.ValueRO.PlayerInteractLayer,
+                physicsState.ValueRO.IntelLayer, playerInteractionsPairsProcessor)
+            .ScheduleParallel(dependency);
         
         // Collide player enemy weapons
         dependency = Physics.FindPairs(
@@ -598,12 +647,36 @@ public partial struct PhysicsSystem: ISystem {
                 physicsState.ValueRO.TerrainLayer,
                 physicsState.ValueRO.EnemyWeaponLayer, terrainProcessor)
             .ScheduleParallel(dependency);
-
+        
+        if (DimensionManager.burstDim.Data == Dimension.Three) {
+            dependency = Physics.FindPairs(
+                    physicsState.ValueRO.TurnipLayer,
+                    physicsState.ValueRO.PlayerLayer, turnipPairsProcessor)
+                .ScheduleParallel(dependency);
+            // XXX: player weapon collisions with turnips disabled so the player
+            // can always hit the enemies and their attacks never get "eaten"
+            // by the turnips
+            /*
+            dependency = Physics.FindPairs(
+                    physicsState.ValueRO.TurnipLayer,
+                    physicsState.ValueRO.PlayerWeaponLayer, turnipPairsProcessor)
+                .ScheduleParallel(dependency);
+            */
+            dependency = Physics.FindPairs(
+                    physicsState.ValueRO.TurnipLayer,
+                    physicsState.ValueRO.EnemyLayer, turnipPairsProcessor)
+                .ScheduleParallel(dependency);
+            // dependency = Physics.FindPairs(
+            //         physicsState.ValueRO.TurnipLayer,
+            //         physicsState.ValueRO.EnemyWeaponLayer, turnipPairsProcessor)
+            //     .ScheduleParallel(dependency);
+        }
+        
         JobHandle.ScheduleBatchedJobs();
         dependency.Complete();
         
         //PhysicsDebug.DrawLayer(physicsState.ValueRO.PlayerLayer).Run();
-        PhysicsDebug.DrawLayer(physicsState.ValueRO.EnemyLayer).Run();
+        PhysicsDebug.DrawLayer(physicsState.ValueRO.TurnipLayer).Run();
         //PhysicsDebug.DrawLayer(physicsState.ValueRO.IntelLayer).Run();
         
         ecb.Playback(state.EntityManager);
@@ -613,7 +686,6 @@ public partial struct PhysicsSystem: ISystem {
             state.EntityManager.DestroyEntity(entity);
         }
         destroyedSet.Dispose();
-        
 
         // Draw bounding box gizmos
         

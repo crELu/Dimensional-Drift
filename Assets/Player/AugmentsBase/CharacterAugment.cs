@@ -19,7 +19,7 @@ public class CharacterAugment: Augment
         return base.Verify();
     }
 
-    public override AllStats GetStats()
+    public override AllStats GetStats(AllStats prevStats)
     {
         CharacterStats states = tier1;
         if (Stacks == 2) states += tier2;

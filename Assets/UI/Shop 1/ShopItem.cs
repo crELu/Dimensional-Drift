@@ -14,12 +14,11 @@ public enum ShopItemType
 }
 
 // MonoBehaviour for UI
-public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler
+public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("UI Elements")]
     public Image itemIcon;
     public Image rarity;
-    public TextMeshProUGUI costText;
     
     public Item data;
     private ShopManager shopManager;
@@ -31,23 +30,43 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler
 
     public void OnSelect(BaseEventData eventData)
     {
-        shopManager.DisplayText(data.itemTitle, data.description);
+        Select();
     }
 
     public void OnDeselect(BaseEventData eventData)
+    {
+        Unselect();
+    }
+    
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        Select();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        Unselect();
+    }
+
+    private void Select()
+    {
+        string rarityText = data.rarity == 0 ? "I" : data.rarity == 1 ? "II" : "III";
+        shopManager.DisplayText(data.Description, $"{data.itemTitle} {rarityText}", data.baseCost);
+    }
+
+    private void Unselect()
     {
         shopManager.ClearText();
     }
 
     public void Initialize(Item itemData, ShopManager manager)
     {
-        data = itemData;
+        data = Instantiate(itemData);
         shopManager = manager;
         playerInventory = PlayerManager.main.inventory;
         
-        itemIcon.sprite = data.icon;
-        rarity.sprite = data.rarity;
-        costText.text = $"{data.baseCost} Intel";
+        itemIcon.sprite = data.Icon;
+        rarity.sprite = manager.rarities[data.rarity];
     }
 
     private void OnPurchaseClicked()
@@ -58,5 +77,4 @@ public class ShopItem : MonoBehaviour, ISelectHandler, IDeselectHandler
             Destroy(gameObject);
         }
     }
-
 } 

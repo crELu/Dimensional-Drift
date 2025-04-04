@@ -10,7 +10,7 @@ public class StatsAugment: Augment
     public WeaponStats stats;
     public override AugmentType Target => target;
     
-    public override AllStats GetStats()
+    public override AllStats GetStats(AllStats prevStats)
     {
         return new AllStats{weaponStats = stats};
     }

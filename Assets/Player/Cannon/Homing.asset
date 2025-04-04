@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e87ef2c38ef4c7e9b1be6511316be56, type: 3}
   m_Name: Homing
   m_EditorClassIdentifier: 
-  <MaxStacks>k__BackingField: 3
   <Stacks>k__BackingField: 3
   <Requirements>k__BackingField: []
   tier1:
@@ -58,4 +57,5 @@ MonoBehaviour:
       power: 0
       pierce: 0
   postPriority: 0
-  RocketCount: {x: 0, y: 15, z: 65}
+  RocketCount: {x: 0, y: 15, z: 40}
+  HomingCount: {x: 45, y: 90, z: 90}

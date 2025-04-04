@@ -5,9 +5,8 @@ using TMPro;
 
 public class PlayerInventory : MonoBehaviour
 {
-    [SerializeField] private int maxWeaponSlots = 4;
-    [SerializeField] private TextMeshProUGUI intelText;
-    public float Intel { get; private set; }
+    [SerializeField] private TextMeshProUGUI intelText, intelText2;
+    [field:SerializeField] public float Intel { get; private set; }
 
     private void Start()
     {
@@ -21,7 +20,13 @@ public class PlayerInventory : MonoBehaviour
         // Placeholder for default weapon initialization
     }
 
-    public void AddIntel(float amount) { Intel += amount; UpdateUI(); }
+    public void AddIntel(float amount)
+    {
+        Intel += amount;
+        PlayerStats.main.intelGained += amount;
+        UpdateUI(); 
+        
+    }
     public bool SpendIntel(float amount)
     {
         if (Intel >= amount)
@@ -36,5 +41,6 @@ public class PlayerInventory : MonoBehaviour
     public void UpdateUI()
     {
         intelText.text = $"{Intel:F0}";
+        intelText2.text = $"{Intel:F0}";
     }
 }

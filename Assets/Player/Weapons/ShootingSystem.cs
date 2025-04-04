@@ -71,6 +71,7 @@ public partial struct PlayerShootingSystem : ISystem
                     if (cannon.RocketCount != 0) ECB.AddComponent(index, newEntity, new CannonRockets{RocketCount = cannon.RocketCount});
                     if (cannon.ShrapnelCount != 0) { ECB.AddComponent(index, newEntity, new CannonShrapnel{ShrapnelCount = cannon.ShrapnelCount}); }
                 }
+                if (stats.Effects.HomingSpeed != 0) ECB.AddComponent(index, newEntity, new PlayerProjectileHoming{TurnSpeed = stats.Effects.HomingSpeed, Radius = stats.Effects.HomingRadius});
                 // Add PhysicsVelocity for regular bullets
                 ECB.AddComponent(index, newEntity, new PhysicsVelocity
                 {
@@ -78,12 +79,13 @@ public partial struct PlayerShootingSystem : ISystem
                 });
                 ECB.AddComponent(index, newEntity, new Lifetime { Time = stats.Stats.duration });
             }
+            if (stats.Effects.Interference != 0) ECB.AddComponent(index, newEntity, new GunInterference{Strength = stats.Effects.Interference});
             ECB.AddComponent(index, newEntity, new PlayerProjectileDeath
             {
                 Stats = stats.Stats,
                 Position = position,
             });
-            ECB.AddComponent(index, newEntity, new PlayerProjectile()
+            ECB.AddComponent(index, newEntity, new PlayerProjectile
             {
                 Health = 10000,
             });
@@ -104,6 +106,7 @@ public partial struct PlayerShootingSystem : ISystem
         
         var deltaTime = SystemAPI.Time.DeltaTime;
         var bullets = PlayerManager.Bullets;
+        Debug.Log(bullets.Count);
         EntityCommandBuffer.ParallelWriter ecb = GetEntityCommandBuffer(ref state);
 
         Entity player = SystemAPI.GetSingletonEntity<PlayerAspect>();
@@ -134,7 +137,7 @@ public partial struct PlayerShootingSystem : ISystem
             
             //var prefab = projectiles.ElementAt((int)attack.projectile).Projectile;
 
-            while (bulletQueue.Count > 0 && SystemAPI.Time.ElapsedTime > bulletQueue.Peek().time)
+            while (bulletQueue.Count > 0 && Time.time > bulletQueue.Peek().time)
             {
                 var bulletData = bulletQueue.Dequeue();
                 var prefab = _projectiles[(int)attack.Projectile];
@@ -147,11 +150,11 @@ public partial struct PlayerShootingSystem : ISystem
         }
 
         bullets.RemoveAll(a => a.Bullets.Count == 0);
-        
+        var nativeBulletArr = new NativeArray<BulletEntity>(bulletsToFire.ToArray(), Allocator.TempJob);
         var job = new BulletFiringJob
         {
             ECB = ecb,
-            BulletsToFire = new NativeArray<BulletEntity>(bulletsToFire.ToArray(), Allocator.TempJob),
+            BulletsToFire = nativeBulletArr,
             PlayerTransform = LocalTransform.FromMatrix(PlayerManager.main.transform.localToWorldMatrix),
             PlayerLookRotation = PlayerManager.main.movement.LookRotation,
             TransformLookup = _localTransformLookup,
@@ -159,17 +162,13 @@ public partial struct PlayerShootingSystem : ISystem
 
         // Schedule with initial dependency chain
         JobHandle handle = job.Schedule(bulletsToFire.Count, 64, state.Dependency);
-        
-        
-        // Combine disposals with main handle
-        //handle = job.PlayerTransform.Dispose(handle);
 
         state.Dependency = handle;
     
         p.Player = pData;
         
+        state.Dependency = nativeBulletArr.Dispose(state.Dependency);
     }
-    
     
     private EntityCommandBuffer.ParallelWriter GetEntityCommandBuffer(ref SystemState state)
     {

@@ -17,7 +17,7 @@ public class BombWeapon: PlayerWeapon
         if (pressed)
         {
             _chargeTimer += Time.deltaTime;
-            if (!_charged && _chargeTimer > BaseStats.attackDelay)
+            if (!_charged && _chargeTimer > MainStats.attackDelay)
             {
                 chargeSound.Play();
                 _charged = true;

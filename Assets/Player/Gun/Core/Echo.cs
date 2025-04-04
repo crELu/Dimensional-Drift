@@ -12,16 +12,16 @@ namespace Player.Gun.Core
         public Vector2 echoSize;
         public override AugmentType Target => AugmentType.Gun;
         public Vector3 echoChance;
+        public float interference;
         public override void PostProcessing(WeaponStats stats, List<Attack> attacks)
         {
             Attack attack = new Attack { Bullets = new(), Info = attacks[0].Info, Projectile = Attack.ProjectileType.GunPortal};
+            if (Stacks >=2 ) attack.Info.Effects.Interference = interference;
             for (int i = 0; i < attacks.Count; i++)
             {
                 var a = attacks[i];
-                Debug.Log(a.Bullets.Count);
                 foreach (var b in a.Bullets)
                 {
-                    
                     if (Random.value > Pick(echoChance))
                         continue;
                     var k = Random.insideUnitCircle.normalized * echoSize.x;

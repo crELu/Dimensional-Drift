@@ -25,40 +25,55 @@ using Vector3 = UnityEngine.Vector3;
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager main;
-    public static float3 Position => burstPos.Data;
+    public static float3 Position => burstPos.Data.Position;
     private class IntFieldKey {}
-    public static readonly SharedStatic<float3> burstPos = SharedStatic<float3>.GetOrCreate<PlayerManager, IntFieldKey>();
+    public static readonly SharedStatic<PlayerDataBurst> burstPos = SharedStatic<PlayerDataBurst>.GetOrCreate<PlayerManager, IntFieldKey>();
+
+    public struct PlayerDataBurst
+    {
+        public float3 Position;
+        public float Damage;
+    }
     
     public static float waveTimer, maxWaveTimer;
     public static int waveCount;
-    
+    private static int T;
+
     public PlayerMovement movement;
     public PlayerInventory inventory;
     
-    private InputAction _fireAction;
-    private InputAction _weaponUpAction;
-    private InputAction _weaponDownAction;
-    private InputAction _scanAction;
     [Header("Stats Settings")] 
     public List<CharacterAugment> augments;
-    public CharacterStats stats;
-    protected CharacterStats AddonStats;
+    [SerializeField] private CharacterStats stats;
+    private AllStats _extraStats;
+    [SerializeField] private CharacterStats baseStats;
+    public float MaxHealth => baseStats.flatHealth;
+    public float MaxShield => baseStats.flatShield;
+    private float ShieldRegen => baseStats.shieldRegen;
+    private float MaxAmmo => baseStats.flatAmmo;
+    private float AmmoRegen => baseStats.ammoRegen;
+    public float DashCd => baseStats.dashCd;
+    public float PickupRadius => baseStats.pickupRadius;
+    public float BoostRegen => baseStats.boostRegen;
+    public bool FullHealth => Mathf.Approximately(health, MaxHealth);
+    public bool FullShield => Mathf.Approximately(shield, MaxShield);
     public float health, shield;
     [field:SerializeField] public float Ammo { get; private set; }
-    public static bool fire;
     public RawImage ammoText, waveImage;
-    public TextMeshProUGUI velocity;
+    [SerializeField] private TextMeshProUGUI velocityText;
+    public float velocity;
     [Header("Weapon Settings")] 
     public PlayerWeapon CurrentWeapon => weapons[currentWeapon];
     public int currentWeapon;
     public List<PlayerWeapon> weapons;
     public List<Image> weaponSlots;
     public Sprite weaponSelected, weaponUnselected;
+    public GameObject infiniteAmmo;
     
     public static List<Attack> Bullets => main.CurrentWeapon.Bullets;
     public RectTransform hp, sd;
-    public TextMeshProUGUI waveCounter;
-    
+    public TextMeshProUGUI waveCounter, newWaveText;
+    public RawImage newWaveImage;
     public VisualEffect minimap, overlay;
     public RectTransform minimapIcon;
     public GraphicsBuffer MinimapPos, OverlayPos;
@@ -67,54 +82,104 @@ public class PlayerManager : MonoBehaviour
     [Header("Sound Settings")]
     [SerializeField] private AudioSource PlayerDamageTrack;
     [SerializeField] private AudioClip DamageSFX;
-    [SerializeField] private AudioSource PlayerDeathTrack;
-    [SerializeField] private AudioClip DeathSFX;
-    private bool alreadyPlayed = false;
-
     private bool _isScanning;
     public float ScanRadius { get; private set; }
     public int ScanState { get; private set; }
-
-    void Start()
-    {
-        _fireAction = InputSystem.actions.FindAction("Fire 1");
-        _weaponUpAction  = InputSystem.actions.FindAction("Weapon Up");
-        _weaponDownAction  = InputSystem.actions.FindAction("Weapon Down");
-        _scanAction  = InputSystem.actions.FindAction("Scan");
+    private float _startTime;
+    void Awake() {
         main = this;
-        transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
-        Application.targetFrameRate = 60;
+        _startTime = Time.time;
     }
     
-    public void AddAugment(Augment augment)
+    void Start()
     {
-        if (augment is CharacterAugment charAug)
-            augments.Add(charAug);
-        else if (augment is StatsCharAugment statsAug)
-            AddonStats += statsAug.GetStats().characterStats;
-        else
+        transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+        Application.targetFrameRate = 60;
+        CalcStats();
+        T = Shader.PropertyToID("_t");
+    }
+    
+    public void AddAugment(Augment augment, int tier)
+    {
+        if (augment.Target != AugmentType.Character)
         {
-            Debug.Log($"Wrong augment type {augment.Target} for character.");
+            Debug.LogError($"Wrong augment type {augment.Target} for player.");
+            return;
+        }
+        if (tier < 0 || tier > 2)
+        {
+            Debug.LogError($"Invalid augment tier {tier}.");
+            return;
+        }
+
+        if (augment is CharacterAugment coreAug)
+        {
+            Predicate<CharacterAugment> nameChecker = e => e.Id == coreAug.Id;
+            if (tier == 0)
+            {
+                if (augments.Exists(nameChecker))
+                {
+                    Debug.LogError($"Tried to add T1 augment {augment.Id} for player, but it already exists.");
+                    return;
+                }
+                if (augments.Count >= 3)
+                {
+                    Debug.LogError($"Tried to add T1 augment {augment.Id} for player, but there are already 3.");
+                    
+                }
+                    
+                var clone = Instantiate(coreAug);
+                clone.Stacks = 1;
+                augments.Add(clone);
+            }
+            else if (tier == 1)
+            {
+                if (!augments.Exists(e => nameChecker(e) && e.Stacks == 1))
+                {
+                    Debug.LogError($"Tried to add T2 augment {augment.Id} for player, but no T1 exists.");
+                    return;
+                }
+                augments.Find(nameChecker).Stacks++;
+            }
+            else if (tier == 2)
+            {
+                if (!augments.Exists(e => nameChecker(e) && e.Stacks == 2))
+                {
+                    Debug.LogError($"Tried to add T3 augment {augment.Id} for player, but no T2 exists.");
+                    return;
+                }
+                augments.Find(nameChecker).Stacks++;
+            }
         }
     }
+    
+    public void AddStats(AllStats s)
+    {
+        _extraStats += s;
+    }
 
+    private Coroutine _scanner;
+    
     void Update()
     {
         CheckHealth();
         DoAttack();
+        CalcStats();
+        velocityText.text = $"{velocity:F0}";
         waveCounter.text = $"{waveCount}";
-        ammoText.material.SetFloat("_t", Ammo/100);
-        waveImage.material.SetFloat("_t", waveTimer/maxWaveTimer);
-        AddAmmo(2.5f * Time.deltaTime);
-        if (_scanAction.triggered && !_isScanning)
+        ammoText.material.SetFloat(T, Ammo/MaxAmmo);
+        waveImage.material.SetFloat(T, waveTimer/maxWaveTimer);
+        AddAmmo(AmmoRegen * Time.deltaTime);
+        if (PlayerInputs.main.Scan)
         {
-            StartCoroutine(Scan());
+            if (_scanner == null) _scanner = StartCoroutine(Scan());
+            else _isScanning = false;
         }
-        if (_weaponDownAction.triggered)
+        if (PlayerInputs.main.WeaponDown)
         {
             currentWeapon++;
             currentWeapon %= weapons.Count;
-        } else if (_weaponUpAction.triggered)
+        } else if (PlayerInputs.main.WeaponUp)
         {
             currentWeapon--;
             if (currentWeapon < 0) currentWeapon = weapons.Count - 1;
@@ -125,18 +190,59 @@ public class PlayerManager : MonoBehaviour
             if (currentWeapon == i) weaponSlots[i].sprite = weaponSelected;
             else weaponSlots[i].sprite = weaponUnselected;
         }
+        infiniteAmmo.SetActive(currentWeapon == 0);
 
         var v = transform.forward;
         v.y = 0;
         minimapIcon.transform.rotation = Quaternion.Euler(0, 0, -Quaternion.LookRotation(v).eulerAngles.y);
-        transform.position = Vector3.Lerp(transform.position, burstPos.Data, 20f * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, burstPos.Data.Position, 20f * Time.deltaTime);
+    }
+
+    public void StartNewWave(int num)
+    {
+        newWaveText.text = $"- Wave {num} -";
+        StartCoroutine(Wave());
+    }
+    
+    public (bool, int) ValidAugment(Augment augment)
+    {
+        if (augment.Target != AugmentType.Character) return (false, 0);
+        if (!augments.Exists(e => e.name == augment.name))
+        {
+            if (augments.Count >= 3) return (false, 0);
+            return (true, 0);
+        }
+        var aug = augments.Find(e => e.name == augment.name);
+        if (aug.Stacks >= 3) return (false, 0);
+        return (true, aug.Stacks);
+    }
+    
+    private IEnumerator Wave()
+    {
+        float t = 0;
+        var a = newWaveImage.color;
+        var b = newWaveText.color;
+        newWaveImage.gameObject.SetActive(true);
+        while (t < 3)
+        {
+            t += Time.deltaTime;
+            if (t > 2)
+            {
+                newWaveImage.color = new Color(a.r, a.g, a.b, a.a*(3-t));
+                newWaveText.color = new Color(b.r, b.g, b.b, b.a*(3-t));
+            }
+            yield return new WaitForSecondsRealtime(0);
+        }
+        newWaveImage.color = a;
+        newWaveText.color = b;
+        newWaveImage.gameObject.SetActive(false);
     }
 
     private IEnumerator Scan()
     {
         _isScanning = true;
         float t = 0;
-        while (t < 12)
+        while (_isScanning)
         {
             t += Time.deltaTime;
             if (t < 10)
@@ -144,16 +250,30 @@ public class PlayerManager : MonoBehaviour
                 ScanState = 1;
                 ScanRadius = t * 400;
             }
-            else 
-            {
-                ScanState = -1;
-            }
-            
+            yield return null;
+        }
+
+        t = 2;
+        while (t>0)
+        {
+            t -= Time.deltaTime;
+            ScanState = -1;
             yield return null;
         }
 
         ScanState = 0;
-        _isScanning = false;
+        _scanner = null;
+    }
+
+    private void CalcStats()
+    {
+        CharacterStats s = _extraStats.characterStats;
+        foreach (var augment in augments)
+        {
+            s += augment.GetStats(new AllStats{characterStats = baseStats}).characterStats;
+        }
+        baseStats = stats * s;
+        burstPos.Data.Damage = baseStats.damageMultiplier;
     }
 
     public void DoDamage(float damage)
@@ -164,39 +284,27 @@ public class PlayerManager : MonoBehaviour
         
         health -= damage;
 
-        //Andrew TODO
-        //PlayerDamageTrack.PlayOneShot(DamageSFX)
-
+        // Andrew TODO
+        // PlayerDamageTrack.PlayOneShot(DamageSFX);
     }
 
     private void CheckHealth()
     {
-        health = Mathf.Min(stats.flatHealth, health);
-        shield += stats.shieldRegen * Time.deltaTime;
-        shield = Mathf.Min(stats.flatShield, shield);
-        sd.sizeDelta = new Vector2(shield / stats.flatShield * 1024, 32);
-        hp.sizeDelta = new Vector2(health / stats.flatHealth * 1024, 64);
+        health = Mathf.Min(MaxHealth, health);
+        shield += ShieldRegen * Time.deltaTime;
+        shield = Mathf.Min(MaxShield, shield);
+        sd.sizeDelta = new Vector2(shield / MaxShield * 850, 32);
+        hp.sizeDelta = new Vector2(health / MaxHealth * 1112, 64);
         if (health <= 0)
         {
-            GameObject deathMessageObject = GameObject.Find("Death Message");
-            if (deathMessageObject != null)
-            {
-                TextMeshProUGUI deathMessage =
-                    deathMessageObject.GetComponent<TextMeshProUGUI>();
-
-                deathMessage.SetText("You Died!");
-                if (!alreadyPlayed)
-                {
-                    PlayerDeathTrack.PlayOneShot(DeathSFX);
-                    alreadyPlayed = true;
-                }
-            }
+            Time.timeScale = 0;
+            PlayerStats.main.UpdateUI(waveCount, Time.time - _startTime);
         }
     }
 
     private void DoAttack()
     {
-        fire = CurrentWeapon.Fire(this, _fireAction.IsPressed());
+        CurrentWeapon.Fire(this, PlayerInputs.main.Fire);
     }
 
     public void UseAmmo(float a)
@@ -212,7 +320,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (a<0) Debug.Log("don t do that (add negative ammo)");
         Ammo += a;
-        Ammo = Mathf.Min(100, Ammo);
+        Ammo = Mathf.Min(MaxAmmo, Ammo);
     }
     
 }

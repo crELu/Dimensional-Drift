@@ -12,34 +12,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10ab130bdef24850b100e9689a6f42c0, type: 3}
   m_Name: Gunship
   m_EditorClassIdentifier: 
-  <MaxStacks>k__BackingField: 3
   <Stacks>k__BackingField: 1
   <Requirements>k__BackingField: []
-  coreType: 4
   tier1:
     flatHealth: 0
     flatShield: 0
-    percentHealth: 0
+    percentHealth: -10
     percentShield: 0
-    moveSpeed: 0
-    contactDamage: 0
+    shieldRegen: 0
+    boostRegen: 0
+    ammoRegen: 0
+    flatAmmo: 0
     dashCd: 0
     pickupRadius: 0
+    damageMultiplier: 15
   tier2:
     flatHealth: 0
     flatShield: 0
     percentHealth: 0
     percentShield: 0
-    moveSpeed: 0
-    contactDamage: 0
+    shieldRegen: 0
+    boostRegen: 0
+    ammoRegen: 0
+    flatAmmo: 0
     dashCd: 0
     pickupRadius: 0
+    damageMultiplier: 25
   tier3:
     flatHealth: 0
     flatShield: 0
     percentHealth: 0
     percentShield: 0
-    moveSpeed: 0
-    contactDamage: 0
+    shieldRegen: 0
+    boostRegen: 0
+    ammoRegen: 0
+    flatAmmo: 0
     dashCd: 0
     pickupRadius: 0
+    damageMultiplier: 0

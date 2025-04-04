@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24b31b703eca4cada24f79cbfc114850, type: 3}
   m_Name: Jhin
   m_EditorClassIdentifier: 
-  <MaxStacks>k__BackingField: 3
   <Stacks>k__BackingField: 2
   <Requirements>k__BackingField: []
   tier1:
@@ -24,7 +23,7 @@ MonoBehaviour:
     ammoUse: 0
     count: 0
     bulletStats:
-      damage: 0
+      damage: 15
       duration: 0
       extraction: 0
       power: 0
@@ -38,7 +37,7 @@ MonoBehaviour:
     ammoUse: 0
     count: 0
     bulletStats:
-      damage: 0
+      damage: 20
       duration: 0
       extraction: 0
       power: 0
@@ -52,8 +51,9 @@ MonoBehaviour:
     ammoUse: 0
     count: 0
     bulletStats:
-      damage: 0
+      damage: 30
       duration: 0
       extraction: 0
       power: 0
       pierce: 0
+  postPriority: 0

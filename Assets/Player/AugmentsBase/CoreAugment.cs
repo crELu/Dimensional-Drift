@@ -25,7 +25,7 @@ public class CoreAugment: Augment
         return Stacks == 3 ? values.z : Stacks == 2 ? values.y : values.x;
     }
 
-    public override AllStats GetStats()
+    public override AllStats GetStats(AllStats prevStats)
     {
         WeaponStats states = tier1;
         if (Stacks == 2) states += tier2;

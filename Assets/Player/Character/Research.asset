@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19e48e42191c4150b398d45ceffc1668, type: 3}
+  m_Name: Research
+  m_EditorClassIdentifier: 
+  <Stacks>k__BackingField: 1
+  <Requirements>k__BackingField: []
+  tier1:
+    flatHealth: 0
+    flatShield: 0
+    percentHealth: 0
+    percentShield: 0
+    shieldRegen: 0
+    boostRegen: 0
+    ammoRegen: 0
+    flatAmmo: 0
+    dashCd: 0
+    pickupRadius: 50
+    damageMultiplier: 0
+  tier2:
+    flatHealth: 0
+    flatShield: 0
+    percentHealth: 0
+    percentShield: 0
+    shieldRegen: 0
+    boostRegen: 0
+    ammoRegen: 0
+    flatAmmo: 0
+    dashCd: 0
+    pickupRadius: 75
+    damageMultiplier: 0
+  tier3:
+    flatHealth: 0
+    flatShield: 0
+    percentHealth: 0
+    percentShield: 0
+    shieldRegen: 0
+    boostRegen: 0
+    ammoRegen: 0
+    flatAmmo: 0
+    dashCd: 0
+    pickupRadius: 0
+    damageMultiplier: 0

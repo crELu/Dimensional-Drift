@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40e19351c690431fabcae8110d39b151, type: 3}
+  m_Name: Hull - Item
+  m_EditorClassIdentifier: 
+  itemTitle: Hull Integrity
+  baseCost: 100
+  rarity: 0
+  augment: {fileID: 11400000, guid: 1fc1fde09aa650f4c8febdf505e755d6, type: 2}
+  type: 4
+  target: 4
+  icon: {fileID: 21300000, guid: 39f9015b9bb520b45968b64074d89659, type: 3}
+  textT1: +30 HP, +10% HP.
+  textT2: +30 HP, +25% HP, -10% Boost Recovery.
+  textT3: '+40 HP, +25% HP, -10% Ammo Recovery.
+
+    Emergency Repair: While under
+    50% HP, slowly recover HP.'

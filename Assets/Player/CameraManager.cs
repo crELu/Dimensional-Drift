@@ -7,7 +7,7 @@ public class CameraManager : MonoBehaviour
     public Transform board;
     public Transform lookTarget;
     private Vector3 _offset;
-    public Vector3 offsetMult = new Vector3(0, 2, -5);
+    public AnimationCurve offsetX, offsetY, offsetZ;
     public float smoothAccel, smoothVel, rollSpeed, rollModifier;
     private Vector3 _velocity, _accel;
     private Vector3 smoothTarget;
@@ -18,6 +18,7 @@ public class CameraManager : MonoBehaviour
     public Vector3 orthoCameraPos, normalCameraPos;
     [field: SerializeField] public float Angle { get; set; }
     private Vector3 Up2d => Quaternion.Euler(0, Angle, 0) * Vector3.forward;
+    public RectTransform center, canv;
     private void Start()
     {
         main = this;
@@ -27,9 +28,9 @@ public class CameraManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Update()
     {
-        
     }
 
+    private Vector3 pastLocal;
     // Update is called once per frame
     void LateUpdate()
     {
@@ -41,21 +42,33 @@ public class CameraManager : MonoBehaviour
             var tRoll = v.x * 65;
             _roll = Mathf.Lerp(_roll, tRoll, Time.deltaTime * rollSpeed);
             board.localRotation = Quaternion.Euler(0, 0, _roll + extraRoll);
-            var disp = Vector3.Scale(v, offsetMult) * (v.z+1)/2;
-            targetPosition = PlayerManager.main.transform.position + PlayerManager.main.transform.TransformDirection(_offset + disp);
+            Vector3 scale = new Vector3(offsetX.Evaluate(v.x), offsetY.Evaluate(v.y), offsetZ.Evaluate(v.z));
+            var disp = Vector3.Scale(v, scale) * (v.z+1)/2;
+            targetPosition = _offset + disp;
         }
         else
         {
             board.localRotation = Quaternion.Euler(0, 0, 0);
-            targetPosition = PlayerManager.main.transform.position + PlayerManager.main.transform.TransformDirection(_offset);
+            targetPosition = _offset;
         }
 
         var a = isDashing ? rollModifier : 1;
-        smoothTarget = Vector3.Lerp(smoothTarget, targetPosition, smoothAccel * a * Time.deltaTime);
-        transform.position = Vector3.Lerp(transform.position, smoothTarget, smoothVel * a * Time.deltaTime);
-        var lookTarg = Vector3.Lerp(lookTarget.position, PlayerManager.Position, DimensionManager.normT);
+        pastLocal = Vector3.Slerp(pastLocal, targetPosition, smoothAccel * a * Time.deltaTime);
         
+        var targ = PlayerManager.main.transform.TransformPoint(pastLocal);
+        transform.position = Vector3.Slerp(transform.position, targ, smoothVel * a * Time.deltaTime);
+        
+        var lookTarg = Vector3.Slerp(lookTarget.position, PlayerManager.Position, DimensionManager.normT);
         transform.LookAt(lookTarg, DimensionManager.Dim3 ? Vector3.up : Up2d);
+        var screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
+        var playerCenter = Camera.main.WorldToScreenPoint(PlayerManager.main.transform.position);
+        playerCenter.z = 1;
         
+        center.position = Vector3.Lerp(screenCenter, playerCenter, DimensionManager.normT);
+        if (DimensionManager.normT == 1)
+        {
+            transform.rotation = Quaternion.LookRotation(Vector3.down, Up2d);
+            transform.position = PlayerManager.main.transform.TransformPoint(_offset);
+        }
     }
 }

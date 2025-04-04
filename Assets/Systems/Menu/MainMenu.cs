@@ -1,31 +1,31 @@
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-
+using System;
+using UnityEngine.EventSystems;
+using System.Collections;
 namespace Systems.Menu
 {
     public class MainMenu : MonoBehaviour
     {
-        [SerializeField] private PlayerInput playerInput;
-        [SerializeField] private PlayerManager playerManager;
-        [SerializeField] private GameObject settingsPanel;
+        
+        public GameObject settingsPanel;
+        public GameObject firstSelectable;
 
 
         private void Start()
         {
+            Cursor.lockState = CursorLockMode.Confined;
+            PlayerInputs.main.playerInput.SwitchCurrentActionMap("UI");
             settingsPanel.SetActive(false);
-            playerInput.actions["Player/Settings"].performed += OnSettingsAction;
-            playerInput.actions["UI/Settings"].performed += OnSettingsAction;
-
-            
+            EventSystem.current.SetSelectedGameObject(firstSelectable);
         }
         
         // This method is called by the Play button
         public void PlayGame()
         {
-            // Change "GameScene" to the name of the scene you want to load.
             SceneManager.LoadScene("Main Scene");
+            Time.timeScale = 1;
         }
 
         // This method is called by the Quit button
@@ -40,19 +40,34 @@ namespace Systems.Menu
             #endif
         }
 
-        private void OnSettingsAction(InputAction.CallbackContext context)
+        // This method is called by the Options/Settings button
+        public void OpenSettings()
         {
-            settingsPanel.SetActive(!settingsPanel.activeSelf);
-            if (settingsPanel.activeSelf)
-            {
-                playerInput.SwitchCurrentActionMap("UI");
-                Cursor.lockState = CursorLockMode.Confined;
-            }
-            else
-            {
-                playerInput.SwitchCurrentActionMap("Player");
-                Cursor.lockState = playerManager.targetCursorMode;
-            }
+            // Debug.Log("OpenSettings");
+            settingsPanel.SetActive(true);
+            
+            // Get the SettingsUIController
+            SettingsUIController settingsUI = settingsPanel.GetComponentInChildren<SettingsUIController>();
+            
+            // Set the first selectable UI element with a delay to ensure UI is initialized
+            StartCoroutine(SelectUIWithDelay(settingsUI.volumeSlider.gameObject));
+        }
+
+        private IEnumerator SelectUIWithDelay(GameObject selectableObject)
+        {
+            // Wait for UI to be fully initialized
+            yield return new WaitForEndOfFrame();
+            
+            // Select the UI element
+            EventSystem.current.SetSelectedGameObject(null);
+            yield return null;
+            EventSystem.current.SetSelectedGameObject(selectableObject);
+            Debug.Log($"Selected: {selectableObject.name}");
+        }
+
+        public void CloseSettings() {
+            EventSystem.current.SetSelectedGameObject(firstSelectable);
+            Debug.Log($"Selected: {firstSelectable.name}");
         }
     }
 }

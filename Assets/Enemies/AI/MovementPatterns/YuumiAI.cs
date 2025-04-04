@@ -52,13 +52,18 @@ namespace Enemies.AI
             foreach (var (temp, entity) in SystemAPI.Query<RefRO<Yuumi>>().WithEntityAccess().WithNone<LocalTransform>())
             {
                 var enemy = temp.ValueRO.Attached;
-                if (SystemAPI.Exists(enemy))
+                if (SystemAPI.Exists(enemy) && SystemAPI.HasComponent<EnemyCollisionReceiver>(enemy))
                 {
                     var enemyStats = state.EntityManager.GetComponentData<EnemyCollisionReceiver>(enemy);
                     enemyStats.Invulnerable = false;
                     ecb.SetComponent(enemy, enemyStats);
                 }
                 ecb.RemoveComponent<Yuumi>(entity);
+            }
+            foreach (var (temp, entity) in SystemAPI.Query<RefRO<Yuumi>>().WithEntityAccess())
+            {
+                var enemy = temp.ValueRO.Attached;
+                if (!SystemAPI.Exists(enemy)) ecb.DestroyEntity(entity);
             }
             ecb.Playback(state.EntityManager);
             ecb.Dispose();

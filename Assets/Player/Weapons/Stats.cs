@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 [Serializable]
@@ -48,6 +49,8 @@ public struct WeaponStats
     public string Absolute => $"AttackSpeed: {attackSpeed:F2} attacks/s, Size: {size:F2}, Speed: {speed:F2}, " +
                               $"AttackDelay: {attackDelay:F2}s, " +
                               $"Count: {count}x, Accuracy: {accuracy:F2} deg, Ammo: -{ammoUse:F2}%";
+    
+    public static implicit operator AllStats(WeaponStats stats) => new() { weaponStats = stats };
 }
 
 [Serializable]
@@ -104,10 +107,12 @@ public struct CharacterStats
     public float percentHealth;
     public float percentShield;
     public float shieldRegen;
-    public float moveSpeed;
-    public float contactDamage;
+    public float boostRegen;
+    public float ammoRegen;
+    public float flatAmmo;
     public float dashCd;
     public float pickupRadius;
+    public float damageMultiplier;
     
     public static CharacterStats operator +(CharacterStats a, CharacterStats b)
     {
@@ -115,13 +120,15 @@ public struct CharacterStats
         {
             flatHealth = a.flatHealth + b.flatHealth,
             flatShield = a.flatShield + b.flatShield,
-            percentHealth = Maths.CompoundPercentage(a.percentHealth, b.percentHealth),
-            percentShield = Maths.CompoundPercentage(a.percentShield, b.percentShield),
+            percentHealth = a.percentHealth + b.percentHealth,
+            percentShield = a.percentShield + b.percentShield,
             shieldRegen = Maths.CompoundPercentage(a.shieldRegen, b.shieldRegen),
-            moveSpeed = Maths.CompoundPercentage(a.moveSpeed, b.moveSpeed),
-            contactDamage = Maths.CompoundPercentage(a.contactDamage, b.contactDamage),
+            boostRegen = Maths.CompoundPercentage(a.boostRegen, b.boostRegen),
+            ammoRegen = Maths.CompoundPercentage(a.ammoRegen, b.ammoRegen),
+            flatAmmo = a.flatAmmo + b.flatAmmo,
             dashCd = Maths.CompoundPercentage(a.dashCd, b.dashCd),
             pickupRadius = Maths.CompoundPercentage(a.pickupRadius, b.pickupRadius),
+            damageMultiplier = Maths.CompoundPercentage(a.damageMultiplier, b.damageMultiplier),
         };
     }
     
@@ -129,22 +136,25 @@ public struct CharacterStats
     {
         return new CharacterStats
         {
-            flatHealth = (int)((a.flatHealth + b.flatHealth) * Maths.CompoundPercentage(a.percentHealth, b.percentHealth)),
-            flatShield = (int)((a.flatShield + b.flatShield) * Maths.CompoundPercentage(a.percentShield, b.percentShield)),
+            flatHealth = Mathf.Max((int)((a.flatHealth + b.flatHealth) * (1 + a.percentHealth / 100f) * (1 + b.percentHealth / 100f)), 1),
+            flatShield = Mathf.Max((int)((a.flatShield + b.flatShield) * (1 + a.percentShield / 100f) * (1 + b.percentShield / 100f)), 1),
             percentHealth = a.percentHealth * (1 + b.percentHealth / 100),
             percentShield = a.percentShield * (1 + b.percentShield / 100),
             shieldRegen = a.shieldRegen * (1 + b.shieldRegen / 100),
-            moveSpeed = a.moveSpeed * (1 + b.moveSpeed / 100),
-            contactDamage = a.contactDamage * (1 + b.contactDamage / 100),
+            boostRegen = a.boostRegen * (1 + b.boostRegen / 100),
+            ammoRegen = a.ammoRegen * (1 + b.ammoRegen / 100),
+            flatAmmo = a.flatAmmo + b.flatAmmo,
             dashCd = a.dashCd * (1 + b.dashCd / 100),
             pickupRadius = a.pickupRadius * (1 + b.pickupRadius / 100),
+            damageMultiplier = a.damageMultiplier * (1 + b.damageMultiplier / 100),
         };
     }
     
     public string Relative => $"Health: ({flatHealth}, {percentHealth:F2}%), Health: ({flatShield}, x{percentShield:F2}%)" +
-                              $"MoveSpeed: {moveSpeed:F2}%, Shield Regen: {shieldRegen:F2}%, ContactDamage: {contactDamage:F2}%, " +
+                              $"MoveSpeed: {boostRegen:F2}%, Shield Regen: {shieldRegen:F2}%, " +
                               $"DashCd: {dashCd}%, PickupRadius: {pickupRadius:F2}%";
-    
+
+    public static implicit operator AllStats(CharacterStats stats) => new() { characterStats = stats };
 }
 
 [Serializable]

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40e19351c690431fabcae8110d39b151, type: 3}
+  m_Name: Echo - Item
+  m_EditorClassIdentifier: 
+  itemTitle: Echo
+  baseCost: 100
+  rarity: 0
+  augment: {fileID: 11400000, guid: 42f806717235a814fbe00af541089d4f, type: 2}
+  type: 0
+  target: 0
+  icon: {fileID: 21300000, guid: 15ec1fcead772b1468f893826bae59ba, type: 3}
+  textT1: 'Echo: Each bullet fired has a 25% chance of spawning a mirrored bullet.
+    Mirrored bullet inherit all traits of the base bullet.'
+  textT2: 'Echo+: Echo has a 50% chance of triggering.
+
+    EMP: Mirrored bullets
+    gain 20 Interference.'
+  textT3: '+50% AS.
+
+    Echo++: Echo has a 100% chance of triggering.'

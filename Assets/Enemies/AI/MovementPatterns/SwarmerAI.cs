@@ -83,7 +83,7 @@ namespace Enemies.AI
         {
             state.Dependency = new SwarmerAIJob
             {
-                PlayerPosition = PlayerManager.burstPos.Data,
+                PlayerPosition = PlayerManager.burstPos.Data.Position,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
                 Dim = DimensionManager.burstDim.Data,
             }.ScheduleParallel(state.Dependency);

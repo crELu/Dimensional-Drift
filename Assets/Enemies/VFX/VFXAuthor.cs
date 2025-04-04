@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using ECS.Enemy;
 using Unity.Burst;
 using Unity.Collections;
 using UnityEngine;
@@ -99,10 +98,10 @@ public partial struct TrailUpdateSystem : ISystem
     private partial struct VFXUpdateJob : IJobEntity
         {
             public EntityCommandBuffer.ParallelWriter Ecb;
-            [NativeDisableParallelForRestriction] public NativeArray<Color> Position, ColorLife, Size;
+            public NativeParallelHashMap<int, Color>.ParallelWriter Position, ColorLife, Size;
             [ReadOnly] public ComponentLookup<TrailData> TrailAlive;
             public int Width;
-            [NativeDisableParallelForRestriction] public NativeReference<int> NumDeletions;
+            public NativeQueue<bool>.ParallelWriter NumDeletions;
             [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
             [ReadOnly] public ComponentLookup<Parent> ParentLookup;
             [ReadOnly] public ComponentLookup<PostTransformMatrix> PostTransformLookup;
@@ -114,17 +113,16 @@ public partial struct TrailUpdateSystem : ISystem
                 {
                     TransformHelpers.ComputeWorldTransformMatrix(entity, out float4x4 worldMatrix, ref LocalTransformLookup, ref ParentLookup, ref PostTransformLookup);
                     float3 pos = worldMatrix.c3.xyz;
-                    Position[i] = new Color(pos.x, pos.y, pos.z, 1);
-                    ColorLife[i] = trail.ColorLife;
-                    Size[i] = trail.Scale;
+                    Position.TryAdd(i, new Color(pos.x, pos.y, pos.z, 1));
+                    ColorLife.TryAdd(i, trail.ColorLife);
+                    Size.TryAdd(i, trail.Scale);
                 }
                 else
                 {
                     Ecb.RemoveComponent<TrailSystemData>(chunkIndex, entity);
                     Ecb.RemoveComponent<TrailTexture>(chunkIndex, entity);
-                    NumDeletions.Value++;
-                    //VFXManager.main.UnregisterParticles(Texture.Name, Texture.Id, 1);
-                    Position[i] = Color.clear;
+                    NumDeletions.Enqueue(true);
+                    Position.TryAdd(i, Color.clear);
                 }
             }
         }
@@ -154,20 +152,43 @@ public partial struct TrailUpdateSystem : ISystem
             var position = texture.Position.GetRawTextureData<Color>();
             var color = texture.ColorLife.GetRawTextureData<Color>();
             var size = texture.Size.GetRawTextureData<Color>();
-            var free = new NativeReference<int>(Allocator.TempJob);
+            int entities = query.CalculateEntityCount();
+            var positionSet = new NativeParallelHashMap<int, Color>(entities, Allocator.TempJob);
+            var colorSet = new NativeParallelHashMap<int, Color>(entities, Allocator.TempJob);
+            var sizeSet = new NativeParallelHashMap<int, Color>(entities, Allocator.TempJob);
+            var free = new NativeQueue<bool>(Allocator.TempJob);
             var job = new VFXUpdateJob
             {
-                Ecb = ecb.AsParallelWriter(), Position = position, ColorLife = color, Size = size,
+                Ecb = ecb.AsParallelWriter(),
+                Position = positionSet.AsParallelWriter(),
+                ColorLife = colorSet.AsParallelWriter(),
+                Size = sizeSet.AsParallelWriter(),
                 TrailAlive = _trailLookup, Width = texture.Position.width,
                 LocalTransformLookup = _localTransformLookup,
                 ParentLookup = _parentLookup,
                 PostTransformLookup = _postTransformLookup,
-                NumDeletions = free
+                NumDeletions = free.AsParallelWriter()
             };
             job.ScheduleParallel(query, state.Dependency).Complete();
-            
-            VFXManager.main.UnregisterParticles(texture.Name, texture.Id, free.Value);
 
+            var positionKeys = positionSet.GetKeyArray(Allocator.Temp);
+            var colorKeys = colorSet.GetKeyArray(Allocator.Temp);
+            var sizeKeys = sizeSet.GetKeyArray(Allocator.Temp);
+            
+            foreach (var i in positionKeys) position[i] = positionSet[i];
+            foreach (var i in colorKeys) color[i] = colorSet[i];
+            foreach (var i in sizeKeys) size[i] = sizeSet[i];
+            
+            positionSet.Dispose();
+            colorSet.Dispose();
+            sizeSet.Dispose();
+            positionKeys.Dispose();
+            colorKeys.Dispose();
+            sizeKeys.Dispose();
+            
+            VFXManager.main.UnregisterParticles(texture.Name, texture.Id, free.Count);
+            
+            free.Dispose();
             texture.Position.Apply();
             texture.ColorLife.Apply();
             texture.Size.Apply();
@@ -186,6 +207,7 @@ public partial struct TrailSpawnSystem : ISystem
     
     public void OnUpdate(ref SystemState state)
     {
+        if (!VFXManager.main) return;
         var ecb = new EntityCommandBuffer(Allocator.Temp);
 
         foreach (var (tempTrail, entity) in SystemAPI.Query<RefRW<TempTrail>>().WithEntityAccess())

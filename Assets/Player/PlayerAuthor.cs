@@ -10,6 +10,7 @@ using Unity.Physics.Extensions;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms;
 using Collider = Latios.Psyshock.Collider;
 using Random = UnityEngine.Random;
@@ -80,10 +81,20 @@ public partial struct PlayerPhysicsSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
+        SceneManager.sceneUnloaded += BigBomb;
+    }
+
+    private void BigBomb(Scene unloaded)
+    {
+        if (unloaded.name != "Main Scene")
+            return;
+        World.DisposeAllWorlds();
+        DefaultWorldInitialization.Initialize("Default World", false);
     }
 
     public void OnDestroy(ref SystemState state)
     {
+        
     }
 
     public void OnUpdate(ref SystemState state)
@@ -102,11 +113,11 @@ public partial struct PlayerPhysicsSystem : ISystem
             playerData.movement.Position = player.Transform.Position;
             transform.Rotation = playerData.transform.rotation;
             
-            PlayerManager.burstPos.Data = transform.Position;
+            PlayerManager.burstPos.Data.Position = transform.Position;
             player.PhysicsVelocity = playerPhysics;
-            playerData.velocity.text = $"{math.length(player.PhysicsVelocity.Linear):F0}";
+            playerData.velocity = math.length(player.PhysicsVelocity.Linear);
             RefRW<PhysicsSystemState> physicsState = SystemAPI.GetSingletonRW<PhysicsSystemState>();
-            physicsState.ValueRO.GetInRadius(player.Transform.Position, 30f, physicsState.ValueRO.IntelLayer, out BodiesInRadius inRadius);
+            physicsState.ValueRO.GetInRadius(player.Transform.Position, playerData.PickupRadius, physicsState.ValueRO.IntelLayer, out BodiesInRadius inRadius);
             foreach ((FindObjectsResult, PointDistanceResult) result in inRadius) {
                 if (!state.EntityManager.Exists(result.Item1.entity)) continue;
                 var intelPos = SystemAPI.GetComponent<LocalTransform>(result.Item1.entity);

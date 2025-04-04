@@ -115,7 +115,7 @@ namespace Enemies.AI
             public EntityCommandBuffer.ParallelWriter Ecb;
             [NativeDisableParallelForRestriction] public ComponentLookup<EnemyCollisionReceiver> DamageLookup;
             [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
-            private void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref WormBody body)
+            private void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref WormBody body, ref PhysicsVelocity velocity)
             {
                 var bodyDamage = DamageLookup[entity];
                 if (!DamageLookup.EntityExists(body.Head))
@@ -129,13 +129,23 @@ namespace Enemies.AI
                 bodyDamage.LastDamage = 0;
                 DamageLookup.GetRefRW(entity).ValueRW = bodyDamage;
                 
+                velocity.Linear = float3.zero;
+                velocity.Angular = float3.zero;
+                
                 var bodyTransform = TransformLookup[entity];
                 var prevTransform = TransformLookup[body.Prev];
 
                 var v = math.normalizesafe( bodyTransform.Position - prevTransform.Position);
                 var ideal = prevTransform.Position + v * body.Spacing;
                 var vel = math.length(ideal - bodyTransform.Position);
-                bodyTransform.Position = math.lerp(bodyTransform.Position, ideal, body.Speed) ;
+                if (vel > 50f)
+                {
+                    bodyTransform.Position = ideal;
+                }
+                else
+                {
+                    bodyTransform.Position = math.lerp(bodyTransform.Position, ideal, body.Speed) ;
+                }
 
                 float3 idealUp = prevTransform.Up();
                 float3 newUp = math.normalize(math.lerp(bodyTransform.Up(), idealUp, math.clamp(vel/body.RollSpeed, 0, 1)));
@@ -159,7 +169,7 @@ namespace Enemies.AI
             
             state.Dependency = new WormHeadAIJob
             {
-                PlayerPosition = PlayerManager.burstPos.Data,
+                PlayerPosition = PlayerManager.burstPos.Data.Position,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
                 Dim = DimensionManager.burstDim.Data,
             }.ScheduleParallel(state.Dependency);
@@ -171,7 +181,7 @@ namespace Enemies.AI
             
             state.Dependency = new WormBodyAIJob
             {
-                PlayerPosition = PlayerManager.burstPos.Data,
+                PlayerPosition = PlayerManager.burstPos.Data.Position,
                 DeltaTime = SystemAPI.Time.fixedDeltaTime,
                 Dim = DimensionManager.burstDim.Data,
                 Ecb = ecbWriter,
