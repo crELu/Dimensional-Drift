@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using Systems.Menu;
 using UnityEngine.EventSystems;
 using System.Collections;
+using UnityEngine.InputSystem.Users;
 
 public class SettingsUIController : MonoBehaviour
 {
@@ -42,7 +43,7 @@ public class SettingsUIController : MonoBehaviour
         }
         
         InitializeUI();
-
+        
         // Add listeners
         volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
         sensitivitySlider.onValueChanged.AddListener(OnSensitivityChanged);

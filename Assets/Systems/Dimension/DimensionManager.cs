@@ -19,6 +19,7 @@ public class DimensionManager : MonoBehaviour
     public static float normT => Dim3 ? 1-t : t;
     public static float Duration => _instance.dimSwitchDuration;
     public float dimSwitchDuration;
+    [SerializeField] private GameObject d2, d3;
     
     public AnimationCurve timeCurve;
     
@@ -43,6 +44,8 @@ public class DimensionManager : MonoBehaviour
         if (!CanSwitch) return;
         PastDim = CurrentDim;
         burstDim.Data = PastDim == Dimension.Three ? Dimension.Two :  Dimension.Three;
+        d2.SetActive(!Dim3);
+        d3.SetActive(Dim3);
         StartCoroutine(SwitchDims());
         DimSwitch.Invoke();
         

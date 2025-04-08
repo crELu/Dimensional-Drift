@@ -59,6 +59,7 @@ public class PlayerManager : MonoBehaviour
     public bool FullShield => Mathf.Approximately(shield, MaxShield);
     public float health, shield;
     [field:SerializeField] public float Ammo { get; private set; }
+    private float _ammoTime;
     public RawImage ammoText, waveImage;
     public RawImage hitEffect;
     [ColorUsage(true, true)] public Color shieldColor, healthColor;
@@ -86,6 +87,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private AudioSource PlayerDamageTrack;
     [SerializeField] private AudioClip DamageSFX;
     private bool _isScanning;
+    [SerializeField] private GameObject scan, noScan;
     public float ScanRadius { get; private set; }
     public int ScanState { get; private set; }
     private float _startTime;
@@ -173,13 +175,19 @@ public class PlayerManager : MonoBehaviour
         waveCounter.text = $"{waveCount}";
         ammoText.material.SetFloat(T, Ammo/MaxAmmo);
         waveImage.material.SetFloat(T, waveTimer/maxWaveTimer);
-        AddAmmo(AmmoRegen * Time.deltaTime);
+        _ammoTime -= Time.deltaTime;
+        if (_ammoTime < 0) AddAmmo(AmmoRegen * Time.deltaTime);
+        
         if (PlayerInputs.main.Scan)
         {
             if (_scanner == null) _scanner = StartCoroutine(Scan());
             else _isScanning = false;
         }
-        if (PlayerInputs.main.WeaponDown)
+
+        if (PlayerInputs.main.Weapon != -1)
+        {
+            currentWeapon = PlayerInputs.main.Weapon;
+        } else if (PlayerInputs.main.WeaponDown)
         {
             currentWeapon++;
             currentWeapon %= weapons.Count;
@@ -248,6 +256,8 @@ public class PlayerManager : MonoBehaviour
         float t = 0;
         while (_isScanning)
         {
+            scan.SetActive(true);
+            noScan.SetActive(false);
             t += Time.deltaTime;
             if (t < 10)
             {
@@ -256,7 +266,8 @@ public class PlayerManager : MonoBehaviour
             }
             yield return null;
         }
-
+        scan.SetActive(false);
+        noScan.SetActive(true);
         t = 2;
         while (t>0)
         {
@@ -342,6 +353,7 @@ public class PlayerManager : MonoBehaviour
         if (a<0) {Debug.Log("don t do that (use negative ammo)");}
         if (a>Ammo) {Debug.Log("dont do that (use more ammo than exists)");}
         Ammo -= a;
+        _ammoTime = 1;
         Ammo = Mathf.Max(0, Ammo);
     }
     

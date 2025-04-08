@@ -43,7 +43,7 @@ public class BombWeapon: PlayerWeapon
         AttackInfo info = new AttackInfo { Stats = stats.bulletStats , Scale = new float3(stats.size), Speed = stats.speed, Effects = effects};
         Attack attack = new Attack{Bullets = new(), Info = info, Projectile = Attack.ProjectileType.ChargeBasic};
         
-        attack.Bullets.Enqueue(new Bullet {position = Position, rotation = Maths.GetRandomRotationWithinCone(stats.accuracy, stats.accuracy), time = Time.time});
+        attack.Bullets.Enqueue(new Bullet {position = Position, rotation = new(Maths.Rand(stats.accuracy), Maths.Rand(stats.accuracy), 0), time = Time.time});
 
         return attack;
     }

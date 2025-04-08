@@ -1,30 +1,58 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.Users;
 
 public class GameSceneSettingsController : MonoBehaviour
 {
     public GameObject settingsPanel;
     private float previousTimeScale = 1f;
-    public PlayerInput playerInput;
 
-    // public GameObject firstShopSelectable;
     public GameObject firstSettingsSelectable;
     public GameObject deathScreenReplayButton;
-
+    private bool _isUsingController;
+    [SerializeField] private GameObject controllerUI, keyboardUI;
+    
     private void Start()
     {
         settingsPanel.SetActive(false);
-        if (playerInput != null)
-        {
-            playerInput.actions["Player/Settings"].performed += OnSettingsAction;
-            playerInput.actions["UI/Settings"].performed += OnSettingsAction;
-        }
+        InputUser.onChange += HandleInputChange;
+        _isUsingController = Gamepad.all.Count > 0;
+        ChangeUI();
     }
 
-    private void OnSettingsAction(InputAction.CallbackContext context)
+    private void ChangeUI()
+    {
+        controllerUI.SetActive(_isUsingController);
+        keyboardUI.SetActive(!_isUsingController);
+    }
+    
+    private void HandleInputChange(InputUser user, InputUserChange change, InputDevice device)
+    {
+        if (device != null && (change == InputUserChange.DevicePaired || change == InputUserChange.DeviceLost))
+        {
+            if (device is Keyboard || device is Mouse)
+            {
+                _isUsingController = false;
+            }
+            else if (device is Gamepad)
+            {
+                _isUsingController = true;
+            }
+        }
+
+        ChangeUI();
+    }    
+
+    private void Update()
+    {
+        if (PlayerInputs.main.Settings) OnSettingsAction();
+    }
+
+    private void OnSettingsAction()
     {
         // Debug.Log("OnSettingsAction");
         bool isActive = settingsPanel.activeSelf;
@@ -32,7 +60,7 @@ public class GameSceneSettingsController : MonoBehaviour
         if (!isActive) // Opening settings
         {
             settingsPanel.SetActive(true);
-            playerInput.SwitchCurrentActionMap("UI");
+            PlayerInputs.main.playerInput.SwitchCurrentActionMap("UI");
             Cursor.lockState = CursorLockMode.Confined;
             previousTimeScale = Time.timeScale;
             Time.timeScale = 0f;
@@ -43,7 +71,7 @@ public class GameSceneSettingsController : MonoBehaviour
         else // Closing settings
         {
             settingsPanel.SetActive(false);
-            playerInput.SwitchCurrentActionMap("Player");
+            PlayerInputs.main.playerInput.SwitchCurrentActionMap("Player");
             Cursor.lockState = CursorLockMode.Locked;
             Time.timeScale = previousTimeScale;
             

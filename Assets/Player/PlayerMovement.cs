@@ -30,11 +30,7 @@ public class PlayerMovement : MonoBehaviour
     private static readonly int PlayerPos = Shader.PropertyToID("_PlayerPos");
 
     [Header("Camera Settings")]
-    public Quaternion normalCameraRot, orthoCameraRot;
-    public Vector3 normalCameraPos, orthoCameraPos;
     public float orthographicSize;
-    public AnimationCurve rotationCurve2D, movementCurve2D;
-    public AnimationCurve rotationCurve3D, movementCurve3D;
     
     public float fov = 60f, near = .3f, far = 1000f;
     private float _aspect;
@@ -165,9 +161,9 @@ public class PlayerMovement : MonoBehaviour
                 break;
             case Dimension.Two:
                 StartCoroutine(DoCameraTransition());
+                CameraManager.main.Angle = Mathf.Atan2(transform.forward.x, transform.forward.z) * Mathf.Rad2Deg;
                 if (!_isUsingController)
                 {
-                    CameraManager.main.Angle = Mathf.Atan2(transform.forward.x, transform.forward.z) * Mathf.Rad2Deg;
                     Cursor.lockState = CursorLockMode.Confined;
                     PlayerManager.main.targetCursorMode = CursorLockMode.Confined;
                 }

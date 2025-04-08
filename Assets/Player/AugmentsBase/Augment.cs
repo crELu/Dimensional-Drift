@@ -9,6 +9,7 @@ public class Augment: ScriptableObject
 {
     public virtual string Id => throw new NotImplementedException();
     public virtual int MaxStacks => throw new NotImplementedException();
+    [HideInInspector] public Sprite icon;
     [field:SerializeField, Range(1, 3)]public int Stacks { get; set; }
     [field:SerializeField] public List<Requirement> Requirements { get; private set; }
     public virtual AugmentType Target => throw new NotImplementedException();

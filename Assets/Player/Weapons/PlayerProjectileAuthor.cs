@@ -37,7 +37,10 @@ public struct PlayerProjectile : IComponentData
     public bool InfPierce;
 }
 
-public struct LaserTag : IComponentData {}
+public struct LaserTag : IComponentData
+{
+    public float3 Rotation;
+}
 
 public struct MeleeTag : IComponentData {}
 

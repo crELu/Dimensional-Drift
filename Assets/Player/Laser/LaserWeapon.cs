@@ -13,10 +13,8 @@ public class LaserWeapon : PlayerWeapon
     [Header("Laser Settings")]
 
     [SerializeField] private int maxLaserCount;
-    [SerializeField] private float3 laserRotationOffset;
 
     public static float3 LaserOffset;
-    public static float3 LaserRotationOffset;
     
     public Transform target;
     private Vector3 Position => PlayerManager.main.transform.InverseTransformPoint(target.position);
@@ -30,7 +28,6 @@ public class LaserWeapon : PlayerWeapon
     {
         base.Start();
         LaserOffset = Vector3.Scale(target.localPosition, target.parent.localScale);
-        LaserRotationOffset = laserRotationOffset;
     }
     
     public override bool Fire(PlayerManager player, bool pressed)
@@ -98,7 +95,8 @@ public class LaserWeapon : PlayerWeapon
         
         if (maxLaserCount == 0)
         {
-            attack.Bullets.Enqueue(new Bullet { position = Position, rotation = Quaternion.identity, time = Time.time });
+            attack.Bullets.Enqueue(new Bullet { position = Position, rotation = Vector3.zero, time = Time.time });
+            attack.Bullets.Enqueue(new Bullet { position = Position, rotation = new(0, 15, 0), time = Time.time });
             _laserDuration = stats.bulletStats.duration;
             _maxDuration = _laserDuration;
             Cooldown += stats.bulletStats.duration;

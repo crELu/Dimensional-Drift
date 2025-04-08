@@ -20,6 +20,11 @@ public class Maths
         return yawRotation * pitchRotation;
     }
     
+    public static float Rand(float r)
+    {
+        return Random.Range(-r, r);
+    }
+    
     public static float Sigmoid(float x)
     {
         return 1/(1 + Mathf.Exp(-x));

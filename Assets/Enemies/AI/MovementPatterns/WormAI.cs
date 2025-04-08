@@ -124,7 +124,7 @@ namespace Enemies.AI
                     return;
                 }
                 var headDamage = DamageLookup[body.Head];
-                headDamage.LastDamage += bodyDamage.LastDamage * body.DamageMultiplier;
+                headDamage.LastDamage += bodyDamage.LastDamage * body.DamageMultiplier * (DamageLookup.GetRefRW(body.Head).ValueRW.Invulnerable ? .3f : 1f);
                 DamageLookup.GetRefRW(body.Head).ValueRW = headDamage;
                 bodyDamage.LastDamage = 0;
                 DamageLookup.GetRefRW(entity).ValueRW = bodyDamage;

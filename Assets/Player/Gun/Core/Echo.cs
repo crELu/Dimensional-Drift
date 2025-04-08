@@ -26,7 +26,7 @@ namespace Player.Gun.Core
                         continue;
                     var k = Random.insideUnitCircle.normalized * echoSize.x;
                     var pos = new Vector3(k.x, k.y, -echoSize.y);
-                    attack.Bullets.Enqueue(new Bullet{rotation = Quaternion.identity, time = b.time + .1f, position = pos});
+                    attack.Bullets.Enqueue(new Bullet{rotation = Vector3.zero, time = b.time + .1f, position = pos});
                 }
             }
             attacks.Add(attack);

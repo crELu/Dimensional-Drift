@@ -121,6 +121,33 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Weapon 1",
+                    "type": "Button",
+                    "id": "7cce0766-bb58-492e-93d3-6a20a978e429",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Weapon 2",
+                    "type": "Button",
+                    "id": "7a709d4a-2b11-44b8-a786-1ff9a0dc2607",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Weapon 3",
+                    "type": "Button",
+                    "id": "23639f33-d45a-43b4-8901-79602fb37033",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -501,7 +528,7 @@
                 {
                     "name": "",
                     "id": "f69670c0-ae1c-4b68-b678-577f7c830dd9",
-                    "path": "<Keyboard>/0",
+                    "path": "<Keyboard>/p",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
@@ -528,6 +555,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "Settings",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c78d49ab-3ea9-4286-98c2-8328706a7ac4",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Weapon 1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e11c491f-6fc5-4fff-be96-7479e36c45f1",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Weapon 2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3810cde8-8c37-4271-91f9-4789fd39ccee",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Weapon 3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -1090,7 +1150,7 @@
                 {
                     "name": "",
                     "id": "83fb0afe-ced9-4cdf-872a-a0eb0032057d",
-                    "path": "<Keyboard>/0",
+                    "path": "<Keyboard>/p",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",

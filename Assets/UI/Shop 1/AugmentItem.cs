@@ -14,7 +14,7 @@ public class AugmentItem : Item
     public override Sprite Icon => icon;
     public override void DoAction()
     {
-        
+        augment.icon = icon;
         switch (target)
         {
             case ShopAugmentTarget.Character:

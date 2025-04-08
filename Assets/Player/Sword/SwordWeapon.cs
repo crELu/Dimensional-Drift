@@ -13,7 +13,7 @@ public class SwordWeapon: PlayerWeapon
         AttackInfo info = new AttackInfo() { Stats = stats.bulletStats , Scale = new float3(stats.size), Speed = 0};
         Attack attack = new Attack{Bullets = new(), Info = info};
         
-        attack.Bullets.Enqueue(new Bullet {position = target.position, rotation = Quaternion.identity, time = 0});
+        //attack.Bullets.Enqueue(new Bullet {position = target.position, rotation = Quaternion.identity, time = 0});
 
         return attack;
     }

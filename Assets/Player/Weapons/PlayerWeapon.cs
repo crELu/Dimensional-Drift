@@ -204,7 +204,7 @@ public struct Attack
 public struct Bullet
 {
     public Vector3 position;
-    public Quaternion rotation;
+    public Vector3 rotation;
     // delay until firing
     public float time;
 }

@@ -25,6 +25,12 @@ public class PlayerInputs: MonoBehaviour
     public bool WeaponDown => _weaponDownAction.triggered;
     private InputAction _scanAction;
     public bool Scan => _scanAction.triggered;
+    private InputAction _settingsAction;
+    public bool Settings => _settingsAction.triggered;
+    private InputAction _weapon1Action;
+    private InputAction _weapon2Action;
+    private InputAction _weapon3Action;
+    public int Weapon => _weapon1Action.triggered ? 0 : _weapon2Action.triggered? 1 : _weapon3Action.triggered ? 2 : -1;
     
 
     private void Awake()
@@ -52,7 +58,11 @@ public class PlayerInputs: MonoBehaviour
         _fireAction = playerInput.currentActionMap.FindAction("Fire 1");
         _weaponUpAction = playerInput.currentActionMap.FindAction("Weapon Up");
         _weaponDownAction = playerInput.currentActionMap.FindAction("Weapon Down");
+        _weapon1Action = playerInput.currentActionMap.FindAction("Weapon 1");
+        _weapon2Action = playerInput.currentActionMap.FindAction("Weapon 2");
+        _weapon3Action = playerInput.currentActionMap.FindAction("Weapon 3");
         _scanAction = playerInput.currentActionMap.FindAction("Scan");
+        _settingsAction = playerInput.currentActionMap.FindAction("Settings");
     }
     
 }

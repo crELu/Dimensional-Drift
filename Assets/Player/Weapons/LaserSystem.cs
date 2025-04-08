@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 public struct LaserEffects
 {
@@ -37,11 +38,13 @@ public partial struct LaserSystem : ISystem
         var playerData = PlayerManager.main;
         if (LaserWeapon.LaserIsActive)
         {
-            foreach (var (laserTransform, _) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<LaserTag>>())
+            foreach (var (laserTransform, laser) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<LaserTag>>())
             {
                 laserTransform.ValueRW.Position = playerTransform.Position + 
                                                   math.rotate(playerData.transform.rotation, LaserWeapon.LaserOffset);
-                laserTransform.ValueRW.Rotation = playerData.movement.LookRotation;
+                var rot = laser.ValueRO.Rotation;
+                if (!DimensionManager.Dim3) rot.x = 0;
+                laserTransform.ValueRW.Rotation = math.mul(playerData.movement.LookRotation, quaternion.Euler(math.TORADIANS * rot));
             }
         }
         else

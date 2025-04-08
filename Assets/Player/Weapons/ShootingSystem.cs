@@ -42,7 +42,8 @@ public partial struct PlayerShootingSystem : ISystem
             var originalTransform = TransformLookup[prefab];
         
             var position = PlayerTransform.TransformPoint(bullet.position);
-            var rotation = math.mul(PlayerLookRotation, bullet.rotation);
+            var localRotation = quaternion.Euler(math.TORADIANS * bullet.rotation);
+            var rotation = math.mul(PlayerLookRotation, localRotation);
 
             Entity newEntity = ECB.Instantiate(index, prefab);
         
@@ -56,7 +57,7 @@ public partial struct PlayerShootingSystem : ISystem
             if (stats.Effects.IsLaser)
             {
                 var laser = stats.Effects.Laser.Value;
-                ECB.AddComponent(index, newEntity, new LaserTag());
+                ECB.AddComponent(index, newEntity, new LaserTag {Rotation = bullet.rotation});
                 ECB.AddComponent(index, newEntity, new Lifetime { Time = float.MaxValue});
             } 
             else 
